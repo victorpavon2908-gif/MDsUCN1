@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Registro</title>
+    <link rel="stylesheet" href="{% static 'appOne/css/login.css' %}">
+</head>
+<body>
+<div id="contenedor">
+    <div id="central">
+        <div id="login">
+            <h3 style="color:white;">Registro</h3>
+
+            <form method="POST">{% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Enviar Registro</button>
+            </form>
+
+            <div class="pie-form">
+                <a href="{% url 'login' %}">¿Ya tienes cuenta?</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

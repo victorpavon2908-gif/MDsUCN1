@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <title>Formulario de Acceso</title>    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Overpass&display=swap" rel="stylesheet">
+
+    <!-- Conexión al CSS con Django -->
+   
+    <link rel="stylesheet" href="{% static 'appOne/css/login.css'%}">
+</head>
+
+<body>
+    <div id="contenedor">
+        <div id="central">
+            <div id="login">
+                <img src="https://uploads.onecompiler.io/43nzu6ce2/43x5tpdyg/ss.png" alt="logo-login" />
+
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Usuario" required>
+                    <input type="password" name="password" placeholder="Contraseña" required>
+                    <button type="submit">Login</button>
+                </form>
+
+                {% if messages %}
+                    <div class="mensajes">
+                        {% for message in messages %}
+                            <p style="color:yellow;">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="pie-form">
+                    <a href="#">¿Perdiste tu contraseña?</a>
+                    <a href="{% url 'registro' %}">Registrate</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

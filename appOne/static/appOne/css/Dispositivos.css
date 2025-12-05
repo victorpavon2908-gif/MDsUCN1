@@ -1,0 +1,376 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-image: url('https://uploads.onecompiler.io/43nzu6ce2/43x83dpam/fonds.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  color: #222;
+}
+
+html,
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* --------------------------- */
+/*           NAVBAR            */
+/* --------------------------- */
+.navegacion {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px 0;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.nav h1 {
+  color: #000;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.menu {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #000;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.menu a:hover,
+.menu a.active {
+  border-bottom: 2px solid #fff;
+  padding-bottom: 3px;
+}
+
+.logo-cv {
+  width: 150px;
+}
+
+/* --------------------------- */
+/*          CONTENIDO          */
+/* --------------------------- */
+.contenido {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.contenido h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+/* --------------------------- */
+/*           GALERÍA          */
+/* --------------------------- */
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 25px;
+  max-width: 1000px;
+  margin: 40px auto;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 12px;
+  border-radius: 20px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: .3s;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(241, 196, 15, 0.4);
+}
+
+.card img {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  border-radius: 15px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.card img:hover {
+  transform: scale(1.05);
+}
+
+.card p,
+figcaption {
+  font-size: 0.8rem;
+}
+
+/* --------------------------- */
+/*           MODAL            */
+/* --------------------------- */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-contenido {
+  background: #fff;
+  width: 400px;
+  max-height: 80vh;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-cerrar-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: red;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.contenido-scroll {
+  overflow-y: auto;
+  margin-top: 50px;
+  padding-right: 5px;
+}
+
+.contenido-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.contenido-scroll::-webkit-scrollbar-thumb {
+  background: rgba(241, 196, 15, 0.7);
+}
+
+.contenido-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* --------------------------- */
+/*   NUEVO FORM EDITAR PREMIUM */
+/* --------------------------- */
+
+.form-editar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.form-editar .form-grupo {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-editar label {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #2c3e50;
+}
+
+.form-editar input,
+.form-editar textarea,
+.form-editar select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  font-size: 0.9rem;
+  transition: 0.3s ease;
+}
+
+.form-editar input:focus,
+.form-editar textarea:focus,
+.form-editar select:focus {
+  border-color: #f1c40f;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+}
+
+.preview-img {
+  width: 100%;
+  max-height: 160px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-top: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-actualizar {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 18px;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.45);
+
+  transition: transform 0.2s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.btn-actualizar:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, #1f8f4d, #27ae60);
+  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.55);
+}
+
+.btn-actualizar:active {
+  transform: scale(0.97);
+  box-shadow: 0 3px 8px rgba(39, 174, 96, 0.45);
+}
+
+
+/* --------------------------- */
+/*      BOTÓN FLOTANTE        */
+/* --------------------------- */
+.btn-flotante {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background: #F1C40F;
+  color: #000;
+  font-size: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 3000;
+  transition: .3s ease;
+  font-weight: bold;
+}
+
+.btn-flotante:hover {
+  transform: scale(1.1);
+}
+
+.btn-flotante .tooltip {
+  position: absolute;
+  right: 70px;
+  background: #000;
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  opacity: 0;
+  transition: .3s ease;
+  white-space: nowrap;
+}
+
+.btn-flotante:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-5px);
+}
+
+.btn-editar {
+  width: 100%;
+  padding: 8px;
+  background: #2E9A44;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: .3s;
+}
+
+.btn-editar:hover {
+  background: #1f6f31;
+}
+
+/* --------------------------- */
+/*            FOOTER           */
+/* --------------------------- */
+.footer {
+  width: 100%;
+  padding: 15px 0;
+  margin-top: 40px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.footer p {
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .galeria {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-contenido {
+    width: 90%;
+  }
+}

@@ -1,0 +1,42 @@
+<div class="form-editar">
+
+    <div class="form-grupo">
+        <label>Nombre del dispositivo</label>
+        <input type="text" name="nombre_dispositivo" value="{{ dispositivo.nombre_dispositivo }}" required>
+    </div>
+
+    <div class="form-grupo">
+        <label>Marca</label>
+        <input type="text" name="marca" value="{{ dispositivo.marca }}" required>
+    </div>
+
+    <div class="form-grupo">
+        <label>Código inventario</label>
+        <input type="text" name="codigo_inventario" value="{{ dispositivo.codigo_inventario }}" required>
+    </div>
+
+    <div class="form-grupo">
+        <label>Accesorios</label>
+        <textarea name="accesorios">{{ dispositivo.accesorios }}</textarea>
+    </div>
+
+    <div class="form-grupo">
+        <label>Observación</label>
+        <textarea name="observacion">{{ dispositivo.observacion }}</textarea>
+    </div>
+
+    <div class="form-grupo">
+        <label>Imagen actual</label>
+        {% if dispositivo.imagen %}
+        <img src="{{ dispositivo.imagen.url }}" class="preview-img">
+        {% else %}
+        <p><em>No hay imagen</em></p>
+        {% endif %}
+    </div>
+
+    <div class="form-grupo">
+        <label>Nueva imagen</label>
+        <input type="file" name="imagen" accept="image/*">
+    </div>
+
+</div>

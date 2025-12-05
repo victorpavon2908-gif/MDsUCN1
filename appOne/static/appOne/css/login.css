@@ -1,0 +1,119 @@
+
+body {
+    font-family: 'Overpass', sans-serif;
+    background-image: url(https://uploads.onecompiler.io/43nzu6ce2/43x83dpam/fonds.jpg);
+    color: #1b262c;
+    margin: 0;
+}
+
+#contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100vw;
+    min-height: 100vh;
+}
+
+#central {
+    border-radius: 5px;
+    max-width: 320px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#login {
+    padding: 22px 25px;
+    background-color: #1A9A4A;
+    box-shadow: 0px 0px 5px 5px rgba(0,0,0,0.5);
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+#login input {
+    font-family: 'Overpass', sans-serif;
+    font-size: 110%;
+    color: #000;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+}
+
+#login input::placeholder {
+    color: #43b600;
+    opacity: 0.5;
+}
+
+#login button {
+    font-family: 'Overpass', sans-serif;
+    font-size: 110%;
+    color: #fff;
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 3px;
+    background-color: #F1C40F;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+#login button:hover {
+    background-color: #fff;
+    color: #F1C40F;
+    border: 2px solid #F1C40F;
+}
+
+.pie-form {
+    font-size: 90%;
+    text-align: center;    
+    margin-top: 15px;
+}
+
+.pie-form a {
+    display: block;
+    text-decoration: none;
+    color: #FFF;
+    margin-bottom: 3px;
+}
+
+.pie-form a:hover {
+    color: #F1C40F;
+}
+
+.table-dashboard {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-dashboard th, .table-dashboard td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #f1f1f1;
+}
+
+.btn-success {
+  background: #0B9906;
+  padding: 6px 10px;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.btn-danger {
+  background: #d63031;
+  padding: 6px 10px;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.btn-success:hover { background: #098004; }
+.btn-danger:hover { background: #c0392b; }
+

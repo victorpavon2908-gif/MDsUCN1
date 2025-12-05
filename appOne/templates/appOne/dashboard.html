@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - MDsUCN</title>
+  <link rel="stylesheet" href="{% static 'appOne/css/dashboard.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="navegacion">
+    <nav class="nav">
+      <h1>Medios Audiovisuales</h1>
+      <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" class="logo-cv" />
+      <ul class="menu">
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Soporte</a></li>
+        <li><a href="#">Contactos</a></li>
+        <li class="notif-dropdown">
+          <a href="#" id="notif-btn"><i class="ri-notification-3-line"></i></a>
+
+          <ul class="notif-menu" id="notif-menu">
+            <li><a href="#">Ver notificaciones</a></li>
+            <li><a href="#">Marcar como leídas</a></li>
+            <li><a href="#">Configuración</a></li>
+          </ul>
+        </li>
+
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" />
+
+      <a href="#"><i class="ri-home-4-line"></i> Inicio</a>
+      <a href="{% url 'listardispositivos'%}"><i class="ri-computer-line"></i>Dispositivos</a>
+      {% if request.user.rol == "Admin" %}
+      <a href="{% url 'panel_usuarios' %}"><i class="ri-user-fill"></i> Usuarios</a>
+      {% endif %}
+      <a href="#"><i class="ri-file-chart-fill"></i> Reportes</a>
+      <a href="#"><i class="ri-settings-3-line"></i> Configuración</a>
+      <a href="{% url 'logout'%}"><i class="ri-shut-down-line"></i> Cerrar Sesión</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+
+      <div class="stats">
+        <div class="stat-card"><i class="ri-team-fill"></i>
+          <h3>Usuarios</h3>
+          <p>{{ estadisticas.usuarios }}</p>
+        </div>
+        <div class="stat-card"><i class="ri-computer-fill"></i>
+          <h3>Préstamos</h3>
+          <p>{{ estadisticas.prestamos }}</p>
+        </div>
+        <div class="stat-card"><i class="ri-file-chart-fill"></i>
+          <h3>Reportes</h3>
+          <p>{{ estadisticas.reportes }}</p>
+        </div>
+        <div class="stat-card"><i class="ri-notification-line"></i>
+          <h3>Notificaciones</h3>
+          <p>{{ estadisticas.notificaciones }}</p>
+        </div>
+      </div>
+
+      <div class="charts">
+        <div class="chart-card">
+          <h3>Resumen de préstamos</h3><canvas id="lineChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Tipos de usuarios</h3><canvas id="pieChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Sistema MDsUCN. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    new Chart(document.getElementById("lineChart"), { type: "line", data: { labels: ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SAB", "DOM"], datasets: [{ data: [5, 7, 8, 6, 9, 12, 10], borderColor: "#0B9906", fill: true, backgroundColor: "rgba(59,130,246,0.1)" }] } });
+    new Chart(document.getElementById("pieChart"), { type: "doughnut", data: { labels: ["Docentes", "Estudiantes", "Otros"], datasets: [{ data: [45, 30, 25], backgroundColor: ["#77BA04", "#E9F50A", "#0B9906"] }] } });
+  </script>
+  <script src="{% static 'appOne/js/dashboard.js' %}" defer></script>
+</body>
+
+</html>
