@@ -9,8 +9,10 @@ urlpatterns = [
     path('panel/usuarios/aprobar/<int:id>/', views.aprobar_usuario, name='aprobar_usuario'),
     path('panel/usuarios/rechazar/<int:id>/', views.rechazar_usuario, name='rechazar_usuario'),
     path('usuarios/eliminar/<int:id>/', views.eliminar_usuario, name='eliminar_usuario'),
-
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('usuarios/aprobar/<int:id>/', views.aprobar_usuario_ajax, name='aprobar_usuario'),
+    path('usuarios/rechazar/<int:id>/', views.rechazar_usuario_ajax, name='rechazar_usuario'),
+
     
     # ============================
     #  Url para administar medios 
@@ -19,4 +21,5 @@ urlpatterns = [
     path('dispositivos/agregar/', views.agregar_dispositivo, name='agregar_dispositivo'),
     path('dispositivos/editar/<int:id>/', views.editar_dispositivo, name='editar_dispositivo'),
     path('dispositivos/eliminar/<int:id>/', views.eliminar_dispositivo, name='eliminar_dispositivo'),
+    
 ]

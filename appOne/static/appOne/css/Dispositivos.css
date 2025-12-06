@@ -108,7 +108,7 @@ main {
   border-radius: 20px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   transition: .3s;
-  height: 260px;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -374,3 +374,137 @@ figcaption {
     width: 90%;
   }
 }
+
+.acciones-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-eliminar {
+    width: 100%;
+    padding: 8px;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-eliminar:hover {
+    background: #992d22;
+}
+
+/* =============================== */
+/*     MODAL DE PRESTAMO MEJORADO */
+/* =============================== */
+
+#modalPrestamo .modal-contenido {
+  background: linear-gradient(180deg, #ffffff 60%, #f7f7f7);
+  width: 420px;
+  padding: 30px 25px;
+  border-radius: 22px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.28);
+  border-top: 8px solid #f1c40f;
+  animation: aparecerModal 0.3s ease;
+}
+
+@keyframes aparecerModal {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+#modalPrestamo h3 {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+/* Botón X */
+#modalPrestamo .btn-cerrar-x {
+  background: #c0392b;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  width: 32px;
+  height: 32px;
+  transition: 0.3s;
+}
+
+#modalPrestamo .btn-cerrar-x:hover {
+  background: #992d22;
+  transform: scale(1.1);
+}
+
+/* RECTÁNGULO SCROLLEABLE */
+#modalPrestamo .contenido-scroll {
+  margin-top: 50px;
+  padding-right: 6px;
+  max-height: 55vh;
+}
+
+/* FORMULARIO */
+#modalPrestamo .formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#modalPrestamo label {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+#modalPrestamo input,
+#modalPrestamo textarea {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #dadada;
+  background: #fafafa;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+
+#modalPrestamo input:focus,
+#modalPrestamo textarea:focus {
+  border-color: #f1c40f;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+  outline: none;
+}
+
+/* BOTÓN ENVIAR */
+#modalPrestamo .btn-enviar {
+  background: linear-gradient(135deg, #f1c40f, #f39c12);
+  color: #fff;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(241, 196, 15, 0.45);
+  transition: 0.3s;
+}
+
+#modalPrestamo .btn-enviar:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, #d4ac0d, #f1c40f);
+  box-shadow: 0 6px 18px rgba(241, 196, 15, 0.55);
+}
+
+#modalPrestamo .btn-enviar:active {
+  transform: scale(0.97);
+}
+
+/* Scroll dorado */
+#modalPrestamo .contenido-scroll::-webkit-scrollbar-thumb {
+  background: rgba(241, 196, 15, 0.8);
+}
+

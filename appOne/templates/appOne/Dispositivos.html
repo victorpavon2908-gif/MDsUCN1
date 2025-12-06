@@ -62,8 +62,17 @@
         <p>Observación: {{ d.observacion }}</p>
 
         {% if request.user.rol == "Admin" %}
-        <button class="btn-editar" onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">Editar</button>
+        <div class="acciones-admin">
+          <button class="btn-editar" onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">Editar</button>
+
+          <form action="{% url 'eliminar_dispositivo' d.id %}" method="POST"
+            onsubmit="return confirm('¿Seguro que deseas eliminar este dispositivo?');" style="width:100%;">
+            {% csrf_token %}
+            <button type="submit" class="btn-eliminar" onclick="event.stopPropagation();">Eliminar</button>
+          </form>
+        </div>
         {% endif %}
+
       </figure>
 
       {% empty %}
@@ -90,9 +99,6 @@
 
       <div class="contenido-scroll">
         <form class="formulario">
-
-          <label>Nombre del solicitante:</label>
-          <input type="text" required />
 
           <label>Motivo del préstamo:</label>
           <textarea required></textarea>

@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import RegistroForm , DispositivoForm
 from .models import Usuario , Dispositivo
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # ============================
 # ----- LOGIN ----------------
@@ -154,7 +155,7 @@ def agregar_dispositivo(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Dispositivo agregado correctamente.")
-            return redirect('listar_dispositivos')
+            return redirect('listardispositivos')
     else:
         form = DispositivoForm()
     return render(request, 'appOne/agregar_dispositivo.html', {'form': form})
@@ -189,4 +190,43 @@ def eliminar_dispositivo(request, id):
     dispositivo = get_object_or_404(Dispositivo, id=id)
     dispositivo.delete()
     messages.warning(request, "Dispositivo eliminado.")
-    return redirect('listar_dispositivos')
+    return redirect('listardispositivos')
+
+
+@csrf_exempt
+@login_required
+def aprobar_usuario_ajax(request, id):
+    if request.method == "POST":
+        usuario = get_object_or_404(Usuario, id=id)
+        usuario.is_active = True
+        usuario.save()
+        return JsonResponse({'status': 'ok'})
+
+@csrf_exempt
+@login_required
+def rechazar_usuario_ajax(request, id):
+    if request.method == "POST":
+        usuario = get_object_or_404(Usuario, id=id)
+        usuario.is_active = False
+        usuario.save()
+        return JsonResponse({'status': 'ok'})
+    
+@login_required
+def dashboard(request):
+    usuario = request.user
+    pendiente_aprobacion = None
+
+    if usuario.rol == "Admin" or usuario.is_superuser:
+        # Traer todos los usuarios pendientes
+        usuarios_pendientes = Usuario.objects.filter(is_active=False)
+        pendientes_count = usuarios_pendientes.count()
+    else:
+        usuarios_pendientes = None
+        pendientes_count = 0
+
+
+    return render(request, "appOne/dashboard.html", {
+        "perfil": usuario,
+        "usuarios_pendientes": usuarios_pendientes,
+        "pendientes_count": pendientes_count
+    })
