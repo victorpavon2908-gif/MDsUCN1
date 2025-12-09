@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import RegistroForm , DispositivoForm
-from .models import Usuario , Dispositivo
+from .forms import RegistroForm, DispositivoForm
+from .models import Usuario, Dispositivo
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -60,14 +60,27 @@ def registro(request):
 # ============================
 @login_required
 def dashboard(request):
+    usuario = request.user
 
-    usuario = request.user  # YA NO SE USA PERFIL
-
+    # Si NO está activo → mensaje y sacar al login
     if not usuario.is_active:
         messages.error(request, "Tu cuenta aún no ha sido aprobada.")
+        logout(request)
         return redirect('login')
 
-    return render(request, "appOne/dashboard.html", {"perfil": usuario})
+    # Si es admin → mostrar usuarios pendientes
+    if usuario.rol == "Admin" or usuario.is_superuser:
+        usuarios_pendientes = Usuario.objects.filter(is_active=False)
+        pendientes_count = usuarios_pendientes.count()
+    else:
+        usuarios_pendientes = None
+        pendientes_count = 0
+
+    return render(request, "appOne/dashboard.html", {
+        "perfil": usuario,
+        "usuarios_pendientes": usuarios_pendientes,
+        "pendientes_count": pendientes_count
+    })
 
 
 # ============================
@@ -75,7 +88,7 @@ def dashboard(request):
 # ============================
 @login_required
 def panel_usuarios(request):
-    if request.user.rol != "Admin":   # <-- chequea rol
+    if request.user.rol != "Admin":
         messages.error(request, "No tienes permisos para ver esta sección.")
         return redirect('dashboard')
 
@@ -87,46 +100,49 @@ def panel_usuarios(request):
 # ---- APROBAR USUARIO -------
 # ============================
 @login_required
-def aprobar_usuario(request, id):
-    if request.user.rol != "Admin" and not request.user.is_superuser:
+def rechazar_usuario(request, id):
+    if request.user.rol != "Admin":
+        messages.error(request, "No tienes permiso para realizar esta acción.")
         return redirect('dashboard')
 
     usuario = get_object_or_404(Usuario, id=id)
-
-    usuario.is_active = True
+    usuario.is_active = False
     usuario.save()
 
-    messages.success(request, "Usuario aprobado correctamente.")
+    messages.warning(request, f"Usuario {usuario.nombre_completo} ha sido marcado como rechazado.")
     return redirect('panel_usuarios')
-
 
 # ============================
 # ---- RECHAZAR USUARIO ------
 # ============================
 @login_required
-def rechazar_usuario(request, id):
-    if request.user.rol != "Admin" and not request.user.is_superuser:
+def aprobar_usuario(request, id):
+    if request.user.rol != "Admin":
+        messages.error(request, "No tienes permiso para realizar esta acción.")
         return redirect('dashboard')
 
     usuario = get_object_or_404(Usuario, id=id)
-
-    usuario.is_active = False
+    usuario.is_active = True
     usuario.save()
 
-    messages.warning(request, "Usuario rechazado.")
+    messages.success(request, f"Usuario {usuario.nombre_completo} aprobado.")
     return redirect('panel_usuarios')
 
 
+
+
+# ============================
+# ---- ELIMINAR USUARIO ------
+# ============================
 @login_required
 def eliminar_usuario(request, id):
-    # Solo administradores pueden eliminar usuarios
     if request.user.rol != "Admin" and not request.user.is_superuser:
         messages.error(request, "No tienes permisos para eliminar usuarios.")
         return redirect('dashboard')
 
     usuario = get_object_or_404(Usuario, id=id)
 
-    # Evitar que un Admin se elimine a sí mismo
+    # Evitar autoeliminarse
     if usuario == request.user:
         messages.error(request, "No puedes eliminar tu propia cuenta.")
         return redirect('panel_usuarios')
@@ -137,16 +153,14 @@ def eliminar_usuario(request, id):
 
 
 # ============================
-#  Vista para prestar MEdios -
-# ============================
-# ============================
-#  Vista para administar medios -
+# --- DISPOSITIVOS (CRUD) ----
 # ============================
 
 @login_required
 def listardispositivos(request):
-    dispositivos = Dispositivo.objects.all()  # Trae todos los dispositivos
+    dispositivos = Dispositivo.objects.all()
     return render(request, 'appOne/Dispositivos.html', {'dispositivo': dispositivos})
+
 
 @login_required
 def agregar_dispositivo(request):
@@ -158,7 +172,9 @@ def agregar_dispositivo(request):
             return redirect('listardispositivos')
     else:
         form = DispositivoForm()
+
     return render(request, 'appOne/agregar_dispositivo.html', {'form': form})
+
 
 @login_required
 def editar_dispositivo(request, id):
@@ -193,6 +209,10 @@ def eliminar_dispositivo(request, id):
     return redirect('listardispositivos')
 
 
+# ============================
+# --- AJAX APROBACIONES ------
+# ============================
+
 @csrf_exempt
 @login_required
 def aprobar_usuario_ajax(request, id):
@@ -202,6 +222,7 @@ def aprobar_usuario_ajax(request, id):
         usuario.save()
         return JsonResponse({'status': 'ok'})
 
+
 @csrf_exempt
 @login_required
 def rechazar_usuario_ajax(request, id):
@@ -210,23 +231,16 @@ def rechazar_usuario_ajax(request, id):
         usuario.is_active = False
         usuario.save()
         return JsonResponse({'status': 'ok'})
-    
+# ============================
+# --- configuraciones------
+# ============================
+
 @login_required
-def dashboard(request):
-    usuario = request.user
-    pendiente_aprobacion = None
+def panel_config(request):
 
-    if usuario.rol == "Admin" or usuario.is_superuser:
-        # Traer todos los usuarios pendientes
-        usuarios_pendientes = Usuario.objects.filter(is_active=False)
-        pendientes_count = usuarios_pendientes.count()
-    else:
-        usuarios_pendientes = None
-        pendientes_count = 0
+    # Solo admins
+    if request.user.rol != "Admin" and not request.user.is_superuser:
+        messages.error(request, "No tienes permisos para acceder a esta sección.")
+        return redirect('dashboard')
 
-
-    return render(request, "appOne/dashboard.html", {
-        "perfil": usuario,
-        "usuarios_pendientes": usuarios_pendientes,
-        "pendientes_count": pendientes_count
-    })
+    return render(request, 'appOne/panel_config.html')

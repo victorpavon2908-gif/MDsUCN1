@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Configuración</title>
+  <link rel="stylesheet" href="{% static 'appOne/css/panel_config.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+      <h2 class="sidebar-title">⚙️ Configuración</h2>
+
+      <ul class="sidebar-menu">
+          <li><a href="#"><i class="ri-user-settings-line"></i> Perfil</a></li>
+          <li><a href="#"><i class="ri-lock-password-line"></i> Seguridad</a></li>
+          <li><a href="#"><i class="ri-group-line"></i> Usuarios</a></li>
+          <li><a href="#"><i class="ri-database-2-line"></i> Base de Datos</a></li>
+          <li><a href="#"><i class="ri-settings-3-line"></i> Sistema</a></li>
+          <li><a href="#"><i class="ri-bar-chart-line"></i> Estadísticas</a></li>
+          <li><a href="{% url 'dashboard' %}"><i class="ri-arrow-go-back-fill"></i> Regresar</a></li>
+      </ul>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main class="main">
+      <h1 class="title">Panel de Configuración Avanzada</h1>
+
+      <div class="grid">
+          <div class="card">
+              <h3>Información del Sistema</h3>
+              <p>Configura parámetros globales como zona horaria, nombre del sistema, políticas, etc.</p>
+              <button class="btn">Configurar</button>
+          </div>
+
+          <div class="card">
+              <h3>Gestión de Usuarios</h3>
+              <p>Administrar roles, permisos, estados y accesos del personal.</p>
+              <button class="btn">Entrar</button>
+          </div>
+
+          <div class="card">
+              <h3>Respaldo y Restauración</h3>
+              <p>Generar copias de seguridad o restaurar el sistema en caso de fallos.</p>
+              <button class="btn btn-warning">Administrar</button>
+          </div>
+
+          <div class="card">
+              <h3>Logs del Sistema</h3>
+              <p>Monitoreo detallado de actividades, fallos y accesos.</p>
+              <button class="btn">Ver Logs</button>
+          </div>
+
+          <div class="card">
+              <h3>API e Integraciones</h3>
+              <p>Administrar tokens, endpoints y conexiones externas.</p>
+              <button class="btn">Configurar</button>
+          </div>
+
+          <div class="card">
+              <h3>Parámetros de Seguridad</h3>
+              <p>Control de contraseñas, bloqueo de usuarios, auditoría y más.</p>
+              <button class="btn btn-danger">Ajustar</button>
+          </div>
+      </div>
+  </main>
+
+</body>
+</html>

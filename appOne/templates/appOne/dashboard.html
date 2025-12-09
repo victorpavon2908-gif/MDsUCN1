@@ -18,42 +18,35 @@
   <header class="navegacion">
     <nav class="nav">
       <h1>Medios Audiovisuales</h1>
-      <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" class="logo-cv" />
-
       <ul class="menu">
         <li><a href="#">Inicio</a></li>
         <li><a href="#">Soporte</a></li>
         <li><a href="#">Contactos</a></li>
 
-        <!-- Dropdown -->
+        <!-- Notificaciones -->
         <li class="notif-dropdown">
           <a href="#" id="notif-btn">
             <i class="ri-notification-3-line"></i>
-            {% if usuarios_pendientes %}
-            <span class="notif-badge" id="notif-count">{{ pendientes_count }}</span>
+
+            {% if pendientes_count > 0 %}
+            <span class="notif-badge">{{ pendientes_count }}</span>
             {% endif %}
           </a>
 
-          <ul class="notif-menu" id="notif-menu">
+          <div class="notif-menu" id="notif-menu">
+            <h4 class="notif-title">Solicitudes de acceso</h4>
+
             {% if usuarios_pendientes %}
             {% for u in usuarios_pendientes %}
-            <li class="notif-item" data-user-id="{{ u.id }}">
-              <div class="notif-content">
-                <div class="notif-info">
-                  <strong>{{ u.nombre_completo }}</strong>
-                  <span class="notif-rol">{{ u.rol }}</span>
-                </div>
-                <div class="notif-actions">
-                  <button class="notif-btn-approve" data-user-id="{{ u.id }}">Aprobar</button>
-                  <button class="notif-btn-reject" data-user-id="{{ u.id }}">Rechazar</button>
-                </div>
-              </div>
-            </li>
+            <div class="notif-item">
+              <strong>{{ u.nombre_completo }}</strong>
+              <p class="notif-rol">{{ u.rol }}</p>
+            </div>
             {% endfor %}
             {% else %}
-            <li><a href="#">No hay notificaciones nuevas</a></li>
+            <p class="notif-empty">No hay notificaciones nuevas</p>
             {% endif %}
-          </ul>
+          </div>
         </li>
       </ul>
     </nav>
@@ -63,106 +56,109 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-      <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" />
+      <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png">
 
       <a href="#"><i class="ri-home-4-line"></i> Inicio</a>
-      <a href="{% url 'listardispositivos'%}"><i class="ri-computer-line"></i>Dispositivos</a>
+      <a href="{% url 'listardispositivos' %}"><i class="ri-computer-line"></i>Dispositivos</a>
 
       {% if request.user.rol == "Admin" %}
       <a href="{% url 'panel_usuarios' %}"><i class="ri-user-fill"></i> Usuarios</a>
       {% endif %}
 
       <a href="#"><i class="ri-file-chart-fill"></i> Reportes</a>
-      <a href="#"><i class="ri-settings-3-line"></i> Configuración</a>
-      <a href="{% url 'logout'%}"><i class="ri-shut-down-line"></i> Cerrar Sesión</a>
+      <a href="{% url 'panel_config' %}"><i class="ri-settings-3-line"></i> Configuración</a>
+      <a href="{% url 'logout' %}"><i class="ri-shut-down-line"></i> Cerrar Sesión</a>
     </div>
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
     <div class="main-content">
 
+      <!-- CARDS -->
       <div class="stats">
-        <div class="stat-card"><i class="ri-team-fill"></i>
+
+        <div class="stat-card">
+          <i class="ri-user-3-fill"></i>
           <h3>Usuarios</h3>
           <p>{{ estadisticas.usuarios }}</p>
         </div>
 
-        <div class="stat-card"><i class="ri-computer-fill"></i>
-          <h3>Préstamos</h3>
+        <div class="stat-card">
+          <i class="ri-timer-2-fill"></i>
+          <h3>Préstamos activos</h3>
           <p>{{ estadisticas.prestamos }}</p>
         </div>
 
-        <div class="stat-card"><i class="ri-file-chart-fill"></i>
-          <h3>Reportes</h3>
-          <p>{{ estadisticas.reportes }}</p>
+        <div class="stat-card">
+          <i class="ri-computer-fill"></i>
+          <h3>Disponibles</h3>
+          <p>{{ estadisticas.disponibles }}</p>
         </div>
 
-        <div class="stat-card"><i class="ri-notification-line"></i>
-          <h3>Notificaciones</h3>
-          <p>{{ estadisticas.notificaciones }}</p>
+        <div class="stat-card">
+          <i class="ri-notification-line"></i>
+          <h3>Pendientes</h3>
+          <p>{{ pendientes_count }}</p>
         </div>
+
       </div>
 
+      <!-- GRÁFICO -->
       <div class="charts">
-        <div class="chart-card">
-          <h3>Resumen de préstamos</h3>
-          <canvas id="lineChart"></canvas>
-        </div>
 
         <div class="chart-card">
-          <h3>Tipos de usuarios</h3>
+          <h3>Distribución de usuarios</h3>
           <canvas id="pieChart"></canvas>
         </div>
+
+        <!-- Últimos préstamos -->
+        <div class="table-card">
+          <h3>Últimos préstamos</h3>
+
+          <table class="table-last">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Dispositivo</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for p in ultimos_prestamos %}
+              <tr>
+                <td>{{ p.usuario.nombre_completo }}</td>
+                <td>{{ p.dispositivo.nombre }}</td>
+                <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" style="text-align: center;">No hay préstamos recientes</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+
       </div>
+
     </div>
 
   </div>
 
   <!-- FOOTER -->
+
   <footer>
-    <p>© 2025 Sistema MDsUCN. Todos los derechos reservados.</p>
+    <p>© 2025 Sistema MDsUCN — Todos los derechos reservados.</p>
   </footer>
-
-  <!-- NOTIFICACIONES -->
+  <!-- CHART JS -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const notifBtn = document.getElementById("notif-btn");
-      const notifMenu = document.getElementById("notif-menu");
-
-      notifBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        notifMenu.style.display = notifMenu.style.display === "block" ? "none" : "block";
-      });
-
-      document.addEventListener("click", function (e) {
-        if (!notifBtn.contains(e.target) && !notifMenu.contains(e.target)) {
-          notifMenu.style.display = "none";
-        }
-      });
-    });
-  </script>
-
-  <!-- GRÁFICOS -->
-  <script>
-    new Chart(document.getElementById("lineChart"), {
-      type: "line",
-      data: {
-        labels: ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SAB", "DOM"],
-        datasets: [{
-          data: [5, 7, 8, 6, 9, 12, 10],
-          borderColor: "#0B9906",
-          fill: true,
-          backgroundColor: "rgba(59,130,246,0.1)"
-        }]
-      }
-    });
-
     new Chart(document.getElementById("pieChart"), {
       type: "doughnut",
       data: {
         labels: ["Docentes", "Estudiantes", "Otros"],
         datasets: [{
           data: [45, 30, 25],
-          backgroundColor: ["#77BA04", "#E9F50A", "#0B9906"]
         }]
       }
     });
