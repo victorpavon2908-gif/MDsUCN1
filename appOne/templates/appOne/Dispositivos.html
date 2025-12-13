@@ -1,180 +1,125 @@
+block{% extends "appOne/dashboard.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Préstamos</title>
+{% block contenido %}
 
-  <link rel="shortcut icon" href="pix/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="{% static 'appOne/css/Dispositivos.css' %}" />
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-</head>
+<h2>Equipos Disponibles</h2>
 
-<body>
+<div class="galeria">
 
-  <!-- NAVBAR -->
-  <header class="navegacion">
-    <div class="container">
-      <nav class="nav">
+  {% for d in dispositivo %}
+  <figure class="card" onclick="abrirFormulario('{{ d.nombre_dispositivo }}')">
 
-        <div class="nav-menu">
-          <h1>Solicitud de Equipos</h1>
-        </div>
+    {% if d.imagen %}
+    <img src="{{ d.imagen.url }}" alt="{{ d.nombre_dispositivo }}">
+    {% else %}
+    <img src="{% static 'appOne/img/default.png' %}" alt="{{ d.nombre_dispositivo }}">
+    {% endif %}
 
-        <div class="nav-logo">
-          <a href="/">
-            <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" class="logo-cv"
-              alt="esloganucn" />
-          </a>
-        </div>
+    <figcaption>{{ d.nombre_dispositivo }} - {{ d.marca }}</figcaption>
 
-        <ul class="menu">
-          <li><a href="{% url 'dashboard' %}">Inicio</a></li>
-          <li><a href="#">Soporte</a></li>
-          <li><a href="#">Contactos</a></li>
-        </ul>
+    <p>Código: {{ d.codigo_inventario }}</p>
+    <p>Accesorios: {{ d.accesorios }}</p>
+    <p>Observación: {{ d.observacion }}</p>
 
-      </nav>
-    </div>
-  </header>
+    {% if request.user.rol == "Admin" %}
+    <div class="acciones-admin">
+      <button class="btn-editar" onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">Editar</button>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="contenido">
-    <h2>Equipos Disponibles</h2>
-
-    <div class="galeria">
-
-      {% for d in dispositivo %}
-      <figure class="card" onclick="abrirFormulario('{{ d.nombre_dispositivo }}')">
-
-        {% if d.imagen %}
-        <img src="{{ d.imagen.url }}" alt="{{ d.nombre_dispositivo }}">
-        {% else %}
-        <img src="{% static 'appOne/img/default.png' %}" alt="{{ d.nombre_dispositivo }}">
-        {% endif %}
-
-        <figcaption>{{ d.nombre_dispositivo }} - {{ d.marca }}</figcaption>
-
-        <p>Código: {{ d.codigo_inventario }}</p>
-        <p>Accesorios: {{ d.accesorios }}</p>
-        <p>Observación: {{ d.observacion }}</p>
-
-        {% if request.user.rol == "Admin" %}
-        <div class="acciones-admin">
-          <button class="btn-editar" onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">Editar</button>
-
-          <form action="{% url 'eliminar_dispositivo' d.id %}" method="POST"
+      <form action="{% url 'eliminar_dispositivo' d.id %}" method="POST"
             onsubmit="return confirm('¿Seguro que deseas eliminar este dispositivo?');" style="width:100%;">
-            {% csrf_token %}
-            <button type="submit" class="btn-eliminar" onclick="event.stopPropagation();">Eliminar</button>
-          </form>
-        </div>
-        {% endif %}
-
-      </figure>
-
-      {% empty %}
-      <p>No hay dispositivos disponibles.</p>
-      {% endfor %}
+        {% csrf_token %}
+        <button type="submit" class="btn-eliminar" onclick="event.stopPropagation();">Eliminar</button>
+      </form>
     </div>
-  </main>
+    {% endif %}
 
-  <!-- BOTÓN FLOTANTE ADMIN -->
-  {% if request.user.rol == "Admin" %}
-  <a href="{% url 'agregar_dispositivo' %}" class="btn-flotante">
-    +
-    <span class="tooltip">Agregar dispositivo</span>
-  </a>
-  {% endif %}
+  </figure>
 
-  <!-- MODAL: SOLICITUD DE PRÉSTAMO -->
-  <div class="modal" id="modalPrestamo">
-    <div class="modal-contenido">
+  {% empty %}
+  <p>No hay dispositivos disponibles.</p>
+  {% endfor %}
 
-      <button class="btn-cerrar-x" onclick="cerrarFormulario()">×</button>
+</div>
 
-      <h3 id="tituloEquipo"></h3>
+{% if request.user.rol == "Admin" %}
+<a href="{% url 'agregar_dispositivo' %}" class="btn-flotante">
+  +
+  <span class="tooltip">Agregar dispositivo</span>
+</a>
+{% endif %}
 
-      <div class="contenido-scroll">
-        <form class="formulario">
+<!-- MODAL: SOLICITUD DE PRÉSTAMO -->
+<div class="modal" id="modalPrestamo">
+  <div class="modal-contenido">
 
-          <label>Motivo del préstamo:</label>
-          <textarea required></textarea>
+    <button class="btn-cerrar-x" onclick="cerrarFormulario()">×</button>
 
-          <label>Fecha de uso:</label>
-          <input type="date" required />
+    <h3 id="tituloEquipo"></h3>
 
-          <label>Hora de inicio del préstamo:</label>
-          <input type="time" required />
+    <div class="contenido-scroll">
+      <form class="formulario">
 
-          <label>Hora de entrega del préstamo:</label>
-          <input type="time" required />
+        <label>Motivo del préstamo:</label>
+        <textarea required></textarea>
 
-          <button type="submit" class="btn-enviar">Enviar solicitud</button>
+        <label>Fecha de uso:</label>
+        <input type="date" required />
 
-        </form>
-      </div>
+        <label>Hora de inicio del préstamo:</label>
+        <input type="time" required />
 
+        <label>Hora de entrega del préstamo:</label>
+        <input type="time" required />
+
+        <button type="submit" class="btn-enviar">Enviar solicitud</button>
+
+      </form>
     </div>
+
   </div>
+</div>
 
-  <!-- MODAL: EDITAR DISPOSITIVO (MEJORADO FULL) -->
-  <div class="modal" id="modalEditar">
-    <div class="modal-contenido">
+<!-- MODAL: EDITAR DISPOSITIVO -->
+<div class="modal" id="modalEditar">
+  <div class="modal-contenido">
 
-      <button class="btn-cerrar-x" onclick="cerrarEditar()">×</button>
+    <button class="btn-cerrar-x" onclick="cerrarEditar()">×</button>
 
-      <h3>Editar dispositivo</h3>
+    <h3>Editar dispositivo</h3>
 
-      <div class="contenido-scroll">
-        <form id="formEditar" method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-
-          <div id="contenidoFormEditar"></div>
-
-          <button type="submit" class="btn-actualizar">Actualizar</button>
-        </form>
-      </div>
-
+    <div class="contenido-scroll">
+      <form id="formEditar" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div id="contenidoFormEditar"></div>
+        <button type="submit" class="btn-actualizar">Actualizar</button>
+      </form>
     </div>
+
   </div>
+</div>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>© 2025 Sistema de Medios Audiovisuales MDsUCN. Todos los derechos reservados.</p>
-  </footer>
+<script>
+function abrirFormulario(nombre) {
+  document.getElementById("tituloEquipo").textContent = "Préstamo de " + nombre;
+  document.getElementById("modalPrestamo").style.display = "flex";
+}
+function cerrarFormulario() {
+  document.getElementById("modalPrestamo").style.display = "none";
+}
+function abrirEditar(id) {
+  const url = `/dispositivos/editar/${id}/`;
+  fetch(url)
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById("contenidoFormEditar").innerHTML = html;
+      document.getElementById("formEditar").action = url;
+      document.getElementById("modalEditar").style.display = "flex";
+    });
+}
+function cerrarEditar() {
+  document.getElementById("modalEditar").style.display = "none";
+}
+</script>
 
-
-  <!-- SCRIPTS -->
-  <script>
-    function abrirFormulario(nombre) {
-      document.getElementById("tituloEquipo").textContent = "Préstamo de " + nombre;
-      document.getElementById("modalPrestamo").style.display = "flex";
-    }
-
-    function cerrarFormulario() {
-      document.getElementById("modalPrestamo").style.display = "none";
-    }
-
-    function abrirEditar(id) {
-      const url = `/dispositivos/editar/${id}/`;
-
-      fetch(url)
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById("contenidoFormEditar").innerHTML = html;
-          document.getElementById("formEditar").action = url;
-          document.getElementById("modalEditar").style.display = "flex";
-        });
-    }
-
-    function cerrarEditar() {
-      document.getElementById("modalEditar").style.display = "none";
-    }
-  </script>
-
-</body>
-
-</html>
+{% endblock %}

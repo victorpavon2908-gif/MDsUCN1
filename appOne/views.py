@@ -19,7 +19,7 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect('dashboard')
+            return redirect('dashboardinicio')
         else:
             messages.error(request, "Usuario o contraseña incorrectos.")
 
@@ -82,6 +82,9 @@ def dashboard(request):
         "pendientes_count": pendientes_count
     })
 
+@login_required
+def layaut_Principal(request):
+    return render(request, 'appOne/layaut_Principal.html')
 
 # ============================
 # ------ PANEL ADMIN ---------

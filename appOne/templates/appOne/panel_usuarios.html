@@ -1,81 +1,52 @@
+{% extends "appOne/dashboard.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel de Usuarios</title>
-    <link rel="stylesheet" href="{% static 'appOne/css/panel_usuarios.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-</head>
 
-<body>
-    <header class="navegacion">
-        <div class="nav">
-            <h1>Gestión de Usuarios</h1>
-            <div class="nav-logo">
-                <a href="/"><img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" class="logo-cv"
-                        alt="esloganucn" /></a>
-            </div>
-            <ul class="menu">
-                <li><a href="{% url 'dashboard'%}">Inicio</a></li>
-                <li><a href="#">Historial</a></li>
-                <li><a href="{% url 'logout'%}">Salir</a></li>
-            </ul>
-        </div>
-    </header>
+{% block contenido %}
+<div class="table-wrapper">
+    <table class="table-dashboard">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Código</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u.nombre_completo }}</td>
+                <td>{{ u.correo_institucional }}</td>
+                <td>{{ u.codigo }}</td>
+                <td>{{ u.rol }}</td>
+                <td>
+                    {% if u.is_active %}
+                    <span class="estado aprobado">Aprobado</span>
+                    {% else %}
+                    <span class="estado pendiente">Pendiente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'aprobar_usuario' u.id %}" class="btn btn-success">
+                        <i class="ri-check-fill"></i> Aprobar
+                    </a>
 
-    <div class="container">
-        <h2 class="dashboard-title">👥 Gestión de Usuarios</h2>
+                    <a href="{% url 'rechazar_usuario' u.id %}" class="btn btn-yellow">
+                        <i class="ri-close-fill"></i> Rechazar
+                    </a>
 
-        <div class="table-wrapper">
-            <table class="table-dashboard">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Código</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in usuarios %}
-                    <tr>
-                        <td>{{ u.nombre_completo }}</td>
-                        <td>{{ u.correo_institucional }}</td>
-                        <td>{{ u.codigo }}</td>
-                        <td>{{ u.rol }}</td>
-                        <td>
-                            {% if u.is_active %}
-                            <span class="estado aprobado">Aprobado</span>
-                            {% else %}
-                            <span class="estado pendiente">Pendiente</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'aprobar_usuario' u.id %}" class="btn btn-success">
-                                <i class="ri-check-fill"></i> Aprobar
-                            </a>
+                    <a href="{% url 'eliminar_usuario' u.id %}"
+                       onclick="return confirm('⚠️ ¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.');"
+                       class="btn btn-danger">
+                        <i class="ri-delete-bin-6-line"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-                            <a href="{% url 'rechazar_usuario' u.id %}" class="btn btn-yellow">
-                                <i class="ri-close-fill"></i> Rechazar
-                            </a>
-
-                            <!-- 🔴 Botón ELIMINAR -->
-                            <a href="{% url 'eliminar_usuario' u.id %}"
-                                onclick="return confirm('⚠️ ¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.');"
-                                class="btn btn-danger">
-                                <i class="ri-delete-bin-6-line"></i> Eliminar
-                            </a>
-
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</body>
-
-</html>
+{% endblock %}

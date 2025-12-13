@@ -6,6 +6,7 @@ urlpatterns = [
     path('salir/', views.logout_view, name="logout"),
     path('registro/', views.registro, name='registro'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboardinicio/', views.layaut_Principal, name='dashboardinicio'),
     # Panel admin
     path('panel/usuarios/', views.panel_usuarios, name='panel_usuarios'),
     path('panel/usuarios/aprobar/<int:id>/', views.aprobar_usuario, name='aprobar_usuario'),
