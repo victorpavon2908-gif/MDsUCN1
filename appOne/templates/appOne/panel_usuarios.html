@@ -1,6 +1,8 @@
 {% extends "appOne/dashboard.html" %}
 {% load static %}
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appOne/css/usuario.css' %}">
+{% endblock %}
 {% block contenido %}
 <div class="table-wrapper">
     <table class="table-dashboard">

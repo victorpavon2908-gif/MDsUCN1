@@ -1,0 +1,173 @@
+/* ================= RESET ================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+}
+
+/* ================= CONTENEDOR ================= */
+
+.table-wrapper {
+    width: 100%;
+    padding: 25px;
+    overflow-x: auto;
+}
+
+/* ================= TABLA ================= */
+
+.table-dashboard {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.table-dashboard thead {
+    background: #1e293b;
+}
+
+.table-dashboard th {
+    color: #000000;
+    text-align: left;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+.table-dashboard td {
+    padding: 14px;
+    font-size: 14.5px;
+    color: #333;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-dashboard tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* ================= ESTADOS ================= */
+
+.estado {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.estado.aprobado {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.estado.pendiente {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ================= BOTONES ================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    margin: 3px;
+    transition: 0.25s ease;
+    white-space: nowrap;
+}
+
+.btn i {
+    font-size: 17px;
+}
+
+/* Botón aprobar */
+.btn-success {
+    background: #22c55e;
+    color: #ffffff;
+}
+
+.btn-success:hover {
+    background: #16a34a;
+}
+
+/* Botón rechazar */
+.btn-yellow {
+    background: #facc15;
+    color: #1f2933;
+}
+
+.btn-yellow:hover {
+    background: #eab308;
+}
+
+/* Botón eliminar */
+.btn-danger {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* ================= RESPONSIVE ================= */
+
+/* Tablets */
+@media (max-width: 992px) {
+    .table-dashboard {
+        min-width: 750px;
+        font-size: 14px;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+}
+
+/* Móviles grandes */
+@media (max-width: 768px) {
+    .table-wrapper {
+        padding: 15px;
+    }
+
+    .table-dashboard {
+        min-width: 650px;
+    }
+
+    .btn i {
+        font-size: 16px;
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .table-dashboard {
+        min-width: 600px;
+    }
+
+    .estado {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    .btn {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+}

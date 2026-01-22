@@ -1,5 +1,6 @@
 from django import forms
-from .models import Usuario , Dispositivo
+from .models import Usuario , Dispositivo, Prestamo
+
 
 class RegistroForm(forms.ModelForm):
     password = forms.CharField(
@@ -54,4 +55,20 @@ class DispositivoForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'rows':3}),
             'accesorios': forms.Textarea(attrs={'rows':2}),
             'observacion': forms.Textarea(attrs={'rows':2}),
+        }
+
+
+
+
+class PrestamoForm(forms.ModelForm):
+    class Meta:
+        model = Prestamo
+        fields = [
+            'motivo',
+            'fecha_uso',
+            'hora_inicio',
+            'hora_entrega'
+        ]
+        widgets = {
+            'motivo': forms.Textarea(attrs={'rows': 3}),
         }

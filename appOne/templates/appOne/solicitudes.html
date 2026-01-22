@@ -1,0 +1,58 @@
+{% extends "appOne/dashboard.html" %}
+{% load static %}
+
+{% block contenido %}
+
+<h2>Solicitudes de Préstamos</h2>
+
+<div class="table-wrapper">
+    <table class="table-dashboard">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Dispositivo</th>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Estado</th>
+                {% if request.user.rol == "Admin" %}
+                <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for p in prestamos %}
+            <tr>
+                <td>{{ p.usuario.nombre_completo }}</td>
+                <td>{{ p.dispositivo.nombre_dispositivo }}</td>
+                <td>{{ p.fecha_uso }}</td>
+                <td>{{ p.hora_inicio }} - {{ p.hora_entrega }}</td>
+                <td>
+                    <span class="estado {{ p.estado|lower }}">
+                        {{ p.estado }}
+                    </span>
+                </td>
+
+                {% if request.user.rol == "Admin" %}
+                <td>
+                    <a href="{% url 'aprobar_prestamo' p.id %}" class="btn btn-success">
+                        Aprobar
+                    </a>
+                    <a href="{% url 'rechazar_prestamo' p.id %}" class="btn btn-danger">
+                        Rechazar
+                    </a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align:center">
+                    No hay solicitudes registradas
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

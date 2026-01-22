@@ -1,5 +1,9 @@
-block{% extends "appOne/dashboard.html" %}
+{% extends "appOne/dashboard.html" %}
 {% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appOne/css/Dispositivos.css' %}">
+{% endblock %}
 
 {% block contenido %}
 
@@ -8,36 +12,65 @@ block{% extends "appOne/dashboard.html" %}
 <div class="galeria">
 
   {% for d in dispositivo %}
-  <figure class="card" onclick="abrirFormulario('{{ d.nombre_dispositivo }}')">
+  <figure class="card"
+          onclick="abrirFormulario('{{ d.id }}','{{ d.nombre_dispositivo }}')">
+
+    {# ================= ESTADO DEL PRÉSTAMO ================= #}
+    {% for p in prestamos_usuario %}
+      {% if p.dispositivo.id == d.id %}
+
+        {% if p.estado == "pendiente" %}
+          <div class="estado-prestamo pendiente">
+            ⏳ Pendiente de aprobación
+          </div>
+        {% elif p.estado == "aprobado" %}
+          <div class="estado-prestamo aprobado">
+            ✅ Solicitud aprobada
+          </div>
+        {% endif %}
+
+      {% endif %}
+    {% endfor %}
+    {# ======================================================== #}
 
     {% if d.imagen %}
-    <img src="{{ d.imagen.url }}" alt="{{ d.nombre_dispositivo }}">
+      <img src="{{ d.imagen.url }}" alt="{{ d.nombre_dispositivo }}">
     {% else %}
-    <img src="{% static 'appOne/img/default.png' %}" alt="{{ d.nombre_dispositivo }}">
+      <img src="{% static 'appOne/img/default.png' }}" alt="{{ d.nombre_dispositivo }}">
     {% endif %}
 
     <figcaption>{{ d.nombre_dispositivo }} - {{ d.marca }}</figcaption>
 
-    <p>Código: {{ d.codigo_inventario }}</p>
-    <p>Accesorios: {{ d.accesorios }}</p>
-    <p>Observación: {{ d.observacion }}</p>
+    <p><strong>Código:</strong> {{ d.codigo_inventario }}</p>
+    <p><strong>Accesorios:</strong> {{ d.accesorios }}</p>
+    <p><strong>Observación:</strong> {{ d.observacion }}</p>
 
     {% if request.user.rol == "Admin" %}
     <div class="acciones-admin">
-      <button class="btn-editar" onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">Editar</button>
 
-      <form action="{% url 'eliminar_dispositivo' d.id %}" method="POST"
-            onsubmit="return confirm('¿Seguro que deseas eliminar este dispositivo?');" style="width:100%;">
+      <button class="btn-editar"
+              onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">
+        Editar
+      </button>
+
+      <form action="{% url 'eliminar_dispositivo' d.id %}"
+            method="POST"
+            style="width:100%;"
+            onsubmit="return confirm('¿Seguro que deseas eliminar este dispositivo?');">
         {% csrf_token %}
-        <button type="submit" class="btn-eliminar" onclick="event.stopPropagation();">Eliminar</button>
+        <button type="submit"
+                class="btn-eliminar"
+                onclick="event.stopPropagation();">
+          Eliminar
+        </button>
       </form>
+
     </div>
     {% endif %}
 
   </figure>
-
   {% empty %}
-  <p>No hay dispositivos disponibles.</p>
+    <p>No hay dispositivos disponibles.</p>
   {% endfor %}
 
 </div>
@@ -49,7 +82,10 @@ block{% extends "appOne/dashboard.html" %}
 </a>
 {% endif %}
 
-<!-- MODAL: SOLICITUD DE PRÉSTAMO -->
+<!-- ================================================= -->
+<!--              MODAL SOLICITUD PRÉSTAMO              -->
+<!-- ================================================= -->
+
 <div class="modal" id="modalPrestamo">
   <div class="modal-contenido">
 
@@ -57,30 +93,40 @@ block{% extends "appOne/dashboard.html" %}
 
     <h3 id="tituloEquipo"></h3>
 
-    <div class="contenido-scroll">
-      <form class="formulario">
+    <form method="POST"
+          action="{% url 'crear_prestamo' %}"
+          id="formPrestamo"
+          class="formulario">
 
-        <label>Motivo del préstamo:</label>
-        <textarea required></textarea>
+      {% csrf_token %}
 
-        <label>Fecha de uso:</label>
-        <input type="date" required />
+      <input type="hidden" name="dispositivo_id" id="dispositivo_id">
 
-        <label>Hora de inicio del préstamo:</label>
-        <input type="time" required />
+      <label>Motivo del préstamo</label>
+      <textarea name="motivo" required></textarea>
 
-        <label>Hora de entrega del préstamo:</label>
-        <input type="time" required />
+      <label>Fecha de uso</label>
+      <input type="date" name="fecha_uso" required>
 
-        <button type="submit" class="btn-enviar">Enviar solicitud</button>
+      <label>Hora de inicio</label>
+      <input type="time" name="hora_inicio" required>
 
-      </form>
-    </div>
+      <label>Hora de entrega</label>
+      <input type="time" name="hora_entrega" required>
+
+      <button type="submit" class="btn-enviar">
+        Enviar solicitud
+      </button>
+
+    </form>
 
   </div>
 </div>
 
-<!-- MODAL: EDITAR DISPOSITIVO -->
+<!-- ================================================= -->
+<!--                MODAL EDITAR EQUIPO                 -->
+<!-- ================================================= -->
+
 <div class="modal" id="modalEditar">
   <div class="modal-contenido">
 
@@ -92,33 +138,48 @@ block{% extends "appOne/dashboard.html" %}
       <form id="formEditar" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div id="contenidoFormEditar"></div>
-        <button type="submit" class="btn-actualizar">Actualizar</button>
+
+        <button type="submit" class="btn-actualizar">
+          Actualizar
+        </button>
       </form>
     </div>
 
   </div>
 </div>
 
+<!-- ================================================= -->
+<!--                    JAVASCRIPT                      -->
+<!-- ================================================= -->
+
 <script>
-function abrirFormulario(nombre) {
-  document.getElementById("tituloEquipo").textContent = "Préstamo de " + nombre;
-  document.getElementById("modalPrestamo").style.display = "flex";
+function abrirFormulario(id, nombre) {
+    document.getElementById("tituloEquipo").textContent =
+        "Solicitud de préstamo — " + nombre;
+
+    document.getElementById("dispositivo_id").value = id;
+
+    document.getElementById("modalPrestamo").style.display = "flex";
 }
+
 function cerrarFormulario() {
-  document.getElementById("modalPrestamo").style.display = "none";
+    document.getElementById("modalPrestamo").style.display = "none";
 }
+
 function abrirEditar(id) {
-  const url = `/dispositivos/editar/${id}/`;
-  fetch(url)
-    .then(response => response.text())
-    .then(html => {
-      document.getElementById("contenidoFormEditar").innerHTML = html;
-      document.getElementById("formEditar").action = url;
-      document.getElementById("modalEditar").style.display = "flex";
-    });
+    const url = `/dispositivos/editar/${id}/`;
+
+    fetch(url)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("contenidoFormEditar").innerHTML = html;
+            document.getElementById("formEditar").action = url;
+            document.getElementById("modalEditar").style.display = "flex";
+        });
 }
+
 function cerrarEditar() {
-  document.getElementById("modalEditar").style.display = "none";
+    document.getElementById("modalEditar").style.display = "none";
 }
 </script>
 

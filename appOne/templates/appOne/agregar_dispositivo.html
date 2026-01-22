@@ -1,42 +1,24 @@
+{% extends "appOne/dashboard.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>agregar_dispositivo - MDsUCN</title>
-  <link rel="stylesheet" href="{% static 'appOne/css/add_dispositivos.css' %}">
-  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appOne/css/add_dispositivos.css' %}">
+{% endblock %}
 
-<body>
-  <header class="navegacion">
-    <div class="nav">
-      <h1>Gestión de Usuarios</h1>
-      <div class="nav-logo">
-        <a href="/"><img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" class="logo-cv"
-            alt="esloganucn" /></a>
-      </div>
-      <ul class="menu">
-        <li><a href="{% url 'dashboard'%}">Inicio</a></li>
-        <li><a href="#">Historial</a></li>
-        <li><a href="{% url 'logout'%}">Salir</a></li>
-      </ul>
-    </div>
-  </header>
-  <form method="POST" enctype="multipart/form-data" class="formulario-contenedor">
+{% block contenido %}
+
+<h2 class="titulo-form">Agregar dispositivo</h2>
+
+<form method="POST" enctype="multipart/form-data" class="formulario-contenedor">
     {% csrf_token %}
 
     <div class="formulario-grid">
         {{ form.as_p }}
     </div>
 
-    <button type="submit" class="btn-guardar">Guardar</button>
+    <button type="submit" class="btn-guardar">
+        <i class="ri-save-3-line"></i> Guardar
+    </button>
 </form>
 
-
-</body>
-
-</html>
+{% endblock %}

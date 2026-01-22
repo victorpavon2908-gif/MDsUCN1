@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import RegistroForm, DispositivoForm
-from .models import Usuario, Dispositivo
+from .forms import RegistroForm, DispositivoForm, PrestamoForm
+from .models import Usuario, Dispositivo, Prestamo
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
 
 # ============================
 # ----- LOGIN ----------------
@@ -247,3 +248,117 @@ def panel_config(request):
         return redirect('dashboard')
 
     return render(request, 'appOne/panel_config.html')
+
+
+
+@login_required
+def solicitar_prestamo(request, id):
+    dispositivo = get_object_or_404(Dispositivo, id=id)
+
+    if request.method == "POST":
+        form = PrestamoForm(request.POST)
+        if form.is_valid():
+            prestamo = form.save(commit=False)
+            prestamo.usuario = request.user
+            prestamo.dispositivo = dispositivo
+            prestamo.estado = "Pendiente"
+            prestamo.save()
+
+            messages.success(request, "Solicitud enviada correctamente.")
+            return redirect('listardispositivos')
+    else:
+        form = PrestamoForm()
+
+    return render(request, "appOne/solicitar_prestamo.html", {
+        "form": form,
+        "dispositivo": dispositivo
+    })
+
+@login_required
+def aprobar_prestamo(request, id):
+    if request.user.rol != "Admin":
+        return redirect("dashboard")
+
+    prestamo = get_object_or_404(Prestamo, id=id)
+    prestamo.estado = "aprobado"
+    prestamo.save()
+
+    messages.success(request, "Préstamo aprobado.")
+    return redirect("solicitudes_prestamos")
+
+
+
+@login_required
+def rechazar_prestamo(request, id):
+    if request.user.rol != "Admin":
+        return redirect('dashboard')
+
+    prestamo = get_object_or_404(Prestamo, id=id)
+    prestamo.estado = "Rechazado"
+    prestamo.save()
+
+    messages.error(request, "Préstamo rechazado.")
+    return redirect('solicitudes_prestamos')
+
+@login_required
+def crear_prestamo(request):
+    if request.method == "POST":
+
+        dispositivo_id = request.POST.get("dispositivo_id")
+
+        dispositivo = get_object_or_404(Dispositivo, id=dispositivo_id)
+
+        # ❌ evitar préstamos duplicados activos
+        prestamo_activo = Prestamo.objects.filter(
+            usuario=request.user,
+            dispositivo=dispositivo,
+            estado__in=["pendiente", "aprobado"]
+        ).exists()
+
+        if prestamo_activo:
+            messages.warning(
+                request,
+                "Ya tienes una solicitud activa para este dispositivo."
+            )
+            return redirect("listardispositivos")
+
+        Prestamo.objects.create(
+            usuario=request.user,
+            dispositivo=dispositivo,
+            motivo=request.POST.get("motivo"),
+            fecha_uso=request.POST.get("fecha_uso"),
+            hora_inicio=request.POST.get("hora_inicio"),
+            hora_entrega=request.POST.get("hora_entrega"),
+            estado="pendiente"
+        )
+
+        messages.success(request, "Solicitud enviada correctamente.")
+        return redirect("listardispositivos")
+
+@login_required
+def solicitudes_prestamos(request):
+
+    if request.user.rol == "Admin":
+        prestamos = Prestamo.objects.all().order_by("-fecha_solicitud")
+    else:
+        prestamos = Prestamo.objects.filter(
+            usuario=request.user
+        ).order_by("-fecha_solicitud")
+
+    return render(request, "appOne/solicitudes.html", {
+        "prestamos": prestamos
+    })
+
+@login_required
+def devolver_prestamo(request, id):
+    if request.user.rol != "Admin":
+        return redirect("dashboard")
+
+    prestamo = get_object_or_404(Prestamo, id=id)
+    prestamo.estado = "devuelto"
+    prestamo.save()
+
+    messages.success(request, "Dispositivo devuelto correctamente.")
+    return redirect("solicitudes_prestamos")
+
+

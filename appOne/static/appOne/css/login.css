@@ -1,101 +1,150 @@
-/* Fondo general */
-body {
+/* ================= LOGIN ================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700&display=swap');
+
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+/* ================= FONDO ================= */
+body {
     font-family: 'Overpass', sans-serif;
-    background: url("https://uploads.onecompiler.io/43nzu6ce2/43x83dpam/fonds.jpg") no-repeat center center/cover;
-    height: 100vh;
+    background: url("https://uploads.onecompiler.io/43nzu6ce2/43x83dpam/fonds.jpg") no-repeat center center / cover;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
 }
 
-/* Oscurecedor + blur */
+/* Overlay */
 .bg-overlay {
     position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%; 
-    height: 100%;
-    background: rgba(0, 0, 0, 0.30);
-    backdrop-filter: blur(3px);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.40);
+    backdrop-filter: blur(4px);
+    z-index: 1;
 }
 
-/* Caja del login */
+/* ================= CONTENEDOR LOGIN ================= */
 .login-box {
     position: relative;
     z-index: 5;
     width: 360px;
+    max-width: 92%;
     padding: 40px 35px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.45);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 15px 40px rgba(0,0,0,.45);
     text-align: center;
 }
 
-/* Logo */
+/* LOGO */
 .login-box img {
     width: 140px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
-/* Inputs */
+/* ================= INPUTS ================= */
 .login-box input {
     width: 100%;
-    padding: 12px;
-    background: rgba(255,255,255,0.85);
+    padding: 13px 14px;
+    border-radius: 10px;
     border: none;
-    border-radius: 8px;
-    margin-bottom: 14px;
     font-size: 15px;
+    margin-bottom: 15px;
+    background: rgba(255,255,255,.9);
     outline: none;
 }
 
 .login-box input::placeholder {
-    color: #444;
+    color: #555;
 }
 
-/* Botón */
+/* ================= BOTÓN ================= */
 .login-box button {
     width: 100%;
-    padding: 12px;
-    background: #1A9A4A;
+    padding: 13px;
+    border-radius: 10px;
     border: none;
-    border-radius: 8px;
+    background: #1A9A4A;
     color: white;
-    font-weight: bold;
     font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
     transition: .25s ease;
 }
 
 .login-box button:hover {
     background: #F1C40F;
+    color: #1e293b;
 }
 
-/* Links */
+/* ================= MENSAJES ================= */
+.mensajes {
+    margin-top: 10px;
+}
+
+.mensajes p {
+    color: #ffeb3b;
+    font-size: 14px;
+}
+
+/* ================= LINKS ================= */
 .pie-form {
-    margin-top: 18px;
+    margin-top: 20px;
 }
 
 .pie-form a {
     display: block;
-    color: #fff;
     font-size: 14px;
     text-decoration: none;
-    opacity: 0.8;
-    transition: .3s;
+    color: white;
+    opacity: .85;
+    margin-top: 6px;
+    transition: .25s;
 }
 
 .pie-form a:hover {
-    opacity: 1;
     color: #F1C40F;
+    opacity: 1;
 }
 
-/* Mensajes */
-.mensajes p {
-    color: #ffeb3b;
-    margin: 5px 0;
+/* ================= RESPONSIVE ================= */
+
+/* Tablets */
+@media (max-width: 768px) {
+    .login-box {
+        padding: 35px 28px;
+    }
+
+    .login-box img {
+        width: 120px;
+    }
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+    .login-box {
+        padding: 28px 22px;
+    }
+
+    .login-box img {
+        width: 105px;
+    }
+
+    .login-box input {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .login-box button {
+        font-size: 15px;
+    }
 }

@@ -1,0 +1,132 @@
+/* ================= DASHBOARD INICIO ================= */
+
+/* CONTENEDOR DE TARJETAS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+/* TARJETAS */
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 25px 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card i {
+  font-size: 42px;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.stat-card h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.stat-card p {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* ================= GRÁFICOS ================= */
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+/* CARD GENERAL */
+.chart-card,
+.table-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 25px;
+  box-shadow: var(--shadow);
+}
+
+.chart-card h3,
+.table-card h3 {
+  font-size: 17px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* GRÁFICO */
+.chart-card canvas {
+  width: 100% !important;
+  max-height: 300px;
+}
+
+/* ================= TABLA ================= */
+.table-last {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table-last thead {
+  background: #eef1f6;
+}
+
+.table-last th,
+.table-last td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.table-last tbody tr:hover {
+  background: #f5f8ff;
+}
+
+.table-last td {
+  color: var(--text-dark);
+}
+
+/* MENSAJE VACÍO */
+.table-last td[colspan] {
+  padding: 20px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* ================= RESPONSIVE ================= */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Móviles */
+@media (max-width: 600px) {
+  .stat-card p {
+    font-size: 22px;
+  }
+
+  .chart-card,
+  .table-card {
+    padding: 18px;
+  }
+
+  .table-last th,
+  .table-last td {
+    font-size: 13px;
+    padding: 10px;
+  }
+}
