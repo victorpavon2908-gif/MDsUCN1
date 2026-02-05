@@ -44,6 +44,8 @@ urlpatterns = [
     path('prestamos/aprobar/<int:id>/', views.aprobar_prestamo, name='aprobar_prestamo'),
     path('prestamos/devolver/<int:id>/', views.devolver_prestamo, name='devolver_prestamo'),
     path('prestamos/rechazar/<int:id>/', views.rechazar_prestamo, name='rechazar_prestamo'),
+    path('reportes/', views.reportes, name='reportes'),
+
 
 
 ]

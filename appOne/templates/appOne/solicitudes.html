@@ -1,9 +1,29 @@
 {% extends "appOne/dashboard.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appOne/css/solicitudes.css' %}">
+{% endblock %}
+
 {% block contenido %}
 
 <h2>Solicitudes de Préstamos</h2>
+
+<!-- ===== FILTROS ===== -->
+<div class="filtros">
+    <a href="?estado=todos" class="filtro {% if estado_actual == 'todos' %}activo{% endif %}">
+        Todos
+    </a>
+    <a href="?estado=pendiente" class="filtro {% if estado_actual == 'pendiente' %}activo{% endif %}">
+        Pendientes
+    </a>
+    <a href="?estado=aprobado" class="filtro {% if estado_actual == 'aprobado' %}activo{% endif %}">
+        Aprobados
+    </a>
+    <a href="?estado=devuelto" class="filtro {% if estado_actual == 'devuelto' %}activo{% endif %}">
+        Devueltos
+    </a>
+</div>
 
 <div class="table-wrapper">
     <table class="table-dashboard">
@@ -23,30 +43,36 @@
         <tbody>
             {% for p in prestamos %}
             <tr>
-                <td>{{ p.usuario.nombre_completo }}</td>
-                <td>{{ p.dispositivo.nombre_dispositivo }}</td>
-                <td>{{ p.fecha_uso }}</td>
-                <td>{{ p.hora_inicio }} - {{ p.hora_entrega }}</td>
-                <td>
+                <td data-label="Usuario">{{ p.usuario.nombre_completo }}</td>
+                <td data-label="Dispositivo">{{ p.dispositivo.nombre_dispositivo }}</td>
+                <td data-label="Fecha">{{ p.fecha_uso|date:"d/m/Y" }}</td>
+                <td data-label="Horario">{{ p.hora_inicio|time:"H:i" }} - {{ p.hora_entrega|time:"H:i" }}</td>
+
+                <td data-label="Estado">
                     <span class="estado {{ p.estado|lower }}">
-                        {{ p.estado }}
+                        {{ p.estado|capfirst }}
                     </span>
                 </td>
 
                 {% if request.user.rol == "Admin" %}
-                <td>
-                    <a href="{% url 'aprobar_prestamo' p.id %}" class="btn btn-success">
-                        Aprobar
-                    </a>
-                    <a href="{% url 'rechazar_prestamo' p.id %}" class="btn btn-danger">
-                        Rechazar
-                    </a>
+                <td data-label="Acciones">
+                    {% if p.estado == "pendiente" %}
+                        <a href="{% url 'aprobar_prestamo' p.id %}" class="btn btn-success">Aprobar</a>
+                        <a href="{% url 'rechazar_prestamo' p.id %}" class="btn btn-danger">Rechazar</a>
+
+                    {% elif p.estado == "aprobado" %}
+                        <a href="{% url 'devolver_prestamo' p.id %}" class="btn btn-warning">Marcar como devuelto</a>
+
+                    {% else %}
+                        <span class="text-muted">Sin acciones</span>
+                    {% endif %}
                 </td>
                 {% endif %}
             </tr>
+
             {% empty %}
             <tr>
-                <td colspan="6" style="text-align:center">
+                <td colspan="{% if request.user.rol == 'Admin' %}6{% else %}5{% endif %}" style="text-align:center">
                     No hay solicitudes registradas
                 </td>
             </tr>

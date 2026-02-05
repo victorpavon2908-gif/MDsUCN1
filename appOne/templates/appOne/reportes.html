@@ -1,0 +1,68 @@
+{% extends "appOne/dashboard.html" %}
+{% load static %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appOne/css/reportes.css' %}">
+{% endblock %}
+
+{% block contenido %}
+
+<div class="reportes-container">
+
+    <h1 class="titulo">📊 Panel de Reportes</h1>
+
+    <!-- ===== TARJETAS ===== -->
+    <div class="cards">
+        <div class="card">
+            <h3>Dispositivos</h3>
+            <p>{{ total_dispositivos }}</p>
+        </div>
+        <div class="card">
+            <h3>Usuarios Activos</h3>
+            <p>{{ total_usuarios }}</p>
+        </div>
+        <div class="card">
+            <h3>Préstamos Totales</h3>
+            <p>{{ total_prestamos }}</p>
+        </div>
+    </div>
+
+    <!-- ===== GRÁFICOS ===== -->
+    <div class="graficos">
+
+        <div class="grafico">
+            <h2>Préstamos por Estado</h2>
+            <canvas id="estadoChart"></canvas>
+        </div>
+
+        <div class="grafico">
+            <h2>Préstamos Últimos 7 Días</h2>
+            <canvas id="diasChart"></canvas>
+        </div>
+
+        <div class="grafico full">
+            <h2>Dispositivos Más Solicitados</h2>
+            <canvas id="dispositivosChart"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const estadosLabels = {{ estados_labels|safe }};
+    const estadosData = {{ estados_data|safe }};
+
+    const diasLabels = {{ dias|safe }};
+    const diasData = {{ prestamos_por_dia|safe }};
+
+    const dispositivosLabels = {{ dispositivos_labels|safe }};
+    const dispositivosData = {{ dispositivos_data|safe }};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'appOne/js/reportes.js' %}"></script>
+
+{% endblock %}

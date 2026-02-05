@@ -82,27 +82,38 @@ class Dispositivo(models.Model):
 #           PRÉSTAMOS
 # ============================
 
+from django.db import models
+from django.core.exceptions import ValidationError
+
+
 class Prestamo(models.Model):
 
+    ESTADO_PENDIENTE = 'pendiente'
+    ESTADO_APROBADO = 'aprobado'
+    ESTADO_RECHAZADO = 'rechazado'
+    ESTADO_DEVUELTO = 'devuelto'
+
     ESTADO_CHOICES = [
-        ('pendiente', 'Pendiente'),
-        ('aprobado', 'Aprobado'),
-        ('devuelto', 'Devuelto'),
+        (ESTADO_PENDIENTE, 'Pendiente'),
+        (ESTADO_APROBADO, 'Aprobado'),
+        (ESTADO_RECHAZADO, 'Rechazado'),
+        (ESTADO_DEVUELTO, 'Devuelto'),
     ]
 
     usuario = models.ForeignKey(
-        Usuario,
+        'Usuario',
         on_delete=models.CASCADE,
         related_name="prestamos"
     )
 
     dispositivo = models.ForeignKey(
-        Dispositivo,
+        'Dispositivo',
         on_delete=models.CASCADE,
         related_name="prestamos"
     )
 
     motivo = models.TextField()
+
     fecha_uso = models.DateField()
     hora_inicio = models.TimeField()
     hora_entrega = models.TimeField()
@@ -110,10 +121,32 @@ class Prestamo(models.Model):
     estado = models.CharField(
         max_length=10,
         choices=ESTADO_CHOICES,
-        default='pendiente'
+        default=ESTADO_PENDIENTE
     )
 
     fecha_solicitud = models.DateTimeField(auto_now_add=True)
+
+    # ============================
+    # VALIDACIONES PROFESIONALES
+    # ============================
+    def clean(self):
+        # Hora entrega debe ser mayor a inicio
+        if self.hora_entrega <= self.hora_inicio:
+            raise ValidationError("La hora de entrega debe ser mayor a la hora de inicio.")
+
+        # Evitar doble préstamo del mismo dispositivo en el mismo horario aprobado
+        prestamos_conflictivos = Prestamo.objects.filter(
+            dispositivo=self.dispositivo,
+            fecha_uso=self.fecha_uso,
+            estado=self.ESTADO_APROBADO,
+            hora_inicio__lt=self.hora_entrega,
+            hora_entrega__gt=self.hora_inicio
+        ).exclude(pk=self.pk)
+
+        if prestamos_conflictivos.exists():
+            raise ValidationError(
+                "Este dispositivo ya está prestado en ese rango de horario."
+            )
 
     def __str__(self):
         return f"{self.dispositivo.nombre_dispositivo} - {self.usuario.nombre_completo} ({self.estado})"
