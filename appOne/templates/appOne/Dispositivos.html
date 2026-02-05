@@ -3,6 +3,10 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/Dispositivos.css' %}">
+<link rel="stylesheet" href="{% static 'appOne/css/editar_dispositivos.css' %}">
+
+<!-- Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock %}
 
 {% block contenido %}
@@ -15,28 +19,20 @@
   <figure class="card"
           onclick="abrirFormulario('{{ d.id }}','{{ d.nombre_dispositivo }}')">
 
-    {# ================= ESTADO DEL PRÉSTAMO ================= #}
     {% for p in prestamos_usuario %}
       {% if p.dispositivo.id == d.id %}
-
         {% if p.estado == "pendiente" %}
-          <div class="estado-prestamo pendiente">
-            ⏳ Pendiente de aprobación
-          </div>
+          <div class="estado-prestamo pendiente">⏳ Pendiente de aprobación</div>
         {% elif p.estado == "aprobado" %}
-          <div class="estado-prestamo aprobado">
-            ✅ Solicitud aprobada
-          </div>
+          <div class="estado-prestamo aprobado">✅ Solicitud aprobada</div>
         {% endif %}
-
       {% endif %}
     {% endfor %}
-    {# ======================================================== #}
 
     {% if d.imagen %}
       <img src="{{ d.imagen.url }}" alt="{{ d.nombre_dispositivo }}">
     {% else %}
-      <img src="{% static 'appOne/img/default.png' }}" alt="{{ d.nombre_dispositivo }}">
+      <img src="{% static 'appOne/img/default.png' %}" alt="{{ d.nombre_dispositivo }}">
     {% endif %}
 
     <figcaption>{{ d.nombre_dispositivo }} - {{ d.marca }}</figcaption>
@@ -47,7 +43,6 @@
 
     {% if request.user.rol == "Admin" %}
     <div class="acciones-admin">
-
       <button class="btn-editar"
               onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">
         Editar
@@ -64,7 +59,6 @@
           Eliminar
         </button>
       </form>
-
     </div>
     {% endif %}
 
@@ -82,37 +76,33 @@
 </a>
 {% endif %}
 
-<!-- ================================================= -->
-<!--              MODAL SOLICITUD PRÉSTAMO              -->
-<!-- ================================================= -->
+<!-- ================= MODAL PRÉSTAMO ================= -->
 
 <div class="modal" id="modalPrestamo">
   <div class="modal-contenido">
 
     <button class="btn-cerrar-x" onclick="cerrarFormulario()">×</button>
 
-    <h3 id="tituloEquipo"></h3>
+    <h3 id="tituloEquipo" class="titulo-modal"></h3>
 
     <form method="POST"
           action="{% url 'crear_prestamo' %}"
-          id="formPrestamo"
           class="formulario">
 
       {% csrf_token %}
-
       <input type="hidden" name="dispositivo_id" id="dispositivo_id">
 
       <label>Motivo del préstamo</label>
       <textarea name="motivo" required></textarea>
 
       <label>Fecha de uso</label>
-      <input type="date" name="fecha_uso" required>
+      <input type="text" id="fecha_uso" name="fecha_uso" required>
 
       <label>Hora de inicio</label>
-      <input type="time" name="hora_inicio" required>
+      <input type="text" id="hora_inicio" name="hora_inicio" required>
 
       <label>Hora de entrega</label>
-      <input type="time" name="hora_entrega" required>
+      <input type="text" id="hora_entrega" name="hora_entrega" required>
 
       <button type="submit" class="btn-enviar">
         Enviar solicitud
@@ -123,9 +113,7 @@
   </div>
 </div>
 
-<!-- ================================================= -->
-<!--                MODAL EDITAR EQUIPO                 -->
-<!-- ================================================= -->
+<!-- ================= MODAL EDITAR ================= -->
 
 <div class="modal" id="modalEditar">
   <div class="modal-contenido">
@@ -138,27 +126,23 @@
       <form id="formEditar" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div id="contenidoFormEditar"></div>
-
-        <button type="submit" class="btn-actualizar">
-          Actualizar
-        </button>
+        <button type="submit" class="btn-actualizar">Actualizar</button>
       </form>
     </div>
 
   </div>
 </div>
 
-<!-- ================================================= -->
-<!--                    JAVASCRIPT                      -->
-<!-- ================================================= -->
+<!-- ================= SCRIPTS ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
 <script>
 function abrirFormulario(id, nombre) {
     document.getElementById("tituloEquipo").textContent =
         "Solicitud de préstamo — " + nombre;
-
     document.getElementById("dispositivo_id").value = id;
-
     document.getElementById("modalPrestamo").style.display = "flex";
 }
 
@@ -181,6 +165,31 @@ function abrirEditar(id) {
 function cerrarEditar() {
     document.getElementById("modalEditar").style.display = "none";
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    flatpickr("#fecha_uso", {
+        locale: "es",
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        altInput: true,
+        altFormat: "d F Y",
+    });
+
+    flatpickr("#hora_inicio", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+    });
+
+    flatpickr("#hora_entrega", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+    });
+});
+
 </script>
 
 {% endblock %}

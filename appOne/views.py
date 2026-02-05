@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Q
 
 
 # ============================
@@ -99,8 +100,35 @@ def panel_usuarios(request):
         messages.error(request, "No tienes permisos para ver esta sección.")
         return redirect('dashboard')
 
+    buscar = request.GET.get('buscar')
+    rol = request.GET.get('rol')
+    estado = request.GET.get('estado')
+
     usuarios = Usuario.objects.all()
-    return render(request, 'appOne/panel_usuarios.html', {'usuarios': usuarios})
+
+    # 🔎 BUSCADOR
+    if buscar:
+        usuarios = usuarios.filter(
+            Q(nombre_completo__icontains=buscar) |
+            Q(correo_institucional__icontains=buscar) |
+            Q(codigo__icontains=buscar) |
+            Q(dispositivos__nombre_dispositivo__icontains=buscar)  # <-- magia
+        ).distinct()
+
+    # 🎭 FILTRO POR ROL
+    if rol:
+        usuarios = usuarios.filter(rol=rol)
+
+    # 🟢 FILTRO POR ESTADO
+    if estado == "activo":
+        usuarios = usuarios.filter(is_active=True)
+    elif estado == "inactivo":
+        usuarios = usuarios.filter(is_active=False)
+
+    context = {
+        'usuarios': usuarios,
+    }
+    return render(request, 'appOne/panel_usuarios.html', context)
 
 
 # ============================
@@ -215,29 +243,6 @@ def eliminar_dispositivo(request, id):
     messages.warning(request, "Dispositivo eliminado.")
     return redirect('listardispositivos')
 
-
-# ============================
-# --- AJAX APROBACIONES ------
-# ============================
-
-@csrf_exempt
-@login_required
-def aprobar_usuario_ajax(request, id):
-    if request.method == "POST":
-        usuario = get_object_or_404(Usuario, id=id)
-        usuario.is_active = True
-        usuario.save()
-        return JsonResponse({'status': 'ok'})
-
-
-@csrf_exempt
-@login_required
-def rechazar_usuario_ajax(request, id):
-    if request.method == "POST":
-        usuario = get_object_or_404(Usuario, id=id)
-        usuario.is_active = False
-        usuario.save()
-        return JsonResponse({'status': 'ok'})
 # ============================
 # --- configuraciones------
 # ============================

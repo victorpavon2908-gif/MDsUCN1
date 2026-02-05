@@ -1,9 +1,36 @@
 {% extends "appOne/dashboard.html" %}
 {% load static %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/usuario.css' %}">
 {% endblock %}
+
 {% block contenido %}
+
+<h2 class="titulo-seccion">Panel de Usuarios</h2>
+
+<!-- ================= FILTROS ================= -->
+<form method="GET" class="filtros-usuarios">
+    <input type="text" name="buscar"
+           placeholder="Buscar por nombre, correo, código o dispositivo..."
+           value="{{ request.GET.buscar }}">
+
+    <select name="rol">
+        <option value="">Todos los roles</option>
+        <option value="Admin" {% if request.GET.rol == "Admin" %}selected{% endif %}>Admin</option>
+        <option value="Usuario" {% if request.GET.rol == "Usuario" %}selected{% endif %}>Usuario</option>
+    </select>
+
+    <select name="estado">
+        <option value="">Todos los estados</option>
+        <option value="activo" {% if request.GET.estado == "activo" %}selected{% endif %}>Activos</option>
+        <option value="inactivo" {% if request.GET.estado == "inactivo" %}selected{% endif %}>Inactivos</option>
+    </select>
+
+    <button type="submit" class="btn-filtrar">Filtrar</button>
+</form>
+
+<!-- ================= TABLA ================= -->
 <div class="table-wrapper">
     <table class="table-dashboard">
         <thead>
@@ -25,25 +52,31 @@
                 <td>{{ u.rol }}</td>
                 <td>
                     {% if u.is_active %}
-                    <span class="estado aprobado">Aprobado</span>
+                        <span class="estado activo">Activo</span>
                     {% else %}
-                    <span class="estado pendiente">Pendiente</span>
+                        <span class="estado inactivo">Inactivo</span>
                     {% endif %}
                 </td>
-                <td>
+                <td class="acciones">
                     <a href="{% url 'aprobar_usuario' u.id %}" class="btn btn-success">
-                        <i class="ri-check-fill"></i> Aprobar
+                        <i class="ri-check-fill"></i> Activar
                     </a>
 
-                    <a href="{% url 'rechazar_usuario' u.id %}" class="btn btn-yellow">
-                        <i class="ri-close-fill"></i> Rechazar
+                    <a href="{% url 'rechazar_usuario' u.id %}" class="btn btn-warning">
+                        <i class="ri-close-fill"></i> Desactivar
                     </a>
 
                     <a href="{% url 'eliminar_usuario' u.id %}"
-                       onclick="return confirm('⚠️ ¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.');"
+                       onclick="return confirm('⚠️ ¿Seguro que deseas eliminar este usuario?');"
                        class="btn btn-danger">
                         <i class="ri-delete-bin-6-line"></i> Eliminar
                     </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="no-registros">
+                    No hay usuarios registrados
                 </td>
             </tr>
             {% endfor %}

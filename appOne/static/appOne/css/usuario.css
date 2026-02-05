@@ -1,173 +1,226 @@
-/* ================= RESET ================= */
+/* ========= TIPOGRAFÍA Y BASE ========= */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root{
+    --primary:#2563eb;
+    --bg:#f3f6fb;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --success:#16a34a;
+    --warning:#eab308;
+    --danger:#dc2626;
+    --radius:14px;
 }
 
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f4f6f9;
+body{
+    background:var(--bg);
+    font-family:'Segoe UI',system-ui;
 }
 
-/* ================= CONTENEDOR ================= */
+/* ========= TÍTULO ========= */
 
-.table-wrapper {
-    width: 100%;
-    padding: 25px;
-    overflow-x: auto;
+.titulo-seccion{
+    margin: 25px 25px 10px;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
 }
 
-/* ================= TABLA ================= */
+/* ========= FILTROS (CARD) ========= */
 
-.table-dashboard {
-    width: 100%;
-    min-width: 900px;
-    border-collapse: collapse;
-    background: #ffffff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-}
-
-.table-dashboard thead {
-    background: #1e293b;
-}
-
-.table-dashboard th {
-    color: #000000;
-    text-align: left;
-    padding: 14px;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-}
-
-.table-dashboard td {
-    padding: 14px;
-    font-size: 14.5px;
-    color: #333;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.table-dashboard tbody tr:hover {
-    background: #f8fafc;
-}
-
-/* ================= ESTADOS ================= */
-
-.estado {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.estado.aprobado {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.estado.pendiente {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-/* ================= BOTONES ================= */
-
-.btn {
-    display: inline-flex;
+.filtros-usuarios{
+    margin: 10px 25px 20px;
+    background: var(--card);
+    padding: 18px;
+    border-radius: var(--radius);
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    padding: 7px 12px;
-    border-radius: 7px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    margin: 3px;
-    transition: 0.25s ease;
-    white-space: nowrap;
 }
 
-.btn i {
-    font-size: 17px;
+.filtros-usuarios input,
+.filtros-usuarios select{
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border:1px solid var(--border);
+    font-size:14px;
+    min-width: 240px;
+    background:#f8fafc;
+    transition:.2s;
 }
 
-/* Botón aprobar */
-.btn-success {
-    background: #22c55e;
-    color: #ffffff;
+.filtros-usuarios input:focus,
+.filtros-usuarios select:focus{
+    outline:none;
+    border-color:var(--primary);
+    background:white;
+    box-shadow:0 0 0 3px rgba(37,99,235,.15);
 }
 
-.btn-success:hover {
-    background: #16a34a;
+.btn-filtrar{
+    height:42px;
+    padding:0 22px;
+    border:none;
+    border-radius:10px;
+    background:var(--primary);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
 }
 
-/* Botón rechazar */
-.btn-yellow {
-    background: #facc15;
-    color: #1f2933;
+.btn-filtrar:hover{
+    transform:translateY(-1px);
+    box-shadow:0 6px 15px rgba(37,99,235,.3);
 }
 
-.btn-yellow:hover {
-    background: #eab308;
+/* ========= TABLA COMO CARD ========= */
+
+.table-wrapper{
+    padding: 0 25px 30px;
 }
 
-/* Botón eliminar */
-.btn-danger {
-    background: #ef4444;
-    color: #ffffff;
+.table-dashboard{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    background:var(--card);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
 }
 
-.btn-danger:hover {
-    background: #dc2626;
+/* HEADER SUAVE */
+.table-dashboard thead{
+    background:#f1f5f9;
 }
 
-/* ================= RESPONSIVE ================= */
+.table-dashboard th{
+    text-align:left;
+    padding:16px;
+    font-size:13.5px;
+    color:var(--muted);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    border-bottom:1px solid var(--border);
+}
 
-/* Tablets */
-@media (max-width: 992px) {
-    .table-dashboard {
-        min-width: 750px;
-        font-size: 14px;
+/* FILAS */
+.table-dashboard td{
+    padding:16px;
+    font-size:14.5px;
+    color:var(--text);
+    border-bottom:1px solid var(--border);
+}
+
+.table-dashboard tbody tr{
+    transition:.2s;
+}
+
+.table-dashboard tbody tr:hover{
+    background:#f8fafc;
+}
+
+/* ========= ESTADOS BONITOS ========= */
+
+.estado{
+    padding:6px 14px;
+    border-radius:50px;
+    font-size:12px;
+    font-weight:700;
+    display:inline-block;
+}
+
+.estado.activo{
+    background:#dcfce7;
+    color:var(--success);
+}
+
+.estado.inactivo{
+    background:#fee2e2;
+    color:var(--danger);
+}
+
+/* ========= BOTONES MODERNOS ========= */
+
+.acciones{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 14px;
+    border-radius:9px;
+    font-size:13px;
+    font-weight:600;
+    text-decoration:none;
+    transition:.2s;
+    white-space:nowrap;
+}
+
+.btn i{
+    font-size:16px;
+}
+
+/* success */
+.btn-success{
+    background:#22c55e;
+    color:white;
+}
+.btn-success:hover{
+    background:#16a34a;
+    transform:translateY(-1px);
+}
+
+/* warning */
+.btn-warning{
+    background:#facc15;
+    color:#1f2937;
+}
+.btn-warning:hover{
+    background:#eab308;
+    transform:translateY(-1px);
+}
+
+/* danger */
+.btn-danger{
+    background:#ef4444;
+    color:white;
+}
+.btn-danger:hover{
+    background:#dc2626;
+    transform:translateY(-1px);
+}
+
+/* ========= VACÍO ========= */
+
+.no-registros{
+    padding:30px;
+    text-align:center;
+    color:var(--muted);
+    font-weight:600;
+}
+
+/* ========= RESPONSIVE REAL ========= */
+
+@media(max-width:900px){
+    .filtros-usuarios{
+        flex-direction:column;
+        align-items:stretch;
     }
 
-    .btn {
-        font-size: 13px;
-        padding: 6px 10px;
-    }
-}
-
-/* Móviles grandes */
-@media (max-width: 768px) {
-    .table-wrapper {
-        padding: 15px;
-    }
-
-    .table-dashboard {
-        min-width: 650px;
-    }
-
-    .btn i {
-        font-size: 16px;
-    }
-}
-
-/* Móviles pequeños */
-@media (max-width: 480px) {
-    .table-dashboard {
-        min-width: 600px;
-    }
-
-    .estado {
-        font-size: 12px;
-        padding: 5px 12px;
-    }
-
-    .btn {
-        font-size: 12px;
-        padding: 6px 8px;
+    .filtros-usuarios input,
+    .filtros-usuarios select,
+    .btn-filtrar{
+        width:100%;
     }
 }

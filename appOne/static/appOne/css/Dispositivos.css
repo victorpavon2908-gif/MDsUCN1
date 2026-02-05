@@ -195,6 +195,31 @@ h2 {
   background: var(--primary-hover);
 }
 
+.titulo-modal{
+  text-align:center;
+  font-weight:700;
+  margin-bottom:15px;
+}
+
+.formulario textarea,
+.formulario input{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #cbd5e1;
+  margin-bottom:12px;
+  background:#f8fafc;
+}
+
+.formulario textarea:focus,
+.formulario input:focus{
+  outline:none;
+  border-color:#2563eb;
+  background:white;
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 600px) {
 
