@@ -3,22 +3,33 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/add_dispositivos.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 {% endblock %}
 
 {% block contenido %}
 
-<h2 class="titulo-form">Agregar dispositivo</h2>
+<div class="form-container">
 
-<form method="POST" enctype="multipart/form-data" class="formulario-contenedor">
-    {% csrf_token %}
-
-    <div class="formulario-grid">
-        {{ form.as_p }}
+    <!-- HEADER -->
+    <div class="form-header">
+        <h2>Agregar Dispositivo</h2>
     </div>
 
-    <button type="submit" class="btn-guardar">
-        <i class="ri-save-3-line"></i> Guardar
-    </button>
-</form>
+    <!-- FORM -->
+    <form method="POST" enctype="multipart/form-data" class="formulario">
+        {% csrf_token %}
+
+        <div class="form-grid">
+            {{ form.as_p }}
+        </div>
+
+        <button type="submit" class="btn-guardar">
+            <i class="ri-save-3-line"></i>
+            Guardar
+        </button>
+
+    </form>
+
+</div>
 
 {% endblock %}

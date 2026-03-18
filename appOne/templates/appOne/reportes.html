@@ -5,28 +5,39 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/reportes.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 {% endblock %}
 
 {% block contenido %}
 
 <div class="reportes-container">
 
-    <h1 class="titulo">📊 Panel de Reportes</h1>
+    <!-- HEADER -->
+    <div class="header-reportes">
+        <h1>Panel de Reportes</h1>
+    </div>
 
-    <!-- ===== TARJETAS ===== -->
+    <!-- ===== CARDS ===== -->
     <div class="cards">
+
         <div class="card">
+            <i class="ri-computer-line"></i>
             <h3>Dispositivos</h3>
             <p>{{ total_dispositivos }}</p>
         </div>
+
         <div class="card">
+            <i class="ri-user-3-line"></i>
             <h3>Usuarios Activos</h3>
             <p>{{ total_usuarios }}</p>
         </div>
+
         <div class="card">
-            <h3>Préstamos Totales</h3>
+            <i class="ri-exchange-dollar-line"></i>
+            <h3>Préstamos</h3>
             <p>{{ total_prestamos }}</p>
         </div>
+
     </div>
 
     <!-- ===== GRÁFICOS ===== -->
@@ -38,7 +49,7 @@
         </div>
 
         <div class="grafico">
-            <h2>Préstamos Últimos 7 Días</h2>
+            <h2>Últimos 7 Días</h2>
             <canvas id="diasChart"></canvas>
         </div>
 

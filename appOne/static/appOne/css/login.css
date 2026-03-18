@@ -1,150 +1,150 @@
-/* ================= LOGIN ================= */
-
-@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ========= BASE ========= */
+:root{
+    --bg:#0b0e11;
+    --card:#1e2329;
+    --text:#eaecef;
+    --muted:#848e9c;
+    --border:#2b3139;
+    --primary:#fcd535;
 }
 
-html, body {
-    height: 100%;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-/* ================= FONDO ================= */
-body {
-    font-family: 'Overpass', sans-serif;
-    background: url("https://uploads.onecompiler.io/43nzu6ce2/43x83dpam/fonds.jpg") no-repeat center center / cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
+body{
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
 }
 
-/* Overlay */
-.bg-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.40);
-    backdrop-filter: blur(4px);
-    z-index: 1;
+/* CONTENEDOR */
+.login-container{
+    display:flex;
+    height:100vh;
 }
 
-/* ================= CONTENEDOR LOGIN ================= */
-.login-box {
-    position: relative;
-    z-index: 5;
-    width: 360px;
-    max-width: 92%;
-    padding: 40px 35px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 18px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 15px 40px rgba(0,0,0,.45);
-    text-align: center;
+/* ========= LADO IZQUIERDO ========= */
+.login-left{
+    flex:1;
+    background:linear-gradient(135deg,#0b0e11,#1e2329);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:60px;
 }
 
-/* LOGO */
-.login-box img {
-    width: 140px;
-    margin-bottom: 22px;
+.login-left h1{
+    font-size:32px;
+    margin-bottom:15px;
+    color:var(--primary);
 }
 
-/* ================= INPUTS ================= */
-.login-box input {
-    width: 100%;
-    padding: 13px 14px;
-    border-radius: 10px;
-    border: none;
-    font-size: 15px;
-    margin-bottom: 15px;
-    background: rgba(255,255,255,.9);
-    outline: none;
+.login-left p{
+    color:var(--muted);
+    max-width:400px;
 }
 
-.login-box input::placeholder {
-    color: #555;
+/* ========= LADO DERECHO ========= */
+.login-right{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-/* ================= BOTÓN ================= */
-.login-box button {
-    width: 100%;
-    padding: 13px;
-    border-radius: 10px;
-    border: none;
-    background: #1A9A4A;
-    color: white;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: .25s ease;
+/* BOX */
+.login-box{
+    width:360px;
 }
 
-.login-box button:hover {
-    background: #F1C40F;
-    color: #1e293b;
+/* TITULO */
+.login-box h2{
+    margin-bottom:25px;
 }
 
-/* ================= MENSAJES ================= */
-.mensajes {
-    margin-top: 10px;
+/* INPUTS */
+.input-group{
+    position:relative;
+    margin-bottom:15px;
 }
 
-.mensajes p {
-    color: #ffeb3b;
-    font-size: 14px;
+.input-group i{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--muted);
 }
 
-/* ================= LINKS ================= */
-.pie-form {
-    margin-top: 20px;
+.input-group input{
+    width:100%;
+    padding:12px 12px 12px 35px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#0b0e11;
+    color:var(--text);
 }
 
-.pie-form a {
-    display: block;
-    font-size: 14px;
-    text-decoration: none;
-    color: white;
-    opacity: .85;
-    margin-top: 6px;
-    transition: .25s;
+.input-group input:focus{
+    outline:none;
+    border-color:var(--primary);
 }
 
-.pie-form a:hover {
-    color: #F1C40F;
-    opacity: 1;
+/* BOTON */
+.btn-login{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:var(--primary);
+    color:black;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:10px;
 }
 
-/* ================= RESPONSIVE ================= */
+.btn-login:hover{
+    opacity:.9;
+}
 
-/* Tablets */
-@media (max-width: 768px) {
-    .login-box {
-        padding: 35px 28px;
+/* MENSAJES */
+.mensajes{
+    margin-top:10px;
+}
+
+.mensajes p{
+    color:#f6465d;
+    font-size:13px;
+}
+
+/* LINKS */
+.extras{
+    margin-top:20px;
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+}
+
+.extras a{
+    color:var(--muted);
+    text-decoration:none;
+}
+
+.extras a:hover{
+    color:var(--primary);
+}
+
+/* ========= RESPONSIVE ========= */
+@media(max-width:900px){
+    .login-left{
+        display:none;
     }
 
-    .login-box img {
-        width: 120px;
-    }
-}
-
-/* Móviles */
-@media (max-width: 480px) {
-    .login-box {
-        padding: 28px 22px;
-    }
-
-    .login-box img {
-        width: 105px;
-    }
-
-    .login-box input {
-        font-size: 14px;
-        padding: 12px;
-    }
-
-    .login-box button {
-        font-size: 15px;
+    .login-container{
+        justify-content:center;
+        align-items:center;
     }
 }

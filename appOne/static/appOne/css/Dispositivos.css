@@ -1,77 +1,101 @@
-/* ================= DISPOSITIVOS ================= */
-
-h2 {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--primary);
+/* ================= TITULO ================= */
+.titulo-seccion {
+  font-size: 18px;
   margin-bottom: 20px;
+  color: var(--text-main);
 }
 
-/* ================= GALERÍA ================= */
+/* ================= GALERIA ================= */
 .galeria {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
 }
 
 /* ================= CARD ================= */
 .card {
-  background: white;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   padding: 15px;
   cursor: pointer;
-  transition: transform .25s ease, box-shadow .25s ease;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0,0,0,.12);
+  border-color: var(--primary);
+  transform: scale(1.02);
 }
 
+/* IMAGEN */
 .card img {
   width: 100%;
-  height: 160px;
+  height: 150px;
   object-fit: cover;
-  border-radius: var(--radius);
+  border-radius: 8px;
   margin-bottom: 10px;
 }
 
+/* TITULO */
 .card figcaption {
   font-weight: 600;
+  font-size: 14px;
   margin-bottom: 6px;
-  font-size: 15px;
+  color: var(--text-main);
 }
 
-.card p {
-  font-size: 13px;
-  margin-bottom: 4px;
-  color: var(--text-dark);
+/* INFO */
+.info p {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
-/* ================= ACCIONES ADMIN ================= */
+.info span {
+  color: var(--text-main);
+}
+
+/* ================= ESTADO ================= */
+.estado-prestamo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.pendiente {
+  background: rgba(252,213,53,0.15);
+  color: var(--primary);
+}
+
+.aprobado {
+  background: rgba(14,203,129,0.15);
+  color: var(--success);
+}
+
+/* ================= ADMIN ================= */
 .acciones-admin {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  gap: 8px;
   margin-top: auto;
 }
 
 .btn-editar,
 .btn-eliminar {
-  padding: 7px 14px;
-  border-radius: 8px;
+  flex: 1;
+  padding: 6px;
+  border-radius: 6px;
   border: none;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
-  font-weight: 500;
 }
 
 .btn-editar {
   background: var(--primary);
-  color: white;
+  color: black;
 }
 
 .btn-eliminar {
@@ -79,160 +103,87 @@ h2 {
   color: white;
 }
 
-/* ================= BOTÓN FLOTANTE ================= */
+/* ================= BOTON FLOAT ================= */
 .btn-flotante {
   position: fixed;
-  right: 30px;
-  bottom: 30px;
+  bottom: 25px;
+  right: 25px;
   width: 55px;
   height: 55px;
   background: var(--primary);
-  color: white;
+  color: black;
   border-radius: 50%;
-  font-size: 32px;
-  text-decoration: none;
+  font-size: 30px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  box-shadow: var(--shadow);
-  z-index: 90;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .btn-flotante:hover {
-  background: var(--primary-hover);
   transform: scale(1.1);
 }
 
+/* TOOLTIP */
 .tooltip {
   position: absolute;
-  bottom: 65px;
+  bottom: 60px;
   right: 0;
-  background: var(--primary);
-  color: white;
+  background: var(--card-bg);
   padding: 5px 10px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 12px;
   opacity: 0;
-  transition: .3s;
 }
 
 .btn-flotante:hover .tooltip {
   opacity: 1;
 }
 
-/* ================= MODALES ================= */
+/* ================= EMPTY ================= */
+.empty {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-top: 30px;
+}
+
+/* ================= MODAL (PRO OSCURO) ================= */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.55);
+  background: rgba(0,0,0,.7);
   justify-content: center;
   align-items: center;
-  z-index: 200;
 }
 
 .modal-contenido {
-  background: white;
-  width: 420px;
-  max-width: 90%;
-  border-radius: var(--radius);
-  padding: 25px;
-  position: relative;
-  animation: fadeModal .25s ease;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
 }
 
-@keyframes fadeModal {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.btn-cerrar-x {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.contenido-scroll {
-  max-height: 400px;
-  overflow-y: auto;
-  margin-top: 15px;
-}
-
-/* ================= FORMULARIO ================= */
-.formulario label {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.formulario textarea,
-.formulario input {
+/* INPUTS */
+.formulario input,
+.formulario textarea {
   width: 100%;
-  padding: 8px 10px;
+  padding: 10px;
+  background: #0b0e11;
+  border: 1px solid var(--border);
+  color: white;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
-  margin-bottom: 12px;
-  font-size: 14px;
+  margin-bottom: 10px;
 }
 
-.btn-enviar,
-.btn-actualizar {
+/* BOTON */
+.btn-enviar {
   width: 100%;
   background: var(--primary);
   border: none;
-  color: white;
   padding: 10px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: bold;
   cursor: pointer;
-}
-
-.btn-enviar:hover,
-.btn-actualizar:hover {
-  background: var(--primary-hover);
-}
-
-.titulo-modal{
-  text-align:center;
-  font-weight:700;
-  margin-bottom:15px;
-}
-
-.formulario textarea,
-.formulario input{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #cbd5e1;
-  margin-bottom:12px;
-  background:#f8fafc;
-}
-
-.formulario textarea:focus,
-.formulario input:focus{
-  outline:none;
-  border-color:#2563eb;
-  background:white;
-  box-shadow:0 0 0 3px rgba(37,99,235,.15);
-}
-
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 600px) {
-
-  .card img {
-    height: 140px;
-  }
-
-  .btn-flotante {
-    right: 20px;
-    bottom: 20px;
-  }
-
-  .modal-contenido {
-    padding: 18px;
-  }
 }

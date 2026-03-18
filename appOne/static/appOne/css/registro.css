@@ -1,119 +1,149 @@
-/* Fuente moderna */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+:root{
+    --bg:#0b0e11;
+    --card:#1e2329;
+    --text:#eaecef;
+    --muted:#848e9c;
+    --border:#2b3139;
+    --primary:#fcd535;
 }
 
-/* Fondo */
-body {
-    background: linear-gradient(135deg, #2E9A44, #F1C40F);
-    min-height: 100vh;                 /* ← CORREGIDO: permite crecer */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;                     /* ← añade espacio para evitar desbordes */
-    overflow-y: auto;                  /* ← permite scroll si crece */
+/* RESET */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-/* Contenedor principal */
-#contenedor {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+body{
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
 }
 
-/* Caja central */
-#central {
-    width: 380px;
-    background: rgba(255,255,255,0.1);
-    padding: 35px;
-    border-radius: 15px;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+/* CONTENEDOR */
+.registro-container{
+    display:flex;
+    min-height:100vh;
 }
 
-/* Login box */
-#login h3 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 26px;
-    font-weight: 600;
-    color: #fff;
+/* IZQUIERDA */
+.registro-left{
+    flex:1;
+    background:linear-gradient(135deg,#0b0e11,#1e2329);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:60px;
 }
 
-#login form {
-    display: flex;
-    flex-direction: column;
+.registro-left h1{
+    color:var(--primary);
+    margin-bottom:15px;
 }
 
-/* Estilos Django form.as_p */
-#login p {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    color: white;
-    font-size: 14px;
+.registro-left p{
+    color:var(--muted);
+    max-width:400px;
 }
 
-#login p label {
-    margin-bottom: 5px;
+/* DERECHA */
+.registro-right{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-#login input {
-    padding: 10px 12px;
-    border: none;
-    border-radius: 10px;
-    outline: none;
-    font-size: 14px;
-    background: rgba(255,255,255,0.85);
+/* BOX */
+.registro-box{
+    width:420px;
+    max-width:95%;
 }
 
-/* Botón */
-#login button {
-    margin-top: 10px;
-    padding: 12px;
-    border: none;
-    background: #2E9A44;
-    color: #fff;
-    font-size: 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.25s ease;
+/* TITULO */
+.registro-box h2{
+    margin-bottom:20px;
 }
 
-#login button:hover {
-    background:#F1C40F;
+/* GRID */
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:15px;
 }
 
-/* Pie del formulario */
-.pie-form {
-    margin-top: 15px;
-    text-align: center;
+/* FORM DJANGO */
+.form-grid p{
+    display:flex;
+    flex-direction:column;
 }
 
-.pie-form a {
-    color: #fff;
-    font-size: 14px;
-    text-decoration: none;
-    opacity: 0.9;
-    transition: 0.2s;
+.form-grid label{
+    font-size:13px;
+    margin-bottom:5px;
+    color:var(--muted);
 }
 
-.pie-form a:hover {
-    opacity: 1;
-    text-decoration: underline;
+/* INPUTS */
+.form-grid input,
+.form-grid select,
+.form-grid textarea{
+    padding:12px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#0b0e11;
+    color:var(--text);
+    font-size:14px;
 }
 
-/* Responsive */
-@media (max-width: 420px) {
-    #central {
-        width: 100%;
-        padding: 25px;
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus{
+    outline:none;
+    border-color:var(--primary);
+}
+
+/* BOTON */
+.btn-registro{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:8px;
+    background:var(--primary);
+    color:black;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.btn-registro:hover{
+    opacity:.9;
+}
+
+/* LINKS */
+.extras{
+    margin-top:15px;
+    text-align:center;
+}
+
+.extras a{
+    color:var(--muted);
+    text-decoration:none;
+    font-size:13px;
+}
+
+.extras a:hover{
+    color:var(--primary);
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+    .registro-left{
+        display:none;
+    }
+
+    .registro-container{
+        justify-content:center;
+        align-items:center;
     }
 }

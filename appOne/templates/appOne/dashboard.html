@@ -8,11 +8,9 @@
   <title>Dashboard - MDsUCN</title>
 
   <link rel="stylesheet" href="{% static 'appOne/css/dashboard.css'%}">
-
-  <link rel="stylesheet" href="{% static 'appOne/css/editar_dispositivos.css' %}">
-
   <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   {% block extra_css %}{% endblock %}
 </head>
 
@@ -21,15 +19,15 @@
   <!-- HEADER -->
   <header class="navegacion">
     <nav class="nav">
-      <h1>Medios Audiovisuales</h1>
+      <h1>MDsUCN</h1>
+
       <ul class="menu">
         <li><a href="#">Inicio</a></li>
         <li><a href="#">Soporte</a></li>
-        <li><a href="#">Contactos</a></li>
 
-        <!-- Notificaciones -->
+        <!-- NOTIFICACIONES -->
         <li class="notif-dropdown">
-          <a href="#" id="notif-btn">
+          <a href="#">
             <i class="ri-notification-3-line"></i>
 
             {% if pendientes_count > 0 %}
@@ -37,20 +35,24 @@
             {% endif %}
           </a>
 
-          <div class="notif-menu" id="notif-menu">
-            <h4 class="notif-title">Solicitudes de acceso</h4>
+          <div class="notif-menu">
+            <h4>Solicitudes</h4>
 
             {% if usuarios_pendientes %}
-            {% for u in usuarios_pendientes %}
-            <div class="notif-item">
-              <strong>{{ u.nombre_completo }}</strong>
-              <p class="notif-rol">{{ u.rol }}</p>
-            </div>
-            {% endfor %}
+              {% for u in usuarios_pendientes %}
+                <div class="notif-item">
+                  <strong>{{ u.nombre_completo }}</strong>
+                  <p>{{ u.rol }}</p>
+                </div>
+              {% endfor %}
             {% else %}
-            <p class="notif-empty">No hay notificaciones nuevas</p>
+              <p>No hay notificaciones</p>
             {% endif %}
           </div>
+        </li>
+
+        <li class="user">
+          <i class="ri-user-3-line"></i> {{ request.user.username }}
         </li>
       </ul>
     </nav>
@@ -59,52 +61,79 @@
   <div class="container">
 
     <!-- SIDEBAR -->
-    <div class="sidebar">
-      <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png">
+      </div>
 
-      <a href="{% url 'dashboardinicio' %}"><i class="ri-home-4-line"></i> Inicio</a>
-      <a href="{% url 'listardispositivos' %}"><i class="ri-computer-line"></i>Dispositivos</a>
+      <nav>
+        <a href="{% url 'dashboardinicio' %}" class="active"><i class="ri-home-4-line"></i> Inicio</a>
+        <a href="{% url 'listardispositivos' %}"><i class="ri-computer-line"></i> Dispositivos</a>
 
-      {% if request.user.rol == "Admin" %}
-      <a href="{% url 'panel_usuarios' %}"><i class="ri-user-fill"></i> Usuarios</a>
-      {% endif %}
-      {% if request.user.rol == "Admin" %}
-      <a href="{% url 'solicitudes_prestamos' %}"><i class="ri-add-fill"></i> Solicitud</a>
-      {% endif %}
+        {% if request.user.rol == "Admin" %}
+        <a href="{% url 'panel_usuarios' %}"><i class="ri-user-fill"></i> Usuarios</a>
+        <a href="{% url 'solicitudes_prestamos' %}"><i class="ri-add-fill"></i> Solicitudes</a>
+        {% endif %}
 
-      <a href="{% url 'reportes' %}"><i class="ri-file-chart-fill"></i> Reportes</a>
-      <a href=""><i class="ri-settings-3-line"></i> Configuración</a>
-      <a href="{% url 'logout' %}"><i class="ri-shut-down-line"></i> Cerrar Sesión</a>
-    </div>
+        <a href="{% url 'reportes' %}"><i class="ri-file-chart-fill"></i> Reportes</a>
+        <a href="#"><i class="ri-settings-3-line"></i> Configuración</a>
+        <a href="{% url 'logout' %}"><i class="ri-shut-down-line"></i> Cerrar sesión</a>
+      </nav>
+    </aside>
 
-    <!-- MAIN CONTENT -->
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
+    <!-- MAIN -->
+    <main class="main-content">
       {% block contenido %}
-      {% endblock %}
-    </div>
 
+      <!-- EJEMPLO DASHBOARD -->
+      <div class="stats">
+        <div class="stat-card">
+          <i class="ri-computer-line"></i>
+          <h3>120</h3>
+          <p>Dispositivos</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="ri-user-line"></i>
+          <h3>80</h3>
+          <p>Usuarios</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="ri-time-line"></i>
+          <h3>15</h3>
+          <p>Préstamos activos</p>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <h3>Actividad reciente</h3>
+        <table class="table-dashboard">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Acción</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Juan</td>
+              <td>Solicitó laptop</td>
+              <td><span class="estado aprobado">Aprobado</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {% endblock %}
+    </main>
 
   </div>
 
-  <!-- FOOTER -->
-
   <footer>
-    <p>© 2025 Sistema MDsUCN — Todos los derechos reservados.</p>
+    <p>© 2026 MDsUCN — Sistema profesional</p>
   </footer>
-  <!-- CHART JS -->
-  <script>
-    new Chart(document.getElementById("pieChart"), {
-      type: "doughnut",
-      data: {
-        labels: ["Docentes", "Estudiantes", "Otros"],
-        datasets: [{
-          data: [45, 30, 25],
-        }]
-      }
-    });
-  </script>
 
 </body>
-
 </html>

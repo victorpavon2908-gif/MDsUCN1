@@ -1,21 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg: #f5f6fa;
-  --sidebar-bg: #0f172a;
-  --sidebar-hover: #1e293b;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
+  --bg: #0b0e11;
+  --card-bg: #1e2329;
+  --sidebar-bg: #0b0e11;
+  --sidebar-hover: #1e2329;
 
-  --success: #10b981;
-  --yellow: #facc15;
-  --danger: #ef4444;
+  --primary: #fcd535;
+  --success: #0ecb81;
+  --danger: #f6465d;
 
-  --text-dark: #1e293b;
-  --text-light: #f8fafc;
+  --text-main: #eaecef;
+  --text-secondary: #848e9c;
 
-  --radius: 14px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+  --border: #2b3139;
 }
 
 /* RESET */
@@ -23,74 +21,55 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
+  transition: 0.2s;
 }
 
 body {
   font-family: 'Inter', sans-serif;
   background: var(--bg);
-  color: var(--text-dark);
-  overflow-x: hidden;
+  color: var(--text-main);
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 .navegacion {
-  background: white;
+  background: #1e2329;
+  border-bottom: 1px solid var(--border);
   position: fixed;
-  top: 0;
   width: 100%;
+  top: 0;
   z-index: 1000;
-  box-shadow: var(--shadow);
 }
 
 .nav {
-  max-width: 1300px;
-  margin: auto;
-  padding: 15px 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-}
-
-.nav h1 {
-  color: var(--primary);
-  font-size: 1.3rem;
-  font-weight: 700;
+  padding: 15px 25px;
 }
 
 .menu {
   display: flex;
-  align-items: center;
-  gap: 25px;
+  gap: 20px;
   list-style: none;
+  align-items: center;
 }
 
 .menu a {
+  color: var(--text-main);
   text-decoration: none;
-  font-weight: 600;
-  color: var(--text-dark);
 }
 
 .menu a:hover {
   color: var(--primary);
 }
 
-.menu i {
-  font-size: 22px;
-}
-
-/* NOTIFICACIONES */
+/* NOTIF */
 .notif-dropdown {
   position: relative;
 }
 
 .notif-badge {
   background: red;
-  color: white;
-  font-size: 11px;
+  font-size: 10px;
   padding: 2px 6px;
   border-radius: 50%;
   position: absolute;
@@ -102,185 +81,136 @@ body {
   display: none;
   position: absolute;
   right: 0;
-  top: 35px;
-  background: white;
-  width: 260px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  top: 30px;
+  background: var(--card-bg);
   padding: 15px;
+  border-radius: 10px;
+  width: 250px;
 }
 
 .notif-dropdown:hover .notif-menu {
   display: block;
 }
 
-/* ================= LAYOUT ================= */
+/* LAYOUT */
 .container {
   display: flex;
   margin-top: 70px;
 }
 
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 .sidebar {
   width: 240px;
   background: var(--sidebar-bg);
+  height: 100vh;
   position: fixed;
-  top: 70px;
-  bottom: 0;
-  overflow-y: auto;
-  padding-top: 25px;
+  border-right: 1px solid var(--border);
 }
 
 .sidebar img {
   width: 120px;
-  margin: 0 auto 25px;
+  margin: 20px auto;
   display: block;
 }
 
 .sidebar a {
   display: block;
-  padding: 14px 30px;
-  color: var(--text-light);
+  padding: 15px 25px;
+  color: var(--text-secondary);
   text-decoration: none;
-  font-weight: 500;
-  transition: .3s;
 }
 
 .sidebar a:hover {
   background: var(--sidebar-hover);
-  padding-left: 40px;
+  color: var(--primary);
 }
 
-/* ================= MAIN ================= */
+.sidebar a.active {
+  background: rgba(252,213,53,0.1);
+  color: var(--primary);
+}
+
+/* MAIN */
 .main-content {
   margin-left: 240px;
   padding: 30px;
   width: 100%;
-  min-height: calc(100vh - 70px);
 }
 
-/* ================= CARDS ================= */
+/* CARDS */
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 20px;
 }
 
 .stat-card {
-  background: white;
-  padding: 25px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  text-align: center;
-  transition: .3s;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 
 .stat-card:hover {
-  transform: translateY(-6px);
+  border-color: var(--primary);
 }
 
 .stat-card i {
-  font-size: 40px;
   color: var(--primary);
+  font-size: 25px;
 }
 
-/* ================= TABLAS ================= */
+/* TABLA */
 .table-wrapper {
-  background: white;
-  margin-top: 25px;
-  padding: 25px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow-x: auto;
+  margin-top: 20px;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 10px;
 }
 
 .table-dashboard {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
-}
-
-.table-dashboard th,
-.table-dashboard td {
-  padding: 12px;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 14px;
 }
 
 .table-dashboard th {
-  background: #eef1f6;
-  font-weight: 600;
+  text-align: left;
+  padding: 10px;
+  color: var(--text-secondary);
+}
+
+.table-dashboard td {
+  padding: 10px;
 }
 
 .table-dashboard tr:hover {
-  background: #f0f4ff;
+  background: rgba(255,255,255,0.02);
 }
 
-/* ================= ESTADOS ================= */
+/* ESTADOS */
 .estado {
-  padding: 4px 10px;
-  border-radius: 8px;
+  padding: 5px 10px;
+  border-radius: 5px;
   font-size: 12px;
-  font-weight: 600;
 }
 
-.aprobado { background: var(--success); color: white; }
-.pendiente { background: var(--yellow); }
-
-/* ================= BOTONES ================= */
-.btn {
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  border: none;
-  cursor: pointer;
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+.aprobado {
+  color: #0ecb81;
+  background: rgba(14,203,129,0.1);
 }
 
-.btn-success { background: var(--success); }
-.btn-yellow { background: var(--yellow); color: #1e293b; }
-.btn-danger { background: var(--danger); }
-
-/* ================= FOOTER ================= */
+/* FOOTER */
 footer {
   margin-left: 240px;
-  padding: 20px;
-  background: white;
   text-align: center;
-  box-shadow: var(--shadow);
+  padding: 20px;
+  color: var(--text-secondary);
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 900px) {
-  .main-content,
-  footer {
-    margin-left: 0;
-  }
-
-  .sidebar {
-    position: fixed;
-    left: -240px;
-    transition: .3s;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
+/* SCROLL */
+::-webkit-scrollbar {
+  width: 6px;
 }
-
-@media (max-width: 600px) {
-  .nav h1 {
-    font-size: 1rem;
-  }
-
-  .menu {
-    gap: 15px;
-  }
-
-  .table-dashboard {
-    min-width: 500px;
-  }
+::-webkit-scrollbar-thumb {
+  background: #2b3139;
 }

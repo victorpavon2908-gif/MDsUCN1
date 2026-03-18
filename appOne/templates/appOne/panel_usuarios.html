@@ -3,85 +3,119 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/usuario.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 {% endblock %}
 
 {% block contenido %}
 
-<h2 class="titulo-seccion">Panel de Usuarios</h2>
+<div class="usuarios-container">
 
-<!-- ================= FILTROS ================= -->
-<form method="GET" class="filtros-usuarios">
-    <input type="text" name="buscar"
-           placeholder="Buscar por nombre, correo, código o dispositivo..."
-           value="{{ request.GET.buscar }}">
+    <!-- HEADER -->
+    <div class="header-usuarios">
+        <h2>Gestión de Usuarios</h2>
+        <span class="total-users">Total: {{ usuarios|length }}</span>
+    </div>
 
-    <select name="rol">
-        <option value="">Todos los roles</option>
-        <option value="Admin" {% if request.GET.rol == "Admin" %}selected{% endif %}>Admin</option>
-        <option value="Usuario" {% if request.GET.rol == "Usuario" %}selected{% endif %}>Usuario</option>
-    </select>
+    <!-- FILTROS -->
+    <form method="GET" class="filtros-usuarios">
 
-    <select name="estado">
-        <option value="">Todos los estados</option>
-        <option value="activo" {% if request.GET.estado == "activo" %}selected{% endif %}>Activos</option>
-        <option value="inactivo" {% if request.GET.estado == "inactivo" %}selected{% endif %}>Inactivos</option>
-    </select>
+        <div class="input-group">
+            <i class="ri-search-line"></i>
+            <input type="text" name="buscar"
+                placeholder="Buscar usuario..."
+                value="{{ request.GET.buscar }}">
+        </div>
 
-    <button type="submit" class="btn-filtrar">Filtrar</button>
-</form>
+        <select name="rol">
+            <option value="">Todos los roles</option>
+            <option value="Admin" {% if request.GET.rol == "Admin" %}selected{% endif %}>Admin</option>
+            <option value="Usuario" {% if request.GET.rol == "Usuario" %}selected{% endif %}>Usuario</option>
+        </select>
 
-<!-- ================= TABLA ================= -->
-<div class="table-wrapper">
-    <table class="table-dashboard">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Código</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for u in usuarios %}
-            <tr>
-                <td>{{ u.nombre_completo }}</td>
-                <td>{{ u.correo_institucional }}</td>
-                <td>{{ u.codigo }}</td>
-                <td>{{ u.rol }}</td>
-                <td>
-                    {% if u.is_active %}
-                        <span class="estado activo">Activo</span>
-                    {% else %}
-                        <span class="estado inactivo">Inactivo</span>
-                    {% endif %}
-                </td>
-                <td class="acciones">
-                    <a href="{% url 'aprobar_usuario' u.id %}" class="btn btn-success">
-                        <i class="ri-check-fill"></i> Activar
-                    </a>
+        <select name="estado">
+            <option value="">Estado</option>
+            <option value="activo" {% if request.GET.estado == "activo" %}selected{% endif %}>Activo</option>
+            <option value="inactivo" {% if request.GET.estado == "inactivo" %}selected{% endif %}>Inactivo</option>
+        </select>
 
-                    <a href="{% url 'rechazar_usuario' u.id %}" class="btn btn-warning">
-                        <i class="ri-close-fill"></i> Desactivar
-                    </a>
+        <button type="submit" class="btn-filtrar">Filtrar</button>
 
-                    <a href="{% url 'eliminar_usuario' u.id %}"
-                       onclick="return confirm('⚠️ ¿Seguro que deseas eliminar este usuario?');"
-                       class="btn btn-danger">
-                        <i class="ri-delete-bin-6-line"></i> Eliminar
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="no-registros">
-                    No hay usuarios registrados
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    </form>
+
+    <!-- TABLA -->
+    <div class="table-wrapper">
+        <table class="table-dashboard">
+
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Código</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+
+                    <td class="user-cell">
+                        <div class="avatar">
+                            {{ u.nombre_completo|slice:":1" }}
+                        </div>
+                        <span>{{ u.nombre_completo }}</span>
+                    </td>
+
+                    <td>{{ u.correo_institucional }}</td>
+                    <td>{{ u.codigo }}</td>
+
+                    <td>
+                        <span class="rol {{ u.rol|lower }}">
+                            {{ u.rol }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if u.is_active %}
+                            <span class="estado activo">Activo</span>
+                        {% else %}
+                            <span class="estado inactivo">Inactivo</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="acciones">
+
+                        <a href="{% url 'aprobar_usuario' u.id %}" class="btn success">
+                            <i class="ri-check-line"></i>
+                        </a>
+
+                        <a href="{% url 'rechazar_usuario' u.id %}" class="btn warning">
+                            <i class="ri-close-line"></i>
+                        </a>
+
+                        <a href="{% url 'eliminar_usuario' u.id %}"
+                           onclick="return confirm('¿Eliminar usuario?');"
+                           class="btn danger">
+                            <i class="ri-delete-bin-6-line"></i>
+                        </a>
+
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="no-data">
+                        No hay usuarios registrados
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
 </div>
 
 {% endblock %}

@@ -1,226 +1,216 @@
-/* ========= TIPOGRAFÍA Y BASE ========= */
-
+/* ========= BASE BINANCE ========= */
 :root{
-    --primary:#2563eb;
-    --bg:#f3f6fb;
-    --card:#ffffff;
-    --text:#0f172a;
-    --muted:#64748b;
-    --border:#e2e8f0;
-    --success:#16a34a;
-    --warning:#eab308;
-    --danger:#dc2626;
-    --radius:14px;
+    --bg:#0b0e11;
+    --card:#1e2329;
+    --text:#eaecef;
+    --muted:#848e9c;
+    --border:#2b3139;
+
+    --primary:#fcd535;
+    --success:#0ecb81;
+    --danger:#f6465d;
+    --warning:#fcd535;
+
+    --radius:12px;
 }
 
 body{
     background:var(--bg);
-    font-family:'Segoe UI',system-ui;
+    color:var(--text);
+    font-family: Arial, sans-serif;
 }
 
-/* ========= TÍTULO ========= */
-
-.titulo-seccion{
-    margin: 25px 25px 10px;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--text);
+/* CONTENEDOR */
+.usuarios-container{
+    padding:20px;
 }
 
-/* ========= FILTROS (CARD) ========= */
+/* HEADER */
+.header-usuarios{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
 
+.header-usuarios h2{
+    font-size:18px;
+}
+
+.total-users{
+    font-size:13px;
+    color:var(--muted);
+}
+
+/* FILTROS */
 .filtros-usuarios{
-    margin: 10px 25px 20px;
-    background: var(--card);
-    padding: 18px;
-    border-radius: var(--radius);
-    box-shadow: 0 6px 20px rgba(0,0,0,.06);
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
 }
 
-.filtros-usuarios input,
-.filtros-usuarios select{
-    height: 42px;
-    padding: 0 14px;
-    border-radius: 10px;
+.input-group{
+    position:relative;
+}
+
+.input-group i{
+    position:absolute;
+    top:50%;
+    left:10px;
+    transform:translateY(-50%);
+    color:var(--muted);
+}
+
+.input-group input{
+    padding:10px 10px 10px 30px;
+    background:#0b0e11;
     border:1px solid var(--border);
-    font-size:14px;
-    min-width: 240px;
-    background:#f8fafc;
-    transition:.2s;
+    color:var(--text);
+    border-radius:8px;
 }
 
-.filtros-usuarios input:focus,
-.filtros-usuarios select:focus{
-    outline:none;
-    border-color:var(--primary);
-    background:white;
-    box-shadow:0 0 0 3px rgba(37,99,235,.15);
+select{
+    padding:10px;
+    background:#0b0e11;
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
 }
 
+/* BOTON */
 .btn-filtrar{
-    height:42px;
-    padding:0 22px;
-    border:none;
-    border-radius:10px;
     background:var(--primary);
-    color:white;
-    font-weight:600;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
     cursor:pointer;
-    transition:.2s;
+    font-weight:600;
 }
 
-.btn-filtrar:hover{
-    transform:translateY(-1px);
-    box-shadow:0 6px 15px rgba(37,99,235,.3);
-}
-
-/* ========= TABLA COMO CARD ========= */
-
+/* TABLA */
 .table-wrapper{
-    padding: 0 25px 30px;
+    background:var(--card);
+    border-radius:var(--radius);
+    border:1px solid var(--border);
+    overflow:hidden;
 }
 
 .table-dashboard{
     width:100%;
-    border-collapse:separate;
-    border-spacing:0;
-    background:var(--card);
-    border-radius:var(--radius);
-    overflow:hidden;
-    box-shadow:0 10px 25px rgba(0,0,0,.06);
-}
-
-/* HEADER SUAVE */
-.table-dashboard thead{
-    background:#f1f5f9;
+    border-collapse:collapse;
 }
 
 .table-dashboard th{
     text-align:left;
-    padding:16px;
-    font-size:13.5px;
-    color:var(--muted);
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.5px;
-    border-bottom:1px solid var(--border);
-}
-
-/* FILAS */
-.table-dashboard td{
-    padding:16px;
-    font-size:14.5px;
-    color:var(--text);
-    border-bottom:1px solid var(--border);
-}
-
-.table-dashboard tbody tr{
-    transition:.2s;
-}
-
-.table-dashboard tbody tr:hover{
-    background:#f8fafc;
-}
-
-/* ========= ESTADOS BONITOS ========= */
-
-.estado{
-    padding:6px 14px;
-    border-radius:50px;
+    padding:12px;
     font-size:12px;
-    font-weight:700;
-    display:inline-block;
+    color:var(--muted);
+    background:#2b3139;
+}
+
+.table-dashboard td{
+    padding:12px;
+    border-top:1px solid var(--border);
+}
+
+.table-dashboard tr:hover{
+    background:rgba(255,255,255,0.03);
+}
+
+/* USER CELL */
+.user-cell{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--primary);
+    color:black;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+/* ROLES */
+.rol{
+    padding:4px 10px;
+    border-radius:6px;
+    font-size:11px;
+}
+
+.rol.admin{
+    background:rgba(252,213,53,0.15);
+    color:var(--primary);
+}
+
+.rol.usuario{
+    background:rgba(14,203,129,0.15);
+    color:var(--success);
+}
+
+/* ESTADOS */
+.estado{
+    padding:4px 10px;
+    border-radius:6px;
+    font-size:11px;
 }
 
 .estado.activo{
-    background:#dcfce7;
+    background:rgba(14,203,129,0.15);
     color:var(--success);
 }
 
 .estado.inactivo{
-    background:#fee2e2;
+    background:rgba(246,70,93,0.15);
     color:var(--danger);
 }
 
-/* ========= BOTONES MODERNOS ========= */
-
+/* BOTONES */
 .acciones{
     display:flex;
-    gap:8px;
-    flex-wrap:wrap;
+    gap:6px;
 }
 
 .btn{
-    display:inline-flex;
+    padding:6px 8px;
+    border-radius:6px;
+    display:flex;
     align-items:center;
-    gap:6px;
-    padding:8px 14px;
-    border-radius:9px;
-    font-size:13px;
-    font-weight:600;
-    text-decoration:none;
-    transition:.2s;
-    white-space:nowrap;
+    justify-content:center;
 }
 
-.btn i{
-    font-size:16px;
+.btn.success{
+    color:var(--success);
 }
 
-/* success */
-.btn-success{
-    background:#22c55e;
-    color:white;
-}
-.btn-success:hover{
-    background:#16a34a;
-    transform:translateY(-1px);
+.btn.warning{
+    color:var(--warning);
 }
 
-/* warning */
-.btn-warning{
-    background:#facc15;
-    color:#1f2937;
-}
-.btn-warning:hover{
-    background:#eab308;
-    transform:translateY(-1px);
+.btn.danger{
+    color:var(--danger);
 }
 
-/* danger */
-.btn-danger{
-    background:#ef4444;
-    color:white;
-}
-.btn-danger:hover{
-    background:#dc2626;
-    transform:translateY(-1px);
+.btn:hover{
+    background:rgba(255,255,255,0.05);
 }
 
-/* ========= VACÍO ========= */
-
-.no-registros{
-    padding:30px;
+/* VACIO */
+.no-data{
     text-align:center;
+    padding:20px;
     color:var(--muted);
-    font-weight:600;
 }
 
-/* ========= RESPONSIVE REAL ========= */
-
-@media(max-width:900px){
+/* RESPONSIVE */
+@media(max-width:800px){
     .filtros-usuarios{
         flex-direction:column;
-        align-items:stretch;
-    }
-
-    .filtros-usuarios input,
-    .filtros-usuarios select,
-    .btn-filtrar{
-        width:100%;
     }
 }

@@ -1,48 +1,59 @@
 {% extends "appOne/dashboard.html" %}
 {% load static %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/layaut_Principal.css' %}">
 {% endblock %}
 
 {% block contenido %}
 
+<!-- STATS -->
 <div class="stats">
 
     <div class="stat-card">
         <i class="ri-user-3-fill"></i>
-        <h3>Usuarios</h3>
-        <p>{{ estadisticas.usuarios }}</p>
+        <div>
+            <h3>Usuarios</h3>
+            <p>{{ estadisticas.usuarios }}</p>
+        </div>
     </div>
 
     <div class="stat-card">
         <i class="ri-timer-2-fill"></i>
-        <h3>Préstamos activos</h3>
-        <p>{{ estadisticas.prestamos }}</p>
+        <div>
+            <h3>Préstamos activos</h3>
+            <p>{{ estadisticas.prestamos }}</p>
+        </div>
     </div>
 
     <div class="stat-card">
         <i class="ri-computer-fill"></i>
-        <h3>Disponibles</h3>
-        <p>{{ estadisticas.disponibles }}</p>
+        <div>
+            <h3>Disponibles</h3>
+            <p>{{ estadisticas.disponibles }}</p>
+        </div>
     </div>
 
     <div class="stat-card">
         <i class="ri-notification-line"></i>
-        <h3>Pendientes</h3>
-        <p>{{ pendientes_count }}</p>
+        <div>
+            <h3>Pendientes</h3>
+            <p>{{ pendientes_count }}</p>
+        </div>
     </div>
 
 </div>
 
-<!-- GRÁFICO -->
+<!-- CHARTS + TABLA -->
 <div class="charts">
 
+    <!-- GRÁFICO -->
     <div class="chart-card">
         <h3>Distribución de usuarios</h3>
         <canvas id="pieChart"></canvas>
     </div>
 
-    <!-- Últimos préstamos -->
+    <!-- TABLA -->
     <div class="table-card">
         <h3>Últimos préstamos</h3>
 
@@ -64,7 +75,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3" style="text-align: center;">No hay préstamos recientes</td>
+                    <td colspan="3" class="empty">No hay préstamos recientes</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -73,4 +84,5 @@
     </div>
 
 </div>
-{% endblock%}
+
+{% endblock %}

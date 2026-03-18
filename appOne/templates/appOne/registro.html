@@ -1,28 +1,59 @@
 {% load static %}
 <!doctype html>
-<html>
+<html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Registro</title>
+    <title>Crear Cuenta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Iconos -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{% static 'appOne/css/registro.css' %}">
 </head>
+
 <body>
-<div id="contenedor">
-    <div id="central">
-        <div id="login">
-            <h3>Registro</h3>
+
+<div class="registro-container">
+
+    <!-- IZQUIERDA -->
+    <div class="registro-left">
+        <h1>Vamos a Registrarte</h1>
+        <p>Crea tu cuenta para solicitar dispositivos</p>
+    </div>
+
+    <!-- DERECHA -->
+    <div class="registro-right">
+
+        <div class="registro-box">
+
+            <h2>Crear Cuenta</h2>
 
             <form method="POST">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Enviar Registro</button>
+
+                <div class="form-grid">
+                    {{ form.as_p }}
+                </div>
+
+                <button type="submit" class="btn-registro">
+                    Crear cuenta
+                </button>
             </form>
 
-            <div class="pie-form">
-                <a href="{% url 'login' %}">¿Ya tienes cuenta?</a>
+            <div class="extras">
+                <a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión</a>
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 </body>
 </html>

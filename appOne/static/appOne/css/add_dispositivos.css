@@ -1,88 +1,112 @@
-/* ================= AGREGAR DISPOSITIVO ================= */
+/* ========= BASE BINANCE ========= */
+:root{
+    --bg:#0b0e11;
+    --card:#1e2329;
+    --text:#eaecef;
+    --muted:#848e9c;
+    --border:#2b3139;
 
-.titulo-form {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--primary);
-  margin-bottom: 25px;
+    --primary:#fcd535;
+    --primary-hover:#e6c200;
+    --success:#0ecb81;
+
+    --radius:12px;
 }
 
-/* CONTENEDOR FORMULARIO */
-.formulario-contenedor {
-  background: white;
-  max-width: 900px;
-  padding: 30px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family: Arial, sans-serif;
+}
+
+/* CONTENEDOR */
+.form-container{
+    padding:20px;
+}
+
+/* HEADER */
+.form-header h2{
+    font-size:18px;
+    margin-bottom:20px;
+}
+
+/* FORM */
+.formulario{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:25px;
+    max-width:900px;
 }
 
 /* GRID */
-.formulario-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:20px;
 }
 
-/* FORM DJANGO */
-.formulario-grid p {
-  display: flex;
-  flex-direction: column;
+/* DJANGO FORM */
+.form-grid p{
+    display:flex;
+    flex-direction:column;
 }
 
-.formulario-grid label {
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 6px;
+.form-grid label{
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:5px;
 }
 
-.formulario-grid input,
-.formulario-grid select,
-.formulario-grid textarea {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
+/* INPUTS */
+.form-grid input,
+.form-grid select,
+.form-grid textarea{
+    background:#0b0e11;
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px;
+    border-radius:8px;
+    font-size:14px;
+    transition:.2s;
 }
 
-.formulario-grid textarea {
-  resize: vertical;
-  min-height: 80px;
+/* FOCUS */
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus{
+    outline:none;
+    border-color:var(--primary);
+}
+
+/* TEXTAREA */
+.form-grid textarea{
+    min-height:80px;
+    resize:vertical;
 }
 
 /* BOTÓN */
-.btn-guardar {
-  margin-top: 25px;
-  background: var(--primary);
-  color: white;
-  padding: 12px 25px;
-  border-radius: 10px;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.btn-guardar{
+    margin-top:20px;
+    background:var(--primary);
+    color:black;
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
 }
 
-.btn-guardar:hover {
-  background: var(--primary-hover);
+.btn-guardar:hover{
+    background:var(--primary-hover);
 }
 
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 900px) {
-  .formulario-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .formulario-contenedor {
-    padding: 22px;
-  }
-}
-
-@media (max-width: 600px) {
-  .titulo-form {
-    font-size: 1.3rem;
-  }
+/* RESPONSIVE */
+@media(max-width:900px){
+    .form-grid{
+        grid-template-columns:1fr;
+    }
 }
