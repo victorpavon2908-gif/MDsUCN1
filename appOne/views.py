@@ -213,27 +213,51 @@ def agregar_dispositivo(request):
 
 @login_required
 def editar_dispositivo(request, id):
+
     dispositivo = get_object_or_404(Dispositivo, id=id)
 
     if request.method == "POST":
-        form = DispositivoForm(request.POST, request.FILES, instance=dispositivo)
+
+        form = DispositivoForm(
+            request.POST,
+            request.FILES,
+            instance=dispositivo
+        )
+
         if form.is_valid():
             form.save()
-            messages.success(request, "Dispositivo actualizado correctamente.")
+
+            messages.success(
+                request,
+                "Dispositivo actualizado correctamente."
+            )
+
             return redirect('listardispositivos')
+
     else:
+
         form = DispositivoForm(instance=dispositivo)
 
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return render(request, 'appOne/form_editar_dispositivo.html', {
+    # AJAX
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+
+        return render(
+            request,
+            'appOne/form_editar_dispositivo.html',
+            {
                 'form': form,
                 'dispositivo': dispositivo
-            })
+            }
+        )
 
-    return render(request, 'appOne/form_editar_dispositivo.html', {
-        'form': form,
-        'dispositivo': dispositivo
-    })
+    return render(
+        request,
+        'appOne/form_editar_dispositivo.html',
+        {
+            'form': form,
+            'dispositivo': dispositivo
+        }
+    )
 
 
 @login_required

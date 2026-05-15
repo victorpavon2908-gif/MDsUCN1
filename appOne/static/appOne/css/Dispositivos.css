@@ -1,139 +1,176 @@
 /* ================= TITULO ================= */
 .titulo-seccion {
-  font-size: 18px;
-  margin-bottom: 20px;
-  color: var(--text-main);
+  font-size: 22px;
+  margin-bottom: 25px;
+  color: var(--primary);
+  font-weight: 700;
 }
 
 /* ================= GALERIA ================= */
 .galeria {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 22px;
 }
 
 /* ================= CARD ================= */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-top: 5px solid var(--primary);
+  border-radius: 14px;
   padding: 15px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   position: relative;
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .card:hover {
-  border-color: var(--primary);
-  transform: scale(1.02);
+  transform: translateY(-4px);
+  border-top-color: var(--secondary);
 }
 
-/* IMAGEN */
+/* ================= IMAGEN ================= */
 .card img {
   width: 100%;
-  height: 150px;
+  height: 160px;
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  border-radius: 10px;
+  margin-bottom: 12px;
 }
 
-/* TITULO */
+/* ================= TITULO ================= */
 .card figcaption {
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 6px;
-  color: var(--text-main);
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: var(--primary);
 }
 
-/* INFO */
+/* ================= INFO ================= */
 .info p {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
+  margin-bottom: 5px;
 }
 
 .info span {
   color: var(--text-main);
+  font-weight: 600;
 }
 
 /* ================= ESTADO ================= */
 .estado-prestamo {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
   font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
 }
 
+/* PENDIENTE */
 .pendiente {
-  background: rgba(252,213,53,0.15);
-  color: var(--primary);
+  background: rgba(203,161,75,0.18);
+  color: var(--gold-dark);
 }
 
+/* APROBADO */
 .aprobado {
-  background: rgba(14,203,129,0.15);
-  color: var(--success);
+  background: rgba(1,148,70,0.15);
+  color: var(--secondary);
+}
+
+/* RECHAZADO OPCIONAL */
+.rechazado {
+  background: rgba(220,38,38,0.10);
+  color: #dc2626;
 }
 
 /* ================= ADMIN ================= */
 .acciones-admin {
   display: flex;
-  gap: 8px;
-  margin-top: auto;
+  gap: 10px;
+  margin-top: 18px;
 }
 
+/* BOTONES */
 .btn-editar,
 .btn-eliminar {
   flex: 1;
-  padding: 6px;
-  border-radius: 6px;
+  padding: 9px;
+  border-radius: 8px;
   border: none;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  transition: .2s ease;
 }
 
+/* EDITAR */
 .btn-editar {
   background: var(--primary);
-  color: black;
-}
-
-.btn-eliminar {
-  background: var(--danger);
   color: white;
 }
 
-/* ================= BOTON FLOAT ================= */
+.btn-editar:hover {
+  background: var(--secondary);
+  transform: translateY(-1px);
+}
+
+/* ELIMINAR */
+.btn-eliminar {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* ================= BOTON FLOTANTE ================= */
 .btn-flotante {
   position: fixed;
   bottom: 25px;
   right: 25px;
-  width: 55px;
-  height: 55px;
-  background: var(--primary);
-  color: black;
+  width: 60px;
+  height: 60px;
+  background: var(--secondary);
+  color: white;
   border-radius: 50%;
-  font-size: 30px;
+  font-size: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+  z-index: 999;
 }
 
 .btn-flotante:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
+  background: var(--primary);
 }
 
-/* TOOLTIP */
+/* ================= TOOLTIP ================= */
 .tooltip {
   position: absolute;
-  bottom: 60px;
+  bottom: 70px;
   right: 0;
-  background: var(--card-bg);
-  padding: 5px 10px;
-  border-radius: 6px;
+  background: var(--primary);
+  color: white;
+  padding: 7px 12px;
+  border-radius: 8px;
   font-size: 12px;
   opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
 .btn-flotante:hover .tooltip {
@@ -144,46 +181,90 @@
 .empty {
   text-align: center;
   color: var(--text-secondary);
-  margin-top: 30px;
+  margin-top: 40px;
+  font-size: 15px;
 }
 
-/* ================= MODAL (PRO OSCURO) ================= */
+/* ================= MODAL ================= */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.7);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
+/* CONTENIDO MODAL */
 .modal-contenido {
-  background: var(--card-bg);
+  background: white;
   border: 1px solid var(--border);
-  padding: 20px;
-  border-radius: 12px;
-  width: 400px;
+  padding: 25px;
+  border-radius: 16px;
+  width: 420px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* INPUTS */
+/* TITULO MODAL */
+.modal-contenido h2 {
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+
+/* ================= INPUTS ================= */
 .formulario input,
-.formulario textarea {
+.formulario textarea,
+.formulario select {
   width: 100%;
-  padding: 10px;
-  background: #0b0e11;
+  padding: 12px;
+  background: #ffffff;
   border: 1px solid var(--border);
-  color: white;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  color: var(--text-main);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
 }
 
-/* BOTON */
+/* FOCUS */
+.formulario input:focus,
+.formulario textarea:focus,
+.formulario select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(21,80,156,0.15);
+}
+
+/* ================= BOTON ================= */
 .btn-enviar {
   width: 100%;
   background: var(--primary);
+  color: white;
   border: none;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: bold;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-enviar:hover {
+  background: var(--secondary);
+}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:768px){
+
+  .galeria{
+    grid-template-columns: 1fr;
+  }
+
+  .modal-contenido{
+    width: 92%;
+  }
+
+  .titulo-seccion{
+    font-size: 20px;
+  }
 }

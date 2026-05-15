@@ -1,74 +1,218 @@
-/* ========= BASE BINANCE ========= */
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ========= PALETA ========= */
 :root{
-    --bg:#0b0e11;
-    --card:#1e2329;
-    --text:#eaecef;
-    --muted:#848e9c;
-    --border:#2b3139;
+    --bg:#EDE3CC;
+    --card:#ffffff;
 
-    --primary:#fcd535;
-    --primary-hover:#e6c200;
-    --success:#0ecb81;
+    --text:#1f2937;
+    --muted:#5f6b7a;
 
-    --radius:12px;
+    --border:#d6c7a8;
+
+    /* VERDE DOMINANTE */
+    --primary:#019446;
+    --primary-hover:#017a39;
+
+    /* AZUL SECUNDARIO */
+    --secondary:#15509C;
+    --secondary-hover:#104E9B;
+
+    /* DORADO */
+    --gold:#CBA14B;
+    --gold-dark:#C89B3B;
+
+    --danger:#dc2626;
+
+    --radius:18px;
+
+    --shadow:
+        0 10px 25px rgba(0,0,0,0.08);
+
+    --glass:
+        rgba(255,255,255,0.75);
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
 body{
-    background:var(--bg);
+    background:
+        linear-gradient(
+            135deg,
+            #f4eedf,
+            #EDE3CC
+        );
+
     color:var(--text);
-    font-family: Arial, sans-serif;
+
+    font-family:'Inter',sans-serif;
+
+    min-height:100vh;
 }
 
-/* CONTENEDOR */
+/* =========================================================
+   CONTENEDOR
+========================================================= */
 .form-container{
-    padding:20px;
+    padding:35px;
 }
 
-/* HEADER */
+/* =========================================================
+   HEADER
+========================================================= */
+.form-header{
+    margin-bottom:28px;
+}
+
 .form-header h2{
-    font-size:18px;
-    margin-bottom:20px;
+    font-size:30px;
+    font-weight:800;
+
+    color:var(--primary);
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin-bottom:8px;
 }
 
-/* FORM */
+.form-header p{
+    color:var(--muted);
+    font-size:14px;
+}
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
 .formulario{
-    background:var(--card);
-    border:1px solid var(--border);
+    background:var(--glass);
+
+    backdrop-filter:blur(10px);
+
+    border:1px solid rgba(255,255,255,0.6);
+
+    border-top:6px solid var(--primary);
+
     border-radius:var(--radius);
-    padding:25px;
-    max-width:900px;
+
+    padding:35px;
+
+    max-width:1000px;
+
+    box-shadow:var(--shadow);
+
+    position:relative;
+
+    overflow:hidden;
 }
 
-/* GRID */
+/* EFECTO DECORATIVO */
+.formulario::before{
+    content:"";
+
+    position:absolute;
+
+    width:250px;
+    height:250px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(1,148,70,0.12),
+            transparent 70%
+        );
+
+    top:-80px;
+    right:-80px;
+
+    border-radius:50%;
+}
+
+/* =========================================================
+   GRID
+========================================================= */
 .form-grid{
     display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:20px;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+
+    gap:24px;
+
+    position:relative;
+    z-index:2;
 }
 
-/* DJANGO FORM */
+/* FULL */
+.form-grid .full{
+    grid-column:1 / -1;
+}
+
+/* =========================================================
+   DJANGO FORM
+========================================================= */
 .form-grid p{
     display:flex;
     flex-direction:column;
 }
 
+/* =========================================================
+   LABELS
+========================================================= */
 .form-grid label{
-    font-size:13px;
-    color:var(--muted);
-    margin-bottom:5px;
+    font-size:14px;
+
+    color:var(--primary);
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
 }
 
-/* INPUTS */
+/* =========================================================
+   INPUTS
+========================================================= */
 .form-grid input,
 .form-grid select,
 .form-grid textarea{
-    background:#0b0e11;
+    background:#ffffff;
+
     border:1px solid var(--border);
+
     color:var(--text);
-    padding:10px;
-    border-radius:8px;
+
+    padding:14px 16px;
+
+    border-radius:14px;
+
     font-size:14px;
-    transition:.2s;
+
+    transition:all .25s ease;
+
+    font-family:'Inter',sans-serif;
+
+    box-shadow:
+        inset 0 1px 2px rgba(0,0,0,0.03);
+}
+
+/* PLACEHOLDER */
+.form-grid input::placeholder,
+.form-grid textarea::placeholder{
+    color:#94a3b8;
 }
 
 /* FOCUS */
@@ -76,37 +220,222 @@ body{
 .form-grid select:focus,
 .form-grid textarea:focus{
     outline:none;
+
     border-color:var(--primary);
+
+    background:#fff;
+
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 0 0 4px rgba(1,148,70,0.14),
+        0 8px 18px rgba(1,148,70,0.08);
 }
 
-/* TEXTAREA */
+/* =========================================================
+   TEXTAREA
+========================================================= */
 .form-grid textarea{
-    min-height:80px;
+    min-height:120px;
     resize:vertical;
 }
 
-/* BOTÓN */
-.btn-guardar{
-    margin-top:20px;
-    background:var(--primary);
-    color:black;
-    padding:12px 20px;
-    border:none;
-    border-radius:8px;
-    font-weight:600;
+/* =========================================================
+   FILE INPUT
+========================================================= */
+.form-grid input[type="file"]{
+    padding:12px;
+
+    border:2px dashed var(--primary);
+
+    background:
+        rgba(1,148,70,0.05);
+
     cursor:pointer;
+}
+
+.form-grid input[type="file"]:hover{
+    background:
+        rgba(1,148,70,0.08);
+}
+
+/* =========================================================
+   CHECKBOX Y RADIO
+========================================================= */
+.form-grid input[type="checkbox"],
+.form-grid input[type="radio"]{
+    width:auto;
+    margin-right:8px;
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+.form-actions{
+    margin-top:30px;
+
+    display:flex;
+    gap:14px;
+
+    flex-wrap:wrap;
+
+    position:relative;
+    z-index:2;
+}
+
+/* BOTÓN PRINCIPAL */
+.btn-guardar{
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-hover)
+        );
+
+    color:white;
+
+    padding:14px 24px;
+
+    border:none;
+
+    border-radius:14px;
+
+    font-weight:700;
+
+    font-size:14px;
+
+    cursor:pointer;
+
     display:inline-flex;
     align-items:center;
-    gap:6px;
+    gap:8px;
+
+    transition:all .25s ease;
+
+    box-shadow:
+        0 8px 18px rgba(1,148,70,0.22);
 }
 
+/* HOVER */
 .btn-guardar:hover{
-    background:var(--primary-hover);
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 14px 28px rgba(1,148,70,0.28);
 }
 
-/* RESPONSIVE */
+/* SECUNDARIO */
+.btn-secundario{
+    background:white;
+
+    color:var(--secondary);
+
+    border:1px solid rgba(21,80,156,0.18);
+
+    padding:14px 22px;
+
+    border-radius:14px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+}
+
+/* HOVER */
+.btn-secundario:hover{
+    background:var(--secondary);
+
+    color:white;
+
+    transform:translateY(-2px);
+}
+
+/* =========================================================
+   ALERTAS
+========================================================= */
+.alerta{
+    padding:14px 18px;
+
+    border-radius:14px;
+
+    margin-bottom:20px;
+
+    font-size:14px;
+
+    font-weight:600;
+}
+
+.alerta.success{
+    background:
+        rgba(1,148,70,0.10);
+
+    color:var(--primary);
+
+    border-left:5px solid var(--primary);
+}
+
+.alerta.error{
+    background:
+        rgba(220,38,38,0.08);
+
+    color:var(--danger);
+
+    border-left:5px solid var(--danger);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 @media(max-width:900px){
-    .form-grid{
-        grid-template-columns:1fr;
+
+    .form-container{
+        padding:20px;
+    }
+
+    .formulario{
+        padding:25px;
+    }
+
+    .form-header h2{
+        font-size:24px;
+    }
+
+    .form-actions{
+        flex-direction:column;
+    }
+
+    .btn-guardar,
+    .btn-secundario{
+        width:100%;
+        justify-content:center;
     }
 }
+
+/* =========================================================
+   MOBILE EXTRA
+========================================================= */
+@media(max-width:500px){
+
+    .formulario{
+        padding:20px;
+        border-radius:16px;
+    }
+
+    .form-header h2{
+        font-size:21px;
+    }
+
+    .form-grid{
+        gap:18px;
+    }
+
+    .form-grid input,
+    .form-grid select,
+    .form-grid textarea{
+        padding:13px 14px;
+    }
+}
+

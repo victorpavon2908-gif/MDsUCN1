@@ -70,5 +70,40 @@
   <span class="tooltip">Agregar</span>
 </a>
 {% endif %}
+<!-- MODAL EDITAR -->
+<div class="modal" id="modalEditar">
+    <div class="modal-contenido">
+        <div id="contenidoEditar"></div>
+    </div>
+</div>
 
+<script>
+function abrirEditar(id) {
+
+    fetch(`/dispositivos/editar/${id}/`, {
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById("contenidoEditar").innerHTML = html;
+        document.getElementById("modalEditar").style.display = "flex";
+    });
+
+}
+
+function cerrarModalEditar() {
+    document.getElementById("modalEditar").style.display = "none";
+}
+
+/* cerrar al tocar fondo */
+window.onclick = function(e) {
+    const modal = document.getElementById("modalEditar");
+
+    if (e.target === modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
 {% endblock %}

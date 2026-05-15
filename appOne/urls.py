@@ -22,6 +22,7 @@ urlpatterns = [
     path('panel/usuarios/', views.panel_usuarios, name='panel_usuarios'),
     path('panel/usuarios/aprobar/<int:id>/', views.aprobar_usuario, name='aprobar_usuario'),
     path('panel/usuarios/rechazar/<int:id>/', views.rechazar_usuario, name='rechazar_usuario'),
+    path('panel/configuracion/', views.panel_config, name='configuracion'),
     path('usuarios/eliminar/<int:id>/', views.eliminar_usuario, name='eliminar_usuario'),
 
     # =========================

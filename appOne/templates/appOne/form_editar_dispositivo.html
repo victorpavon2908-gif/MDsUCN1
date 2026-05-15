@@ -1,49 +1,31 @@
-<div class="form-editar">
+<h3 style="margin-bottom:15px;">
+    Editar dispositivo
+</h3>
 
-    <div class="form-grupo">
-        <label>Nombre del dispositivo</label>
-        <input type="text" name="nombre_dispositivo"
-               value="{{ dispositivo.nombre_dispositivo }}" required>
+<form method="POST"
+      enctype="multipart/form-data"
+      action="{% url 'editar_dispositivo' dispositivo.id %}">
+
+    {% csrf_token %}
+
+    <div class="formulario">
+
+        {{ form.nombre_dispositivo }}
+        {{ form.codigo_inventario }}
+        {{ form.marca }}
+        {{ form.descripcion }}
+        {{ form.imagen }}
+
+        <button type="submit" class="btn-enviar">
+            Guardar cambios
+        </button>
+
+        <button type="button"
+                onclick="cerrarModalEditar()"
+                class="btn-eliminar"
+                style="margin-top:10px;width:100%;">
+            Cancelar
+        </button>
+
     </div>
-
-    <div class="form-grupo">
-        <label>Marca</label>
-        <input type="text" name="marca"
-               value="{{ dispositivo.marca }}" required>
-    </div>
-
-    <div class="form-grupo">
-        <label>Código inventario</label>
-        <input type="text" name="codigo_inventario"
-               value="{{ dispositivo.codigo_inventario }}" required>
-    </div>
-
-    <div class="form-grupo full">
-        <label>Accesorios</label>
-        <textarea name="accesorios">{{ dispositivo.accesorios }}</textarea>
-    </div>
-
-    <div class="form-grupo full">
-        <label>Observación</label>
-        <textarea name="observacion">{{ dispositivo.observacion }}</textarea>
-    </div>
-
-    <div class="form-grupo full">
-        <label>Imagen actual</label>
-        {% if dispositivo.imagen %}
-            <img src="{{ dispositivo.imagen.url }}" class="preview-img">
-        {% else %}
-            <p><em>No hay imagen</em></p>
-        {% endif %}
-    </div>
-
-    <div class="form-grupo full">
-        <label>Nueva imagen</label>
-        <input type="file" name="imagen" id="imagenInput" accept="image/*">
-    </div>
-
-</div>
-
-<button type="submit" class="btn-actualizar">
-    Guardar cambios
-</button>
+</form>

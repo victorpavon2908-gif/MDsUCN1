@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - MDsUCN</title>
 
-  <link rel="stylesheet" href="{% static 'appOne/css/dashboard.css'%}">
+  <link rel="stylesheet" href="{% static 'appOne/css/dashboard.css' %}">
   <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -19,42 +19,55 @@
   <!-- HEADER -->
   <header class="navegacion">
     <nav class="nav">
-      <h1>MDsUCN</h1>
 
-      <ul class="menu">
-        <li><a href="#">Inicio</a></li>
-        <li><a href="#">Soporte</a></li>
+      <div class="nav-left">
+        <h1>MDsUCN</h1>
+      </div>
 
-        <!-- NOTIFICACIONES -->
-        <li class="notif-dropdown">
-          <a href="#">
-            <i class="ri-notification-3-line"></i>
+      <div class="nav-right">
 
-            {% if pendientes_count > 0 %}
-            <span class="notif-badge">{{ pendientes_count }}</span>
-            {% endif %}
-          </a>
+        <!-- RELOJ NICARAGUA -->
+        <div class="clock-box">
+          <i class="ri-time-line"></i>
+          <span id="clock-nicaragua">00:00:00</span>
+        </div>
 
-          <div class="notif-menu">
-            <h4>Solicitudes</h4>
+        <ul class="menu">
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#">Soporte</a></li>
 
-            {% if usuarios_pendientes %}
-              {% for u in usuarios_pendientes %}
-                <div class="notif-item">
-                  <strong>{{ u.nombre_completo }}</strong>
-                  <p>{{ u.rol }}</p>
-                </div>
-              {% endfor %}
-            {% else %}
-              <p>No hay notificaciones</p>
-            {% endif %}
-          </div>
-        </li>
+          <!-- NOTIFICACIONES -->
+          <li class="notif-dropdown">
+            <a href="#">
+              <i class="ri-notification-3-line"></i>
 
-        <li class="user">
-          <i class="ri-user-3-line"></i> {{ request.user.username }}
-        </li>
-      </ul>
+              {% if pendientes_count > 0 %}
+              <span class="notif-badge">{{ pendientes_count }}</span>
+              {% endif %}
+            </a>
+
+            <div class="notif-menu">
+              <h4>Solicitudes</h4>
+
+              {% if usuarios_pendientes %}
+                {% for u in usuarios_pendientes %}
+                  <div class="notif-item">
+                    <strong>{{ u.nombre_completo }}</strong>
+                    <p>{{ u.rol }}</p>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>No hay notificaciones</p>
+              {% endif %}
+            </div>
+          </li>
+
+          <li class="user">
+            <i class="ri-user-3-line"></i> {{ request.user.username }}
+          </li>
+        </ul>
+
+      </div>
     </nav>
   </header>
 
@@ -62,31 +75,53 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
+
       <div class="logo">
         <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png">
       </div>
 
       <nav>
-        <a href="{% url 'dashboardinicio' %}" class="active"><i class="ri-home-4-line"></i> Inicio</a>
-        <a href="{% url 'listardispositivos' %}"><i class="ri-computer-line"></i> Dispositivos</a>
+        <a href="{% url 'dashboardinicio' %}" class="active">
+          <i class="ri-home-4-line"></i> Inicio
+        </a>
+
+        <a href="{% url 'listardispositivos' %}">
+          <i class="ri-computer-line"></i> Dispositivos
+        </a>
 
         {% if request.user.rol == "Admin" %}
-        <a href="{% url 'panel_usuarios' %}"><i class="ri-user-fill"></i> Usuarios</a>
-        <a href="{% url 'solicitudes_prestamos' %}"><i class="ri-add-fill"></i> Solicitudes</a>
+        <a href="{% url 'panel_usuarios' %}">
+          <i class="ri-user-fill"></i> Usuarios
+        </a>
+
+        <a href="{% url 'solicitudes_prestamos' %}">
+          <i class="ri-add-fill"></i> Solicitudes
+        </a>
         {% endif %}
 
-        <a href="{% url 'reportes' %}"><i class="ri-file-chart-fill"></i> Reportes</a>
-        <a href="#"><i class="ri-settings-3-line"></i> Configuración</a>
-        <a href="{% url 'logout' %}"><i class="ri-shut-down-line"></i> Cerrar sesión</a>
+        <a href="{% url 'reportes' %}">
+          <i class="ri-file-chart-fill"></i> Reportes
+        </a>
+
+        <a href="{% url 'configuracion' %}">
+          <i class="ri-settings-3-line"></i> Configuración
+        </a>
+
+        <a href="{% url 'logout' %}">
+          <i class="ri-shut-down-line"></i> Cerrar sesión
+        </a>
       </nav>
+
     </aside>
 
     <!-- MAIN -->
     <main class="main-content">
+
       {% block contenido %}
 
-      <!-- EJEMPLO DASHBOARD -->
+      <!-- CARDS -->
       <div class="stats">
+
         <div class="stat-card">
           <i class="ri-computer-line"></i>
           <h3>120</h3>
@@ -104,11 +139,16 @@
           <h3>15</h3>
           <p>Préstamos activos</p>
         </div>
+
       </div>
 
+      <!-- TABLA -->
       <div class="table-wrapper">
+
         <h3>Actividad reciente</h3>
+
         <table class="table-dashboard">
+
           <thead>
             <tr>
               <th>Usuario</th>
@@ -116,24 +156,54 @@
               <th>Estado</th>
             </tr>
           </thead>
+
           <tbody>
             <tr>
               <td>Juan</td>
               <td>Solicitó laptop</td>
-              <td><span class="estado aprobado">Aprobado</span></td>
+              <td>
+                <span class="estado aprobado">Aprobado</span>
+              </td>
             </tr>
           </tbody>
+
         </table>
+
       </div>
 
       {% endblock %}
+
     </main>
 
   </div>
 
+  <!-- FOOTER -->
   <footer>
     <p>© 2026 MDsUCN — Sistema profesional</p>
   </footer>
+
+  <!-- SCRIPT RELOJ NICARAGUA -->
+  <script>
+    function actualizarHoraNicaragua() {
+
+      const opciones = {
+        timeZone: 'America/Managua',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      };
+
+      const hora = new Intl.DateTimeFormat('es-NI', opciones)
+        .format(new Date());
+
+      document.getElementById('clock-nicaragua').innerText = hora;
+    }
+
+    setInterval(actualizarHoraNicaragua, 1000);
+
+    actualizarHoraNicaragua();
+  </script>
 
 </body>
 </html>

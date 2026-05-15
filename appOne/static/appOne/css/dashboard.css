@@ -1,22 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 :root {
-  --bg: #0b0e11;
-  --card-bg: #1e2329;
-  --sidebar-bg: #0b0e11;
-  --sidebar-hover: #1e2329;
+  --bg: #EDE3CC;
+  --card-bg: #ffffff;
 
-  --primary: #fcd535;
-  --success: #0ecb81;
-  --danger: #f6465d;
+  /* VERDE PRINCIPAL */
+  --sidebar-bg: #019446;
+  --sidebar-hover: #017a39;
 
-  --text-main: #eaecef;
-  --text-secondary: #848e9c;
+  --primary: #019446;
+  --primary-hover: #017a39;
 
-  --border: #2b3139;
+  /* AZUL SECUNDARIO */
+  --secondary: #15509C;
+  --secondary-hover: #104E9B;
+
+  /* DORADOS */
+  --gold: #CBA14B;
+  --gold-dark: #C89B3B;
+
+  /* TEXTOS */
+  --text-main: #1f2937;
+  --text-secondary: #5f6b7a;
+
+  --border: #d6c7a8;
+
+  --danger: #dc2626;
+
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  --radius: 12px;
 }
 
-/* RESET */
+/* =========================================================
+   RESET
+========================================================= */
 * {
   margin: 0;
   padding: 0;
@@ -30,22 +46,101 @@ body {
   color: var(--text-main);
 }
 
-/* HEADER */
+/* =========================================================
+   HEADER
+========================================================= */
 .navegacion {
-  background: #1e2329;
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    var(--primary-hover)
+  );
+
+  border-bottom: 3px solid var(--gold);
+
   position: fixed;
   width: 100%;
   top: 0;
   z-index: 1000;
+
+  box-shadow: var(--shadow);
 }
 
 .nav {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 15px 25px;
 }
 
+/* =========================================================
+   NAV LEFT
+========================================================= */
+.nav-left h1{
+  color:white;
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+/* =========================================================
+   NAV RIGHT
+========================================================= */
+.nav-right{
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+/* =========================================================
+   RELOJ BONITO
+========================================================= */
+.clock-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  background:rgba(255,255,255,0.12);
+
+  padding:10px 16px;
+
+  border-radius:14px;
+
+  border:1px solid rgba(255,255,255,0.15);
+
+  backdrop-filter: blur(8px);
+
+  box-shadow:0 4px 14px rgba(0,0,0,0.12);
+}
+
+/* ICONO */
+.clock-box i{
+  font-size:20px;
+  color:var(--gold);
+}
+
+/* HORA */
+#clock-nicaragua{
+  color:white;
+
+  font-size:15px;
+
+  font-weight:700;
+
+  letter-spacing:1px;
+
+  font-family:'Courier New', monospace;
+}
+
+/* HOVER */
+.clock-box:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,0.18);
+}
+
+/* =========================================================
+   MENU
+========================================================= */
 .menu {
   display: flex;
   gap: 20px;
@@ -54,21 +149,37 @@ body {
 }
 
 .menu a {
-  color: var(--text-main);
+  color: white;
   text-decoration: none;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: 6px;
 }
 
 .menu a:hover {
-  color: var(--primary);
+  background: rgba(255,255,255,0.12);
+  color: var(--gold);
 }
 
-/* NOTIF */
+/* USER */
+.user{
+  color:white;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* =========================================================
+   NOTIFICACIONES
+========================================================= */
 .notif-dropdown {
   position: relative;
 }
 
 .notif-badge {
-  background: red;
+  background: var(--danger);
+  color: white;
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 50%;
@@ -81,136 +192,319 @@ body {
   display: none;
   position: absolute;
   right: 0;
-  top: 30px;
-  background: var(--card-bg);
+  top: 35px;
+
+  background: white;
+
   padding: 15px;
+
   border-radius: 10px;
-  width: 250px;
+
+  width: 260px;
+
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
 }
 
 .notif-dropdown:hover .notif-menu {
   display: block;
 }
 
-/* LAYOUT */
+/* =========================================================
+   LAYOUT
+========================================================= */
 .container {
   display: flex;
-  margin-top: 70px;
+  margin-top: 78px;
 }
 
-/* SIDEBAR */
+/* =========================================================
+   SIDEBAR
+========================================================= */
 .sidebar {
   width: 240px;
-  background: var(--sidebar-bg);
+
+  background: linear-gradient(
+    180deg,
+    var(--primary),
+    var(--primary-hover)
+  );
+
   height: 100vh;
+
   position: fixed;
-  border-right: 1px solid var(--border);
+
+  border-right: 4px solid var(--gold);
+
+  overflow-y: auto;
+
+  box-shadow: 4px 0 12px rgba(0,0,0,0.08);
 }
 
+/* LOGO */
 .sidebar img {
   width: 120px;
   margin: 20px auto;
   display: block;
 }
 
+/* LINKS */
 .sidebar a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
   padding: 15px 25px;
-  color: var(--text-secondary);
+
+  color: rgba(255,255,255,0.90);
+
   text-decoration: none;
+
+  font-weight: 500;
+
+  border-left: 4px solid transparent;
 }
 
+/* HOVER */
 .sidebar a:hover {
-  background: var(--sidebar-hover);
-  color: var(--primary);
+  background: rgba(255,255,255,0.10);
+  color: white;
+  border-left: 4px solid var(--gold);
 }
 
+/* ACTIVE */
 .sidebar a.active {
-  background: rgba(252,213,53,0.1);
-  color: var(--primary);
+  background: rgba(255,255,255,0.12);
+  color: white;
+  border-left: 4px solid var(--gold);
 }
 
-/* MAIN */
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
 .main-content {
   margin-left: 240px;
   padding: 30px;
   width: 100%;
 }
 
-/* CARDS */
+/* =========================================================
+   CARDS
+========================================================= */
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
   gap: 20px;
 }
 
 .stat-card {
   background: var(--card-bg);
-  padding: 20px;
-  border-radius: 10px;
+
+  padding: 22px;
+
+  border-radius: var(--radius);
+
+  border-top: 5px solid var(--primary);
+
   border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
 }
 
+/* HOVER */
 .stat-card:hover {
-  border-color: var(--primary);
+  transform: translateY(-3px);
+  border-top-color: var(--secondary);
 }
 
+/* ICONOS */
 .stat-card i {
   color: var(--primary);
-  font-size: 25px;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+/* TITULO */
+.stat-card h3 {
+  margin-bottom: 8px;
+  color: var(--primary);
+}
+
+/* TEXTO */
+.stat-card p {
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   TABLAS
+========================================================= */
+.table-wrapper {
+  margin-top: 25px;
+
+  background: var(--card-bg);
+
+  padding: 20px;
+
+  border-radius: var(--radius);
+
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
 }
 
 /* TABLA */
-.table-wrapper {
-  margin-top: 20px;
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: 10px;
-}
-
 .table-dashboard {
   width: 100%;
   border-collapse: collapse;
 }
 
+/* HEAD */
 .table-dashboard th {
   text-align: left;
-  padding: 10px;
-  color: var(--text-secondary);
+
+  padding: 14px 10px;
+
+  background: var(--primary);
+
+  color: white;
+
+  font-weight: 600;
 }
 
+/* TD */
 .table-dashboard td {
-  padding: 10px;
+  padding: 14px 10px;
+  border-bottom: 1px solid #eee;
 }
 
+/* HOVER */
 .table-dashboard tr:hover {
-  background: rgba(255,255,255,0.02);
+  background: rgba(1,148,70,0.06);
 }
 
-/* ESTADOS */
+/* =========================================================
+   ESTADOS
+========================================================= */
 .estado {
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
   font-size: 12px;
+  font-weight: 600;
 }
 
+/* APROBADO */
 .aprobado {
-  color: #0ecb81;
-  background: rgba(14,203,129,0.1);
+  color: var(--primary);
+  background: rgba(1,148,70,0.12);
 }
 
-/* FOOTER */
+/* PENDIENTE */
+.pendiente {
+  color: var(--gold-dark);
+  background: rgba(203,161,75,0.15);
+}
+
+/* RECHAZADO */
+.rechazado {
+  color: #dc2626;
+  background: rgba(220,38,38,0.10);
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
 footer {
   margin-left: 240px;
+
   text-align: center;
+
   padding: 20px;
+
   color: var(--text-secondary);
+
+  font-size: 14px;
 }
 
-/* SCROLL */
+/* =========================================================
+   SCROLLBAR
+========================================================= */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #2b3139;
+  background: var(--primary);
+  border-radius: 10px;
 }
+
+::-webkit-scrollbar-track {
+  background: #d9d0bc;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media(max-width: 900px){
+
+  .sidebar{
+    width: 70px;
+  }
+
+  .sidebar a{
+    justify-content: center;
+    padding: 15px;
+  }
+
+  .sidebar a span{
+    display: none;
+  }
+
+  .main-content{
+    margin-left: 70px;
+    padding: 20px;
+  }
+
+  footer{
+    margin-left: 70px;
+  }
+
+  .nav{
+    padding: 15px;
+  }
+
+  .menu{
+    gap: 10px;
+  }
+
+  .clock-box{
+    padding:8px 12px;
+  }
+
+  #clock-nicaragua{
+    font-size:13px;
+  }
+}
+
+@media(max-width:700px){
+
+  .nav{
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .nav-right{
+    width:100%;
+    justify-content:space-between;
+  }
+
+  .clock-box{
+    flex:1;
+    justify-content:center;
+  }
+
+  .container{
+    margin-top:120px;
+  }
+}
+
