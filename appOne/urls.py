@@ -40,13 +40,15 @@ urlpatterns = [
 
     # crear desde modal
     path('prestamos/crear/', views.crear_prestamo, name='crear_prestamo'),
-
+    path("prestamo/modal/<int:id>/",views.modal_prestamo,name="modal_prestamo"),
     # acciones admin
     path('prestamos/aprobar/<int:id>/', views.aprobar_prestamo, name='aprobar_prestamo'),
     path('prestamos/devolver/<int:id>/', views.devolver_prestamo, name='devolver_prestamo'),
     path('prestamos/rechazar/<int:id>/', views.rechazar_prestamo, name='rechazar_prestamo'),
     path('reportes/', views.reportes, name='reportes'),
-
-
-
+    #configuracion
+    path("configuracion/inicio/",views.config_inicio,name="config_inicio"),
+    path("configuracion/perfil/",views.config_perfil,name="config_perfil"),
+    path("configuracion/seguridad/",views.config_seguridad,name="config_seguridad"),
+    path("configuracion/database/",views.config_database,name="config_database"),
 ]

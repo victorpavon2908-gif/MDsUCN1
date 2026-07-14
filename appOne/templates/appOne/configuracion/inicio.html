@@ -1,0 +1,199 @@
+<div class="section-title">
+
+    <h2>Panel General</h2>
+
+    <button class="btn btn-primary">
+        <i class="ri-refresh-line"></i>
+        Actualizar
+    </button>
+
+</div>
+
+
+<div class="grid">
+
+    <div class="card">
+
+        <h3>
+            <i class="ri-group-line"></i>
+            Usuarios
+        </h3>
+
+        <h1>{{ total_usuarios }}</h1>
+
+        <p>
+            Usuarios registrados en el sistema.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            <i class="ri-computer-line"></i>
+            Equipos
+        </h3>
+
+        <h1>{{ total_dispositivos }}</h1>
+
+        <p>
+            Equipos registrados.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            <i class="ri-file-list-3-line"></i>
+            Préstamos
+        </h3>
+
+        <h1>{{ total_prestamos }}</h1>
+
+        <p>
+            Solicitudes registradas.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            <i class="ri-checkbox-circle-line"></i>
+            Aprobados
+        </h3>
+
+        <h1>{{ prestamos_aprobados }}</h1>
+
+        <p>
+            Préstamos aprobados.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            <i class="ri-time-line"></i>
+            Pendientes
+        </h3>
+
+        <h1>{{ prestamos_pendientes }}</h1>
+
+        <p>
+            Solicitudes pendientes.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            <i class="ri-close-circle-line"></i>
+            Rechazados
+        </h3>
+
+        <h1>{{ prestamos_rechazados }}</h1>
+
+        <p>
+            Solicitudes rechazadas.
+        </p>
+
+    </div>
+
+</div>
+
+
+<br><br>
+
+<div class="card">
+
+    <h2>Estado del Sistema</h2>
+
+    <div class="table-responsive">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Elemento</th>
+
+                    <th>Estado</th>
+
+                    <th>Descripción</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr>
+
+                    <td>Servidor</td>
+
+                    <td>
+
+                        <span class="badge badge-success">
+
+                            Activo
+
+                        </span>
+
+                    </td>
+
+                    <td>Sistema funcionando correctamente.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Base de datos</td>
+
+                    <td>
+
+                        <span class="badge badge-success">
+
+                            Conectada
+
+                        </span>
+
+                    </td>
+
+                    <td>Conexión estable.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Respaldos</td>
+
+                    <td>
+
+                        <span class="badge badge-warning">
+
+                            Pendiente
+
+                        </span>
+
+                    </td>
+
+                    <td>Último respaldo hace 2 días.</td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

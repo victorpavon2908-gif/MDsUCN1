@@ -10,6 +10,7 @@ from django.db.models import Count
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
+from .models import Usuario, Dispositivo, Prestamo
 
 
 # ============================
@@ -193,9 +194,21 @@ def eliminar_usuario(request, id):
 
 @login_required
 def listardispositivos(request):
-    dispositivos = Dispositivo.objects.all()
-    return render(request, 'appOne/Dispositivos.html', {'dispositivo': dispositivos})
 
+    dispositivos = Dispositivo.objects.all()
+
+    prestamos_usuario = Prestamo.objects.filter(
+        usuario=request.user
+    )
+
+    return render(
+        request,
+        "appOne/Dispositivos.html",
+        {
+            "dispositivo": dispositivos,
+            "prestamos_usuario": prestamos_usuario
+        }
+    )
 
 @login_required
 def agregar_dispositivo(request):
@@ -282,29 +295,21 @@ def panel_config(request):
     return render(request, 'appOne/panel_config.html')
 
 
-
 @login_required
-def solicitar_prestamo(request, id):
-    dispositivo = get_object_or_404(Dispositivo, id=id)
+def modal_prestamo(request, id):
 
-    if request.method == "POST":
-        form = PrestamoForm(request.POST)
-        if form.is_valid():
-            prestamo = form.save(commit=False)
-            prestamo.usuario = request.user
-            prestamo.dispositivo = dispositivo
-            prestamo.estado = Prestamo.ESTADO_PENDIENTE
-            prestamo.save()
+    dispositivo = get_object_or_404(
+        Dispositivo,
+        id=id
+    )
 
-            messages.success(request, "Solicitud enviada correctamente.")
-            return redirect('listardispositivos')
-    else:
-        form = PrestamoForm()
-
-    return render(request, "appOne/solicitar_prestamo.html", {
-        "form": form,
-        "dispositivo": dispositivo
-    })
+    return render(
+        request,
+        "appOne/modal_prestamo.html",
+        {
+            "dispositivo": dispositivo
+        }
+    )
 
 
 @login_required
@@ -457,4 +462,61 @@ def reportes(request):
 
     return render(request, 'appOne/reportes.html', context)
 
+#configuracion
 
+def config_inicio(request):
+
+    if not request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "appOne/panel_config.html")
+
+    context = {
+
+        "total_usuarios": Usuario.objects.count(),
+
+        "total_dispositivos": Dispositivo.objects.count(),
+
+        "total_prestamos": Prestamo.objects.count(),
+
+        "prestamos_aprobados":
+            Prestamo.objects.filter(estado="aprobado").count(),
+
+        "prestamos_pendientes":
+            Prestamo.objects.filter(estado="pendiente").count(),
+
+        "prestamos_rechazados":
+            Prestamo.objects.filter(estado="rechazado").count(),
+
+    }
+
+    return render(
+        request,
+        "appOne/configuracion/inicio.html",
+        context
+    )
+
+def config_perfil(request):
+
+    return render(
+        request,
+        "appOne/configuracion/perfil.html"
+    )
+
+def config_seguridad(request):
+
+    return render(
+
+        request,
+
+        "appOne/configuracion/seguridad.html"
+
+    )
+
+def config_database(request):
+
+    return render(
+
+        request,
+
+        "appOne/configuracion/database.html"
+
+    )

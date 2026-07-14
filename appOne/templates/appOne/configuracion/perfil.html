@@ -1,0 +1,186 @@
+{% load static %}
+
+<div class="perfil">
+
+    <div class="perfil-header">
+
+        <div class="foto">
+
+            {% if request.user.foto %}
+                <img src="{{ request.user.foto.url }}">
+            {% else %}
+                <img src="{% static 'appOne/img/user.png' %}">
+            {% endif %}
+
+        </div>
+
+        <div>
+
+            <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
+
+            <span class="badge badge-success">
+
+                {{ request.user.rol }}
+
+            </span>
+
+            <p>{{ request.user.email }}</p>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Información Personal</h2>
+
+        <form id="formPerfil">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <div class="form-group">
+
+                    <label>Nombre</label>
+
+                    <input
+                        class="form-control"
+                        name="first_name"
+                        value="{{ request.user.first_name }}">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Apellido</label>
+
+                    <input
+                        class="form-control"
+                        name="last_name"
+                        value="{{ request.user.last_name }}">
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+
+                    <label>Usuario</label>
+
+                    <input
+                        class="form-control"
+                        value="{{ request.user.username }}"
+                        readonly>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Correo</label>
+
+                    <input
+                        class="form-control"
+                        name="email"
+                        value="{{ request.user.email }}">
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+
+                    <label>Rol</label>
+
+                    <input
+                        class="form-control"
+                        value="{{ request.user.rol }}"
+                        readonly>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Fecha Registro</label>
+
+                    <input
+                        class="form-control"
+                        value="{{ request.user.date_joined|date:'d/m/Y' }}"
+                        readonly>
+
+                </div>
+
+            </div>
+
+            <button class="btn btn-primary">
+
+                Guardar Cambios
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <br>
+
+    <div class="card">
+
+        <h2>Seguridad</h2>
+
+        <form id="formPassword">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+
+                <label>Contraseña actual</label>
+
+                <input
+                    class="form-control"
+                    type="password"
+                    name="actual">
+
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+
+                    <label>Nueva contraseña</label>
+
+                    <input
+                        class="form-control"
+                        type="password"
+                        name="nueva">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Confirmar contraseña</label>
+
+                    <input
+                        class="form-control"
+                        type="password"
+                        name="confirmar">
+
+                </div>
+
+            </div>
+
+            <button class="btn btn-warning">
+
+                Cambiar contraseña
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

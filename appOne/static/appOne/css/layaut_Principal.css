@@ -1,297 +1,195 @@
-*{
-    box-sizing:border-box;
+/* ================= DASHBOARD UCN PRO ================= */
+
+/* ================= STATS ================= */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 22px;
+  margin-bottom: 35px;
 }
 
-
-body{
-    background:#f0f5f9;
+/* ================= TARJETAS ================= */
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-top: 5px solid var(--primary);
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
 }
 
-
-/* CABECERA */
-
-.world-header{
-
-    background:
-    linear-gradient(
-    90deg,
-    #006400,
-    #0047ab);
-
-    color:white;
-    padding:30px;
-    border-radius:20px;
-    text-align:center;
-    margin-bottom:25px;
-
+/* HOVER */
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-top-color: var(--secondary);
 }
 
-
-.world-header h1{
-
-font-size:32px;
-
+/* ICONO */
+.stat-card i {
+  font-size: 32px;
+  color: var(--primary);
+  background: rgba(21,80,156,0.10);
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-
-/* PARTIDO */
-
-.live-match{
-
-background:white;
-padding:25px;
-border-radius:20px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-box-shadow:0 5px 15px #bbb;
-margin-bottom:25px;
-
+/* TITULO */
+.stat-card h3 {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+  font-weight: 600;
 }
 
-
-.team{
-
-text-align:center;
-
+/* NUMERO */
+.stat-card p {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
-
-.team img{
-
-width:80px;
-
+/* ================= CHARTS ================= */
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
 }
 
-
-.score span{
-
-font-size:40px;
-font-weight:bold;
-color:#006400;
-
+/* ================= CARDS ================= */
+.chart-card,
+.table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-top: 5px solid var(--gold);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow);
 }
 
-
-.score p{
-
-color:red;
-
+/* TITULOS */
+.chart-card h3,
+.table-card h3 {
+  font-size: 17px;
+  margin-bottom: 18px;
+  color: var(--primary);
+  font-weight: 700;
 }
 
-
-/* STATS */
-
-
-.stats{
-
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:20px;
-
+/* ================= CHART ================= */
+.chart-card canvas {
+  max-height: 300px;
 }
 
-
-.card{
-
-background:white;
-
-padding:20px;
-
-border-radius:20px;
-
-text-align:center;
-
-box-shadow:0 5px 15px #bbb;
-
-transition:.3s;
-
+/* ================= TABLA ================= */
+.table-last {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
-
-.card:hover{
-
-transform:translateY(-10px);
-
+/* HEAD */
+.table-last th {
+  text-align: left;
+  padding: 14px 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
 }
 
-
-.card i{
-
-font-size:40px;
-
-color:#d4af37;
-
+/* CELDAS */
+.table-last td {
+  padding: 14px 12px;
+  color: var(--text-main);
+  border-bottom: 1px solid #ececec;
 }
 
-
-.card h3{
-
-color:#555;
-
+/* FILAS */
+.table-last tr:hover {
+  background: rgba(21,80,156,0.05);
 }
 
-
-.card p{
-
-font-size:25px;
-
-font-weight:bold;
-
-color:#006400;
-
+/* ================= ESTADOS OPCIONALES ================= */
+.estado {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-
-/* CONTENIDO */
-
-
-.content{
-
-margin-top:25px;
-
-display:grid;
-
-grid-template-columns:1fr 1fr;
-
-gap:20px;
-
+/* ACTIVO */
+.estado.activo {
+  background: rgba(1,148,70,0.15);
+  color: var(--secondary);
 }
 
-
-.chart-box,
-.table-box{
-
-
-background:white;
-
-padding:20px;
-
-border-radius:20px;
-
-
-box-shadow:0 5px 15px #bbb;
-
-
+/* PENDIENTE */
+.estado.pendiente {
+  background: rgba(203,161,75,0.15);
+  color: var(--gold-dark);
 }
 
-
-h2{
-
-color:#0047ab;
-
+/* CANCELADO */
+.estado.cancelado {
+  background: rgba(220,38,38,0.12);
+  color: #dc2626;
 }
 
-
-canvas{
-
-max-height:300px;
-
+/* ================= EMPTY ================= */
+.empty {
+  text-align: center;
+  padding: 25px;
+  color: var(--text-secondary);
+  font-size: 15px;
 }
 
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
 
-/* TABLA */
+  .charts {
+    grid-template-columns: 1fr;
+  }
 
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
+  .chart-card,
+  .table-card {
+    padding: 18px;
+  }
 }
 
+/* ================= MOBILE ================= */
+@media (max-width: 600px) {
 
-th{
+  .stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
 
-background:#0047ab;
+  .stat-card i {
+    width: 55px;
+    height: 55px;
+    font-size: 28px;
+  }
 
-color:white;
+  .stat-card p {
+    font-size: 20px;
+  }
 
-padding:12px;
+  .table-last {
+    font-size: 13px;
+  }
 
-}
-
-
-td{
-
-padding:12px;
-
-border-bottom:1px solid #ddd;
-
-}
-
-
-tr:hover{
-
-background:#f2f2f2;
-
-}
-
-
-/* PUBLICIDAD */
-
-
-.banner{
-
-
-margin-top:25px;
-
-background:linear-gradient(
-90deg,
-gold,
-orange);
-
-padding:25px;
-
-border-radius:20px;
-
-text-align:center;
-
-font-size:20px;
-
-font-weight:bold;
-
-
-}
-
-
-/* RESPONSIVE */
-
-
-@media(max-width:800px)
-{
-
-.live-match{
-
-flex-direction:column;
-
-gap:20px;
-
-}
-
-
-.content{
-
-grid-template-columns:1fr;
-
-}
-
-
-.world-header h1{
-
-font-size:22px;
-
-}
-
-
-.score span{
-
-font-size:30px;
-
-}
-
-
+  .table-last th,
+  .table-last td {
+    padding: 10px 8px;
+  }
 }

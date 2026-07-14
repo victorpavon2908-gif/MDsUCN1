@@ -2,165 +2,87 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'appOne/css/mundial.css' %}">
-<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'appOne/css/layaut_Principal.css' %}">
 {% endblock %}
-
 
 {% block contenido %}
 
-<!-- CABECERA MUNDIAL -->
-<div class="world-header">
-    <h1>🏆 FIFA WORLD CUP 2026</h1>
-    <p>La pasión del fútbol se vive aquí</p>
-</div>
-
-
-<!-- MARCADOR EN VIVO -->
-<div class="live-match">
-
-    <div class="team">
-        <img src="{% static 'img/spain.png' %}">
-        <h3>España</h3>
-    </div>
-
-    <div class="score">
-        <span>2 - 1</span>
-        <p>EN VIVO 🔴 78'</p>
-    </div>
-
-    <div class="team">
-        <img src="{% static 'img/brazil.png' %}">
-        <h3>Brasil</h3>
-    </div>
-
-</div>
-
-
-
-<!-- ESTADISTICAS -->
+<!-- STATS -->
 <div class="stats">
 
-    <div class="card">
-        <i class="ri-group-fill"></i>
-        <h3>Usuarios</h3>
-        <p>{{ estadisticas.usuarios }}</p>
+    <div class="stat-card">
+        <i class="ri-user-3-fill"></i>
+        <div>
+            <h3>Usuarios</h3>
+            <p>{{ estadisticas.usuarios }}</p>
+        </div>
     </div>
 
-
-    <div class="card">
-        <i class="ri-football-fill"></i>
-        <h3>Partidos</h3>
-        <p>64</p>
+    <div class="stat-card">
+        <i class="ri-timer-2-fill"></i>
+        <div>
+            <h3>Préstamos activos</h3>
+            <p>{{ estadisticas.prestamos }}</p>
+        </div>
     </div>
 
-
-    <div class="card">
-        <i class="ri-trophy-fill"></i>
-        <h3>Favorito</h3>
-        <p>Brasil</p>
+    <div class="stat-card">
+        <i class="ri-computer-fill"></i>
+        <div>
+            <h3>Disponibles</h3>
+            <p>{{ estadisticas.disponibles }}</p>
+        </div>
     </div>
 
-
-    <div class="card">
-        <i class="ri-fire-fill"></i>
-        <h3>Tendencias</h3>
-        <p>{{ pendientes_count }}</p>
+    <div class="stat-card">
+        <i class="ri-notification-line"></i>
+        <div>
+            <h3>Pendientes</h3>
+            <p>{{ pendientes_count }}</p>
+        </div>
     </div>
 
 </div>
 
+<!-- CHARTS + TABLA -->
+<div class="charts">
 
+    <!-- GRÁFICO -->
+    <div class="chart-card">
+        <h3>Distribución de usuarios</h3>
+        <canvas id="pieChart"></canvas>
+    </div>
 
-<!-- CONTENIDO -->
-<div class="content">
+    <!-- TABLA -->
+    <div class="table-card">
+        <h3>Últimos préstamos</h3>
 
+        <table class="table-last">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Dispositivo</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
 
-<div class="chart-box">
+            <tbody>
+                {% for p in ultimos_prestamos %}
+                <tr>
+                    <td>{{ p.usuario.nombre_completo }}</td>
+                    <td>{{ p.dispositivo.nombre }}</td>
+                    <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="empty">No hay préstamos recientes</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-<h2>Distribución de aficionados</h2>
-
-<canvas id="chart"></canvas>
-
-</div>
-
-
-
-<div class="table-box">
-
-<h2>Últimos pronósticos</h2>
-
-
-<table>
-
-<thead>
-<tr>
-<th>Usuario</th>
-<th>Equipo</th>
-<th>Fecha</th>
-</tr>
-</thead>
-
-
-<tbody>
-
-{% for p in ultimos_prestamos %}
-
-<tr>
-
-<td>{{ p.usuario.nombre_completo }}</td>
-
-<td>{{ p.dispositivo.nombre }}</td>
-
-<td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
-
-
-</tr>
-
-{% empty %}
-
-<tr>
-
-<td colspan="3">
-No hay datos disponibles
-</td>
-
-</tr>
-
-
-{% endfor %}
-
-
-</tbody>
-
-
-</table>
-
+    </div>
 
 </div>
-
-
-</div>
-
-
-<!-- PUBLICIDAD -->
-<div class="banner">
-
-🔥 PROMOCIÓN MUNDIAL 2026 🔥  
-Regístrate hoy y recibe bonos especiales para disfrutar cada partido ⚽
-
-</div>
-
-
-
-{% endblock %}
-
-
-{% block extra_js %}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="{% static 'appOne/js/mundial.js' %}"></script>
-
 
 {% endblock %}

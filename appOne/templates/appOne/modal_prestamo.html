@@ -1,0 +1,226 @@
+{% load static %}
+
+<div class="prestamo-modal">
+
+    <!-- ================= HEADER ================= -->
+
+    <div class="prestamo-header">
+
+        <div>
+
+            <h2>Solicitar préstamo</h2>
+
+            <p>
+                Complete la información para enviar la solicitud del equipo.
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="cerrar"
+            onclick="cerrarModalPrestamo()">
+
+            ✕
+
+        </button>
+
+    </div>
+
+    <!-- ================= CONTENIDO ================= -->
+
+    <div class="prestamo-contenido">
+
+        <!-- =======================================
+                    PANEL IZQUIERDO
+        ======================================== -->
+
+        <aside class="equipo-panel">
+
+            <div class="imagen-equipo">
+
+                <img
+                    src="{% if dispositivo.imagen %}{{ dispositivo.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}"
+                    alt="{{ dispositivo.nombre_dispositivo }}">
+
+            </div>
+
+            <h3>
+
+                {{ dispositivo.nombre_dispositivo }}
+
+            </h3>
+
+            <div class="equipo-datos">
+
+                <div class="dato">
+
+                    <span>Código</span>
+
+                    <strong>
+
+                        {{ dispositivo.codigo_inventario }}
+
+                    </strong>
+
+                </div>
+
+                <div class="dato">
+
+                    <span>Marca</span>
+
+                    <strong>
+
+                        {{ dispositivo.marca }}
+
+                    </strong>
+
+                </div>
+
+                {% if dispositivo.modelo %}
+                <div class="dato">
+
+                    <span>Modelo</span>
+
+                    <strong>
+
+                        {{ dispositivo.modelo }}
+
+                    </strong>
+
+                </div>
+                {% endif %}
+
+                {% if dispositivo.numero_serie %}
+                <div class="dato">
+
+                    <span>Serie</span>
+
+                    <strong>
+
+                        {{ dispositivo.numero_serie }}
+
+                    </strong>
+
+                </div>
+                {% endif %}
+
+            </div>
+
+        </aside>
+
+        <!-- =======================================
+                    FORMULARIO
+        ======================================== -->
+
+        <section class="form-panel">
+
+            <form
+                method="POST"
+                action="{% url 'crear_prestamo' %}">
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="dispositivo_id"
+                    value="{{ dispositivo.id }}">
+
+                <!-- MOTIVO -->
+
+                <div class="grupo">
+
+                    <label>
+
+                        Motivo del préstamo
+
+                    </label>
+
+                    <textarea
+                        name="motivo"
+                        placeholder="Explique el motivo del préstamo..."
+                        required></textarea>
+
+                </div>
+
+                <!-- FECHA -->
+
+                <div class="fila">
+
+                    <div class="grupo">
+
+                        <label>
+
+                            Fecha de uso
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_uso"
+                            required>
+
+                    </div>
+
+                    <div class="grupo">
+
+                        <label>
+
+                            Hora de inicio
+
+                        </label>
+
+                        <input
+                            type="time"
+                            name="hora_inicio"
+                            required>
+
+                    </div>
+
+                    <div class="grupo">
+
+                        <label>
+
+                            Hora de entrega
+
+                        </label>
+
+                        <input
+                            type="time"
+                            name="hora_entrega"
+                            required>
+
+                    </div>
+
+                </div>
+
+                <!-- BOTONES -->
+
+                <div class="acciones">
+
+                    <button
+                        type="button"
+                        class="btn-cancelar"
+                        onclick="cerrarModalPrestamo()">
+
+                        Cancelar
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-guardar">
+
+                        Enviar solicitud
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</div>

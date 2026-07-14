@@ -1,71 +1,235 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Configuración</title>
-  <link rel="stylesheet" href="{% static 'appOne/css/panel_config.css' %}">
-  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Configuración | MDsUCN</title>
+
+    <link rel="stylesheet" href="{% static 'appOne/css/panel_config.css' %}">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
 </head>
 
 <body>
-  <!-- Sidebar -->
-  <aside class="sidebar">
-      <h2 class="sidebar-title">⚙️ Configuración</h2>
 
-      <ul class="sidebar-menu">
-          <li><a href="#"><i class="ri-user-settings-line"></i> Perfil</a></li>
-          <li><a href="#"><i class="ri-lock-password-line"></i> Seguridad</a></li>
-          <li><a href="#"><i class="ri-group-line"></i> Usuarios</a></li>
-          <li><a href="#"><i class="ri-database-2-line"></i> Base de Datos</a></li>
-          <li><a href="#"><i class="ri-settings-3-line"></i> Sistema</a></li>
-          <li><a href="#"><i class="ri-bar-chart-line"></i> Estadísticas</a></li>
-          <li><a href="{% url 'dashboard' %}"><i class="ri-arrow-go-back-fill"></i> Regresar</a></li>
-      </ul>
-  </aside>
+    <!-- ================= SIDEBAR ================= -->
 
-  <!-- Contenido principal -->
-  <main class="main">
-      <h1 class="title">Panel de Configuración Avanzada</h1>
+    <aside class="sidebar">
 
-      <div class="grid">
-          <div class="card">
-              <h3>Información del Sistema</h3>
-              <p>Configura parámetros globales como zona horaria, nombre del sistema, políticas, etc.</p>
-              <button class="btn">Configurar</button>
-          </div>
+        <div class="logo">
 
-          <div class="card">
-              <h3>Gestión de Usuarios</h3>
-              <p>Administrar roles, permisos, estados y accesos del personal.</p>
-              <button class="btn">Entrar</button>
-          </div>
+            <i class="ri-settings-4-fill"></i>
 
-          <div class="card">
-              <h3>Respaldo y Restauración</h3>
-              <p>Generar copias de seguridad o restaurar el sistema en caso de fallos.</p>
-              <button class="btn btn-warning">Administrar</button>
-          </div>
+            <span>Configuración</span>
 
-          <div class="card">
-              <h3>Logs del Sistema</h3>
-              <p>Monitoreo detallado de actividades, fallos y accesos.</p>
-              <button class="btn">Ver Logs</button>
-          </div>
+        </div>
 
-          <div class="card">
-              <h3>API e Integraciones</h3>
-              <p>Administrar tokens, endpoints y conexiones externas.</p>
-              <button class="btn">Configurar</button>
-          </div>
+        <nav>
 
-          <div class="card">
-              <h3>Parámetros de Seguridad</h3>
-              <p>Control de contraseñas, bloqueo de usuarios, auditoría y más.</p>
-              <button class="btn btn-danger">Ajustar</button>
-          </div>
-      </div>
-  </main>
+            <a href="#"
+               class="menu active"
+               data-modulo="inicio">
+
+                <i class="ri-home-5-fill"></i>
+
+                <span>Inicio</span>
+
+            </a>
+
+            <a href="#"
+               class="menu"
+               data-modulo="perfil">
+
+                <i class="ri-user-settings-line"></i>
+
+                <span>Perfil</span>
+
+            </a>
+
+            <a href="#"
+               class="menu"
+               data-modulo="seguridad">
+
+                <i class="ri-lock-password-line"></i>
+
+                <span>Seguridad</span>
+
+            </a>
+
+            <a href="#"
+               class="menu"
+               data-modulo="database">
+
+                <i class="ri-database-2-line"></i>
+
+                <span>Base de Datos</span>
+
+            </a>
+
+            <a href="#"
+               class="menu"
+               data-modulo="sistema">
+
+                <i class="ri-settings-3-line"></i>
+
+                <span>Sistema</span>
+
+            </a>
+
+            <a href="#"
+               class="menu"
+               data-modulo="estadisticas">
+
+                <i class="ri-bar-chart-box-line"></i>
+
+                <span>Estadísticas</span>
+
+            </a>
+
+        </nav>
+
+        <a href="{% url 'dashboard' %}" class="volver">
+
+            <i class="ri-arrow-left-line"></i>
+
+            Regresar
+
+        </a>
+
+    </aside>
+
+
+    <!-- ================= CONTENIDO ================= -->
+
+    <main class="contenido">
+
+        <div class="topbar">
+
+            <h1 id="tituloPagina">
+
+                Panel de Configuración
+
+            </h1>
+
+        </div>
+
+
+        <!-- ESTE CONTENIDO CAMBIARÁ -->
+
+        <section id="contenido-config">
+
+            <div class="bienvenida">
+
+                <div class="icono">
+
+                    <i class="ri-settings-5-fill"></i>
+
+                </div>
+
+                <h2>
+
+                    Bienvenido al Panel de Configuración
+
+                </h2>
+
+                <p>
+
+                    Desde este panel podrás administrar toda la configuración del sistema MDsUCN.
+
+                    Selecciona una opción del menú izquierdo para comenzar.
+
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+<script>
+
+const menus=document.querySelectorAll(".menu");
+
+menus.forEach(menu=>{
+
+    menu.addEventListener("click",function(e){
+
+        e.preventDefault();
+
+        menus.forEach(x=>x.classList.remove("active"));
+
+        this.classList.add("active");
+
+        const modulo=this.dataset.modulo;
+
+        cargarModulo(modulo);
+
+    });
+
+});
+
+
+function cargarModulo(modulo){
+
+    document.getElementById("contenido-config").innerHTML=`
+
+        <div class="loader">
+
+            <div class="spinner"></div>
+
+            <p>Cargando...</p>
+
+        </div>
+
+    `;
+
+    fetch("/configuracion/"+modulo+"/",{
+
+        headers:{
+
+            "X-Requested-With":"XMLHttpRequest"
+
+        }
+
+    })
+
+    .then(r=>r.text())
+
+    .then(html=>{
+
+        document.getElementById("contenido-config").innerHTML=html;
+
+    })
+
+    .catch(()=>{
+
+        document.getElementById("contenido-config").innerHTML=`
+
+            <div class="error">
+
+                <i class="ri-error-warning-fill"></i>
+
+                <h2>Error</h2>
+
+                <p>No fue posible cargar este módulo.</p>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+</script>
 
 </body>
+
 </html>

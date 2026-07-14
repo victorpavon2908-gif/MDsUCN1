@@ -1,0 +1,483 @@
+/*=========================================================
+                    MODAL PRESTAMO
+=========================================================*/
+
+.prestamo-modal{
+
+    width:100%;
+
+    background:#fff;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    font-family:'Segoe UI',sans-serif;
+
+}
+
+
+/*=========================================================
+                    HEADER
+=========================================================*/
+
+.prestamo-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:28px 35px;
+
+    background:linear-gradient(135deg,#15509c,#0b74d6);
+
+    color:#fff;
+
+}
+
+.prestamo-header h2{
+
+    margin:0;
+
+    font-size:30px;
+
+    font-weight:700;
+
+}
+
+.prestamo-header p{
+
+    margin-top:6px;
+
+    opacity:.9;
+
+    font-size:15px;
+
+}
+
+
+/*=========================================================
+                    BOTON CERRAR
+=========================================================*/
+
+.cerrar{
+
+    width:45px;
+
+    height:45px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.15);
+
+    color:#fff;
+
+    font-size:22px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.cerrar:hover{
+
+    background:#dc2626;
+
+    transform:rotate(90deg);
+
+}
+
+
+/*=========================================================
+                    CONTENIDO
+=========================================================*/
+
+.prestamo-contenido{
+
+    display:grid;
+
+    grid-template-columns:330px 1fr;
+
+    min-height:620px;
+
+}
+
+
+/*=========================================================
+                    PANEL IZQUIERDO
+=========================================================*/
+
+.equipo-panel{
+
+    background:#f7f9fc;
+
+    border-right:1px solid #ececec;
+
+    padding:35px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+
+/*=========================================================
+                    IMAGEN
+=========================================================*/
+
+.imagen-equipo{
+
+    width:220px;
+
+    height:220px;
+
+    border-radius:18px;
+
+    background:#fff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+    margin-bottom:25px;
+
+}
+
+.imagen-equipo img{
+
+    width:180px;
+
+    height:180px;
+
+    object-fit:contain;
+
+}
+
+
+/*=========================================================
+                    TITULO
+=========================================================*/
+
+.equipo-panel h3{
+
+    margin-bottom:30px;
+
+    color:#15509c;
+
+    font-size:24px;
+
+    text-align:center;
+
+}
+
+
+/*=========================================================
+                    DATOS
+=========================================================*/
+
+.equipo-datos{
+
+    width:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.dato{
+
+    background:#fff;
+
+    padding:18px;
+
+    border-radius:14px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+}
+
+.dato span{
+
+    display:block;
+
+    color:#888;
+
+    font-size:13px;
+
+    margin-bottom:6px;
+
+}
+
+.dato strong{
+
+    font-size:16px;
+
+    color:#333;
+
+}
+
+
+/*=========================================================
+                    PANEL DERECHO
+=========================================================*/
+
+.form-panel{
+
+    padding:40px 45px;
+
+}
+
+
+/*=========================================================
+                    FORMULARIO
+=========================================================*/
+
+.grupo{
+
+    margin-bottom:25px;
+
+}
+
+.grupo label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+    color:#444;
+
+}
+
+
+/*=========================================================
+                    INPUTS
+=========================================================*/
+
+.grupo input,
+
+.grupo textarea{
+
+    width:100%;
+
+    box-sizing:border-box;
+
+    padding:15px;
+
+    border:1px solid #d8d8d8;
+
+    border-radius:12px;
+
+    font-size:15px;
+
+    transition:.25s;
+
+    background:#fff;
+
+}
+
+.grupo textarea{
+
+    resize:vertical;
+
+    min-height:170px;
+
+}
+
+.grupo input:focus,
+
+.grupo textarea:focus{
+
+    outline:none;
+
+    border-color:#15509c;
+
+    box-shadow:0 0 0 4px rgba(21,80,156,.10);
+
+}
+
+
+/*=========================================================
+                    FILA
+=========================================================*/
+
+.fila{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:22px;
+
+}
+
+
+/*=========================================================
+                    BOTONES
+=========================================================*/
+
+.acciones{
+
+    margin-top:40px;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:18px;
+
+}
+
+.btn-cancelar{
+
+    padding:14px 32px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#ececec;
+
+    color:#444;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.btn-cancelar:hover{
+
+    background:#d8d8d8;
+
+}
+
+.btn-guardar{
+
+    padding:14px 32px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#15509c;
+
+    color:#fff;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.btn-guardar:hover{
+
+    background:#019446;
+
+    transform:translateY(-2px);
+
+}
+
+
+/*=========================================================
+                    SCROLL
+=========================================================*/
+
+.prestamo-modal::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.prestamo-modal::-webkit-scrollbar-thumb{
+
+    background:#c7c7c7;
+
+    border-radius:10px;
+
+}
+
+
+/*=========================================================
+                    RESPONSIVE
+=========================================================*/
+
+@media(max-width:1000px){
+
+    .prestamo-contenido{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .equipo-panel{
+
+        border-right:none;
+
+        border-bottom:1px solid #ececec;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .prestamo-header{
+
+        padding:22px;
+
+    }
+
+    .prestamo-header h2{
+
+        font-size:22px;
+
+    }
+
+    .form-panel{
+
+        padding:25px;
+
+    }
+
+    .fila{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .acciones{
+
+        flex-direction:column;
+
+    }
+
+    .btn-cancelar,
+
+    .btn-guardar{
+
+        width:100%;
+
+    }
+
+}

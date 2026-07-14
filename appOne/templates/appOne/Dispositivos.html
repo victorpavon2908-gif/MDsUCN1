@@ -4,106 +4,232 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/Dispositivos.css' %}">
 <link rel="stylesheet" href="{% static 'appOne/css/editar_dispositivos.css' %}">
-
+<link rel="stylesheet" href="{% static 'appOne/css/modal_prestamo.css' %}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock %}
 
 {% block contenido %}
 
-<h2 class="titulo-seccion">Equipos Disponibles</h2>
+<h2 class="titulo-seccion">
+    Equipos Disponibles
+</h2>
 
 <div class="galeria">
 
-  {% for d in dispositivo %}
-  <figure class="card"
-          onclick="abrirFormulario('{{ d.id }}','{{ d.nombre_dispositivo }}')">
+    {% for d in dispositivo %}
 
-    {% for p in prestamos_usuario %}
-      {% if p.dispositivo.id == d.id %}
-        {% if p.estado == "pendiente" %}
-          <div class="estado-prestamo pendiente">⏳ Pendiente</div>
-        {% elif p.estado == "aprobado" %}
-          <div class="estado-prestamo aprobado">✅ Aprobado</div>
+    <figure class="card" onclick="abrirPrestamo('{{ d.id }}')">
+
+        {% for p in prestamos_usuario %}
+            {% if p.dispositivo.id == d.id %}
+
+                {% if p.estado == "pendiente" %}
+                    <div class="estado-prestamo pendiente">
+                        ⏳ Pendiente
+                    </div>
+
+                {% elif p.estado == "aprobado" %}
+                    <div class="estado-prestamo aprobado">
+                        ✅ Aprobado
+                    </div>
+                {% endif %}
+
+            {% endif %}
+        {% endfor %}
+
+        <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}"
+             alt="{{ d.nombre_dispositivo }}">
+
+        <figcaption>
+            {{ d.nombre_dispositivo }}
+        </figcaption>
+
+        <div class="info">
+            <p>
+                <span>Código:</span>
+                {{ d.codigo_inventario }}
+            </p>
+
+            <p>
+                <span>Marca:</span>
+                {{ d.marca }}
+            </p>
+        </div>
+
+        {% if request.user.rol == "Admin" %}
+
+        <div class="acciones-admin">
+
+            <button
+                class="btn-editar"
+                onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">
+
+                Editar
+
+            </button>
+
+            <form
+                action="{% url 'eliminar_dispositivo' d.id %}"
+                method="POST"
+                onsubmit="return confirm('¿Eliminar dispositivo?');">
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn-eliminar"
+                    onclick="event.stopPropagation();">
+
+                    Eliminar
+
+                </button>
+
+            </form>
+
+        </div>
+
         {% endif %}
-      {% endif %}
+
+    </figure>
+
+    {% empty %}
+
+        <p class="empty">
+            No hay dispositivos disponibles.
+        </p>
+
     {% endfor %}
-
-    <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}">
-
-    <figcaption>{{ d.nombre_dispositivo }}</figcaption>
-
-    <div class="info">
-      <p><span>Código:</span> {{ d.codigo_inventario }}</p>
-      <p><span>Marca:</span> {{ d.marca }}</p>
-    </div>
-
-    {% if request.user.rol == "Admin" %}
-    <div class="acciones-admin">
-      <button class="btn-editar"
-              onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">
-        Editar
-      </button>
-
-      <form action="{% url 'eliminar_dispositivo' d.id %}"
-            method="POST"
-            onsubmit="return confirm('¿Eliminar dispositivo?');">
-        {% csrf_token %}
-        <button type="submit" class="btn-eliminar"
-                onclick="event.stopPropagation();">
-          Eliminar
-        </button>
-      </form>
-    </div>
-    {% endif %}
-
-  </figure>
-
-  {% empty %}
-    <p class="empty">No hay dispositivos disponibles</p>
-  {% endfor %}
 
 </div>
 
 {% if request.user.rol == "Admin" %}
+
 <a href="{% url 'agregar_dispositivo' %}" class="btn-flotante">
-  +
-  <span class="tooltip">Agregar</span>
+
+    +
+
+    <span class="tooltip">
+        Agregar
+    </span>
+
 </a>
+
 {% endif %}
-<!-- MODAL EDITAR -->
+
+
+<!-- ==========================
+        MODAL EDITAR
+=========================== -->
+
 <div class="modal" id="modalEditar">
-    <div class="modal-contenido">
+
+    <div class="modal-contenido modal-editar">
+
         <div id="contenidoEditar"></div>
+
     </div>
+
 </div>
 
-<script>
-function abrirEditar(id) {
 
-    fetch(`/dispositivos/editar/${id}/`, {
-        headers: {
-            "X-Requested-With": "XMLHttpRequest"
+
+<!-- ==========================
+        MODAL PRESTAMO
+=========================== -->
+
+<div class="modal" id="modalPrestamo">
+
+    <div class="modal-contenido modal-prestamo">
+
+        <div id="contenidoPrestamo"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function abrirEditar(id){
+
+    fetch(`/dispositivos/editar/${id}/`,{
+        headers:{
+            "X-Requested-With":"XMLHttpRequest"
         }
     })
-    .then(response => response.text())
-    .then(html => {
-        document.getElementById("contenidoEditar").innerHTML = html;
-        document.getElementById("modalEditar").style.display = "flex";
+
+    .then(r=>r.text())
+
+    .then(html=>{
+
+        document.getElementById("contenidoEditar").innerHTML=html;
+
+        document.getElementById("modalEditar").style.display="flex";
+
     });
 
 }
 
-function cerrarModalEditar() {
-    document.getElementById("modalEditar").style.display = "none";
+
+function cerrarModalEditar(){
+
+    document.getElementById("modalEditar").style.display="none";
+
 }
 
-/* cerrar al tocar fondo */
-window.onclick = function(e) {
-    const modal = document.getElementById("modalEditar");
-
-    if (e.target === modal) {
-        modal.style.display = "none";
-    }
-}
 </script>
+
+
+
+<script>
+
+function abrirPrestamo(id){
+
+    fetch(`/prestamo/modal/${id}/`,{
+
+        headers:{
+            "X-Requested-With":"XMLHttpRequest"
+        }
+
+    })
+
+    .then(r=>r.text())
+
+    .then(html=>{
+
+        document.getElementById("contenidoPrestamo").innerHTML=html;
+
+        document.getElementById("modalPrestamo").style.display="flex";
+
+    });
+
+}
+
+
+function cerrarModalPrestamo(){
+
+    document.getElementById("modalPrestamo").style.display="none";
+
+}
+
+
+
+window.onclick=function(e){
+
+    if(e.target===document.getElementById("modalEditar")){
+
+        cerrarModalEditar();
+
+    }
+
+    if(e.target===document.getElementById("modalPrestamo")){
+
+        cerrarModalPrestamo();
+
+    }
+
+}
+
+</script>
+
 {% endblock %}
