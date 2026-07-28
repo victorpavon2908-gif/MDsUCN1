@@ -6,230 +6,146 @@
 <link rel="stylesheet" href="{% static 'appOne/css/editar_dispositivos.css' %}">
 <link rel="stylesheet" href="{% static 'appOne/css/modal_prestamo.css' %}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Carga FontAwesome para íconos UI modernos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block contenido %}
 
-<h2 class="titulo-seccion">
-    Equipos Disponibles
-</h2>
+<div class="header-pagina">
+    <div>
+        <h2 class="titulo-seccion">Catálogo de Equipos</h2>
+        <p class="subtitulo-seccion">Gestiona y solicita los dispositivos disponibles en la plataforma</p>
+    </div>
+</div>
 
-<div class="galeria">
-
+<div class="galeria-grid">
     {% for d in dispositivo %}
-
-    <figure class="card" onclick="abrirPrestamo('{{ d.id }}')">
-
+    <div class="card-pro">
+        
+        <!-- Badge de Estado FLOTANTE -->
         {% for p in prestamos_usuario %}
             {% if p.dispositivo.id == d.id %}
-
                 {% if p.estado == "pendiente" %}
-                    <div class="estado-prestamo pendiente">
-                        ⏳ Pendiente
-                    </div>
-
+                    <span class="badge-status pendiente">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Pendiente
+                    </span>
                 {% elif p.estado == "aprobado" %}
-                    <div class="estado-prestamo aprobado">
-                        ✅ Aprobado
-                    </div>
+                    <span class="badge-status aprobado">
+                        <i class="fa-solid fa-circle-check"></i> Aprobado
+                    </span>
                 {% endif %}
-
             {% endif %}
         {% endfor %}
 
-        <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}"
-             alt="{{ d.nombre_dispositivo }}">
+        <!-- Zona Clickeable para abrir Prestamo -->
+        <div class="card-body-click" onclick="abrirPrestamo('{{ d.id }}')">
+            <div class="card-image-wrapper">
+                <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}" 
+                     alt="{{ d.nombre_dispositivo }}" 
+                     loading="lazy">
+                <div class="image-overlay">
+                    <span class="btn-quick-view"><i class="fa-solid fa-hand-pointer"></i> Solicitar</span>
+                </div>
+            </div>
 
-        <figcaption>
-            {{ d.nombre_dispositivo }}
-        </figcaption>
-
-        <div class="info">
-            <p>
-                <span>Código:</span>
-                {{ d.codigo_inventario }}
-            </p>
-
-            <p>
-                <span>Marca:</span>
-                {{ d.marca }}
-            </p>
+            <div class="card-details">
+                <h3 class="card-title">{{ d.nombre_dispositivo }}</h3>
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <i class="fa-solid fa-barcode"></i>
+                        <span>Código: <strong>{{ d.codigo_inventario }}</strong></span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fa-solid fa-tag"></i>
+                        <span>Marca: <strong>{{ d.marca }}</strong></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- Acciones de Administrador -->
         {% if request.user.rol == "Admin" %}
-
-        <div class="acciones-admin">
-
-            <button
-                class="btn-editar"
-                onclick="event.stopPropagation(); abrirEditar('{{ d.id }}')">
-
-                Editar
-
+        <div class="card-actions-admin">
+            <button type="button" class="btn-action edit" onclick="abrirEditar('{{ d.id }}')">
+                <i class="fa-solid fa-pen-to-square"></i> Editar
             </button>
 
-            <form
-                action="{% url 'eliminar_dispositivo' d.id %}"
-                method="POST"
-                onsubmit="return confirm('¿Eliminar dispositivo?');">
-
+            <form action="{% url 'eliminar_dispositivo' d.id %}" method="POST" class="form-delete" onsubmit="return confirm('¿Confirma eliminar este dispositivo?');">
                 {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="btn-eliminar"
-                    onclick="event.stopPropagation();">
-
-                    Eliminar
-
+                <button type="submit" class="btn-action delete">
+                    <i class="fa-solid fa-trash-can"></i>
                 </button>
-
             </form>
-
         </div>
-
         {% endif %}
 
-    </figure>
-
+    </div>
     {% empty %}
-
-        <p class="empty">
-            No hay dispositivos disponibles.
-        </p>
-
+    <div class="empty-state">
+        <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
+        <h3>No hay equipos disponibles</h3>
+        <p>Actualmente no existen registros para mostrar en esta lista.</p>
+    </div>
     {% endfor %}
-
 </div>
 
+<!-- Botón Flotante Agregar Dispositivo -->
 {% if request.user.rol == "Admin" %}
-
-<a href="{% url 'agregar_dispositivo' %}" class="btn-flotante">
-
-    +
-
-    <span class="tooltip">
-        Agregar
-    </span>
-
+<a href="{% url 'agregar_dispositivo' %}" class="btn-floating-add" title="Agregar nuevo dispositivo">
+    <i class="fa-solid fa-plus"></i>
 </a>
-
 {% endif %}
 
-
-<!-- ==========================
-        MODAL EDITAR
-=========================== -->
-
-<div class="modal" id="modalEditar">
-
-    <div class="modal-contenido modal-editar">
-
+<!-- MODALES -->
+<div class="modal-backdrop" id="modalEditar">
+    <div class="modal-container modal-sm">
         <div id="contenidoEditar"></div>
-
     </div>
-
 </div>
 
-
-
-<!-- ==========================
-        MODAL PRESTAMO
-=========================== -->
-
-<div class="modal" id="modalPrestamo">
-
-    <div class="modal-contenido modal-prestamo">
-
+<div class="modal-backdrop" id="modalPrestamo">
+    <div class="modal-container modal-lg">
         <div id="contenidoPrestamo"></div>
-
     </div>
-
 </div>
 
-
 <script>
-
-function abrirEditar(id){
-
-    fetch(`/dispositivos/editar/${id}/`,{
-        headers:{
-            "X-Requested-With":"XMLHttpRequest"
-        }
+function abrirEditar(id) {
+    fetch(`/dispositivos/editar/${id}/`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
     })
-
-    .then(r=>r.text())
-
-    .then(html=>{
-
-        document.getElementById("contenidoEditar").innerHTML=html;
-
-        document.getElementById("modalEditar").style.display="flex";
-
+    .then(r => r.text())
+    .then(html => {
+        document.getElementById("contenidoEditar").innerHTML = html;
+        document.getElementById("modalEditar").classList.add("active");
     });
-
 }
 
-
-function cerrarModalEditar(){
-
-    document.getElementById("modalEditar").style.display="none";
-
+function cerrarModalEditar() {
+    document.getElementById("modalEditar").classList.remove("active");
 }
 
-</script>
-
-
-
-<script>
-
-function abrirPrestamo(id){
-
-    fetch(`/prestamo/modal/${id}/`,{
-
-        headers:{
-            "X-Requested-With":"XMLHttpRequest"
-        }
-
+function abrirPrestamo(id) {
+    fetch(`/prestamo/modal/${id}/`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
     })
-
-    .then(r=>r.text())
-
-    .then(html=>{
-
-        document.getElementById("contenidoPrestamo").innerHTML=html;
-
-        document.getElementById("modalPrestamo").style.display="flex";
-
+    .then(r => r.text())
+    .then(html => {
+        document.getElementById("contenidoPrestamo").innerHTML = html;
+        document.getElementById("modalPrestamo").classList.add("active");
     });
-
 }
 
-
-function cerrarModalPrestamo(){
-
-    document.getElementById("modalPrestamo").style.display="none";
-
+function cerrarModalPrestamo() {
+    document.getElementById("modalPrestamo").classList.remove("active");
 }
 
-
-
-window.onclick=function(e){
-
-    if(e.target===document.getElementById("modalEditar")){
-
-        cerrarModalEditar();
-
+window.onclick = function(e) {
+    if (e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.remove("active");
     }
-
-    if(e.target===document.getElementById("modalPrestamo")){
-
-        cerrarModalPrestamo();
-
-    }
-
 }
-
 </script>
 
 {% endblock %}

@@ -1,31 +1,92 @@
-<h3 style="margin-bottom:15px;">
-    Editar dispositivo
-</h3>
+<div class="form-card">
 
-<form method="POST"
-      enctype="multipart/form-data"
-      action="{% url 'editar_dispositivo' dispositivo.id %}">
+    <h3 class="form-title">Editar dispositivo</h3>
 
-    {% csrf_token %}
+    <form method="POST"
+          enctype="multipart/form-data"
+          action="{% url 'editar_dispositivo' dispositivo.id %}">
 
-    <div class="formulario">
+        {% csrf_token %}
 
-        {{ form.nombre_dispositivo }}
-        {{ form.codigo_inventario }}
-        {{ form.marca }}
-        {{ form.descripcion }}
-        {{ form.imagen }}
+        <div class="form-editar">
 
-        <button type="submit" class="btn-enviar">
-            Guardar cambios
-        </button>
+            <!-- NOMBRE DISPOSITIVO (Full Width) -->
+            <div class="form-grupo full">
+                <label for="{{ form.nombre_dispositivo.id_for_label }}">
+                    {{ form.nombre_dispositivo.label }}
+                </label>
+                {{ form.nombre_dispositivo }}
+                {% if form.nombre_dispositivo.errors %}
+                    <span class="error-msg">{{ form.nombre_dispositivo.errors.0 }}</span>
+                {% endif %}
+            </div>
 
-        <button type="button"
-                onclick="cerrarModalEditar()"
-                class="btn-eliminar"
-                style="margin-top:10px;width:100%;">
-            Cancelar
-        </button>
+            <!-- CÓDIGO INVENTARIO -->
+            <div class="form-grupo">
+                <label for="{{ form.codigo_inventario.id_for_label }}">
+                    {{ form.codigo_inventario.label }}
+                </label>
+                {{ form.codigo_inventario }}
+                {% if form.codigo_inventario.errors %}
+                    <span class="error-msg">{{ form.codigo_inventario.errors.0 }}</span>
+                {% endif %}
+            </div>
 
-    </div>
-</form>
+            <!-- MARCA -->
+            <div class="form-grupo">
+                <label for="{{ form.marca.id_for_label }}">
+                    {{ form.marca.label }}
+                </label>
+                {{ form.marca }}
+                {% if form.marca.errors %}
+                    <span class="error-msg">{{ form.marca.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- DESCRIPCIÓN (Full Width) -->
+            <div class="form-grupo full">
+                <label for="{{ form.descripcion.id_for_label }}">
+                    {{ form.descripcion.label }}
+                </label>
+                {{ form.descripcion }}
+                {% if form.descripcion.errors %}
+                    <span class="error-msg">{{ form.descripcion.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- IMAGEN Y PREVIEW (Full Width) -->
+            <div class="form-grupo full">
+                <label for="{{ form.imagen.id_for_label }}">
+                    Imagen del equipo
+                </label>
+                
+                {% if dispositivo.imagen %}
+                    <div class="preview-container">
+                        <img src="{{ dispositivo.imagen.url }}" alt="{{ dispositivo.nombre_dispositivo }}" class="preview-img">
+                        <span class="preview-label">Imagen actual</span>
+                    </div>
+                {% endif %}
+
+                <div class="file-dropzone">
+                    {{ form.imagen }}
+                </div>
+                {% if form.imagen.errors %}
+                    <span class="error-msg">{{ form.imagen.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- ACCIONES Y BOTONES -->
+        <div class="form-acciones">
+            <button type="button" onclick="cerrarModalEditar()" class="btn-cancelar">
+                Cancelar
+            </button>
+            <button type="submit" class="btn-actualizar">
+                Guardar cambios
+            </button>
+        </div>
+
+    </form>
+
+</div>

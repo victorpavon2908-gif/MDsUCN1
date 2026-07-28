@@ -3,13 +3,11 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Crear Cuenta</title>
+    <title>Crear Cuenta | MDsUCN</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Fuente -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Iconos -->
+    <!-- Fuentes y Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
     <!-- CSS -->
@@ -18,42 +16,60 @@
 
 <body>
 
-<div class="registro-container">
+    <div class="registro-wrapper">
+        <!-- Elementos de fondo flotantes para efecto moderno -->
+        <div class="blob-bg blob-1"></div>
+        <div class="blob-bg blob-2"></div>
 
-    <!-- IZQUIERDA -->
-    <div class="registro-left">
-        <h1>Vamos a Registrarte</h1>
-        <p>Crea tu cuenta para solicitar dispositivos</p>
-    </div>
+        <div class="registro-container">
 
-    <!-- DERECHA -->
-    <div class="registro-right">
-
-        <div class="registro-box">
-
-            <h2>Crear Cuenta</h2>
-
-            <form method="POST">
-                {% csrf_token %}
-
-                <div class="form-grid">
-                    {{ form.as_p }}
+            <!-- PANEL IZQUIERDO (Branding & Experience) -->
+            <div class="registro-left">
+                <div class="brand-content">
+                    <div class="badge-tag">
+                        <i class="ri-user-shared-line"><span>Registro Seguro</span></i>
+                    </div>
+                    <h1>Vamos a Registrarte</h1>
+                    <p>Crea tu cuenta institucional para solicitar dispositivos y gestionar tus préstamos de manera eficiente.</p>
                 </div>
+                <div class="left-footer">
+                    <p>&copy; 2026 UCN. Todos los derechos reservados.</p>
+                </div>
+            </div>
 
-                <button type="submit" class="btn-registro">
-                    Crear cuenta
-                </button>
-            </form>
+            <!-- PANEL DERECHO (Formulario de Registro) -->
+            <div class="registro-right">
+                <div class="registro-box">
 
-            <div class="extras">
-                <a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión</a>
+                    <div class="box-header">
+                        <h2>Crear Cuenta</h2>
+                        <p>Completa los datos para dar de alta tu perfil</p>
+                    </div>
+
+                    <form method="POST" class="registro-form">
+                        {% csrf_token %}
+
+                        <div class="form-grid">
+                            {{ form.as_p }}
+                        </div>
+
+                        <button type="submit" class="btn-registro">
+                            <span>Registrarse ahora</span>
+                            <i class="ri-arrow-right-line"></i>
+                        </button>
+                    </form>
+
+                    <div class="extras">
+                        <a href="{% url 'login' %}">
+                            <i class="ri-arrow-left-line"></i> ¿Ya tienes cuenta? <strong>Inicia sesión</strong>
+                        </a>
+                    </div>
+
+                </div>
             </div>
 
         </div>
-
     </div>
-
-</div>
 
 </body>
 </html>

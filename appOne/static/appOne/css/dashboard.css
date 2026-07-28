@@ -1,510 +1,511 @@
+/* ==========================================================================
+   MDsUCN DASHBOARD SYSTEM BASE - ULTRA PRO CSS
+   ========================================================================== */
+
 :root {
-  --bg: #EDE3CC;
-  --card-bg: #ffffff;
-
-  /* VERDE PRINCIPAL */
-  --sidebar-bg: #019446;
-  --sidebar-hover: #017a39;
-
+  /* Colors */
   --primary: #019446;
   --primary-hover: #017a39;
+  --primary-light: #e6f7ef;
 
-  /* AZUL SECUNDARIO */
-  --secondary: #15509C;
-  --secondary-hover: #104E9B;
+  --secondary: #15509c;
+  --secondary-hover: #0f3e7a;
+  --secondary-light: #eef4ff;
 
-  /* DORADOS */
-  --gold: #CBA14B;
-  --gold-dark: #C89B3B;
+  --gold: #cba14b;
+  --gold-dark: #b08738;
 
-  /* TEXTOS */
-  --text-main: #1f2937;
-  --text-secondary: #5f6b7a;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
 
-  --border: #d6c7a8;
+  --sidebar-width: 260px;
+  --topbar-height: 70px;
 
-  --danger: #dc2626;
+  /* Theme Neutrals */
+  --bg-app: #f1f5f9;
+  --surface-card: #ffffff;
+  --border-color: #e2e8f0;
 
-  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
 
-  --radius: 12px;
+  /* Shadows & Radius */
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.12);
+
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* =========================================================
-   RESET
-========================================================= */
+/* Reset Base */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: 0.2s;
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
   color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================================
-   HEADER
-========================================================= */
-.navegacion {
-  background: linear-gradient(
-    90deg,
-    var(--primary),
-    var(--primary-hover)
-  );
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
 
-  border-bottom: 3px solid var(--gold);
-
+/* ==========================================================================
+   1. SIDEBAR
+   ========================================================================== */
+.sidebar {
+  width: var(--sidebar-width);
+  background: #0d1e15; /* Dark Emerald theme */
+  background: linear-gradient(180deg, #091710 0%, #012411 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
   position: fixed;
-  width: 100%;
   top: 0;
-  z-index: 1000;
-
-  box-shadow: var(--shadow);
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  transition: var(--transition);
 }
 
-.nav {
+.sidebar-header {
+  height: var(--topbar-height);
+  padding: 0 20px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* =========================================================
-   NAV LEFT
-========================================================= */
-.nav-left h1{
-  color:white;
-  font-size:24px;
-  font-weight:800;
-  letter-spacing:1px;
-}
-
-/* =========================================================
-   NAV RIGHT
-========================================================= */
-.nav-right{
-  display:flex;
-  align-items:center;
-  gap:20px;
-}
-
-/* =========================================================
-   RELOJ BONITO
-========================================================= */
-.clock-box{
-  display:flex;
-  align-items:center;
-  gap:10px;
-
-  background:rgba(255,255,255,0.12);
-
-  padding:10px 16px;
-
-  border-radius:14px;
-
-  border:1px solid rgba(255,255,255,0.15);
-
-  backdrop-filter: blur(8px);
-
-  box-shadow:0 4px 14px rgba(0,0,0,0.12);
-}
-
-/* ICONO */
-.clock-box i{
-  font-size:20px;
-  color:var(--gold);
-}
-
-/* HORA */
-#clock-nicaragua{
-  color:white;
-
-  font-size:15px;
-
-  font-weight:700;
-
-  letter-spacing:1px;
-
-  font-family:'Courier New', monospace;
-}
-
-/* HOVER */
-.clock-box:hover{
-  transform:translateY(-2px);
-  background:rgba(255,255,255,0.18);
-}
-
-/* =========================================================
-   MENU
-========================================================= */
-.menu {
+.brand {
   display: flex;
-  gap: 20px;
-  list-style: none;
   align-items: center;
+  gap: 12px;
 }
 
-.menu a {
-  color: white;
+.brand-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-name {
+  color: var(--text-inverse);
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+}
+
+.toggle-sidebar-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 12px;
+  overflow-y: auto;
+}
+
+.nav-section-title {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 12px 12px 6px 12px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
+  font-size: 0.9rem;
   font-weight: 500;
-  padding: 8px 10px;
-  border-radius: 6px;
-}
-
-.menu a:hover {
-  background: rgba(255,255,255,0.12);
-  color: var(--gold);
-}
-
-/* USER */
-.user{
-  color:white;
-  font-weight:600;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-/* =========================================================
-   NOTIFICACIONES
-========================================================= */
-.notif-dropdown {
+  border-radius: var(--radius-md);
+  margin-bottom: 4px;
+  transition: var(--transition);
   position: relative;
 }
 
-.notif-badge {
+.nav-item i {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-inverse);
+}
+
+.nav-item:hover i {
+  color: var(--gold);
+}
+
+.nav-item.active {
+  background: var(--primary);
+  color: var(--text-inverse);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(1, 148, 70, 0.3);
+}
+
+.nav-item.active i {
+  color: var(--text-inverse);
+}
+
+.nav-badge {
+  margin-left: auto;
   background: var(--danger);
   color: white;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 50%;
-  position: absolute;
-  top: -5px;
-  right: -8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
 }
 
-.notif-menu {
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 35px;
-
-  background: white;
-
-  padding: 15px;
-
-  border-radius: 10px;
-
-  width: 260px;
-
-  border: 1px solid var(--border);
-
-  box-shadow: var(--shadow);
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.notif-dropdown:hover .notif-menu {
-  display: block;
-}
-
-/* =========================================================
-   LAYOUT
-========================================================= */
-.container {
-  display: flex;
-  margin-top: 78px;
-}
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-.sidebar {
-  width: 240px;
-
-  background: linear-gradient(
-    180deg,
-    var(--primary),
-    var(--primary-hover)
-  );
-
-  height: 100vh;
-
-  position: fixed;
-
-  border-right: 4px solid var(--gold);
-
-  overflow-y: auto;
-
-  box-shadow: 4px 0 12px rgba(0,0,0,0.08);
-}
-
-/* LOGO */
-.sidebar img {
-  width: 120px;
-  margin: 20px auto;
-  display: block;
-}
-
-/* LINKS */
-.sidebar a {
+.logout-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-
-  padding: 15px 25px;
-
-  color: rgba(255,255,255,0.90);
-
+  padding: 10px 14px;
+  color: #fca5a5;
   text-decoration: none;
-
-  font-weight: 500;
-
-  border-left: 4px solid transparent;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
 }
 
-/* HOVER */
-.sidebar a:hover {
-  background: rgba(255,255,255,0.10);
-  color: white;
-  border-left: 4px solid var(--gold);
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
-/* ACTIVE */
-.sidebar a.active {
-  background: rgba(255,255,255,0.12);
-  color: white;
-  border-left: 4px solid var(--gold);
+/* ==========================================================================
+   2. MAIN WRAPPER & TOPBAR
+   ========================================================================== */
+.main-wrapper {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: var(--transition);
 }
 
-/* =========================================================
-   MAIN CONTENT
-========================================================= */
-.main-content {
-  margin-left: 240px;
-  padding: 30px;
-  width: 100%;
+.topbar {
+  height: var(--topbar-height);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
 }
 
-/* =========================================================
-   CARDS
-========================================================= */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mobile-toggle-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.page-title span {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
   gap: 20px;
 }
 
-.stat-card {
-  background: var(--card-bg);
-
-  padding: 22px;
-
-  border-radius: var(--radius);
-
-  border-top: 5px solid var(--primary);
-
-  border: 1px solid var(--border);
-
-  box-shadow: var(--shadow);
+/* Clock */
+.clock-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-app);
+  padding: 7px 14px;
+  border-radius: 30px;
+  border: 1px solid var(--border-color);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--secondary);
 }
 
-/* HOVER */
-.stat-card:hover {
-  transform: translateY(-3px);
-  border-top-color: var(--secondary);
-}
-
-/* ICONOS */
-.stat-card i {
-  color: var(--primary);
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-/* TITULO */
-.stat-card h3 {
-  margin-bottom: 8px;
-  color: var(--primary);
-}
-
-/* TEXTO */
-.stat-card p {
-  color: var(--text-secondary);
-}
-
-/* =========================================================
-   TABLAS
-========================================================= */
-.table-wrapper {
-  margin-top: 25px;
-
-  background: var(--card-bg);
-
-  padding: 20px;
-
-  border-radius: var(--radius);
-
-  border: 1px solid var(--border);
-
-  box-shadow: var(--shadow);
-}
-
-/* TABLA */
-.table-dashboard {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-/* HEAD */
-.table-dashboard th {
-  text-align: left;
-
-  padding: 14px 10px;
-
-  background: var(--primary);
-
-  color: white;
-
-  font-weight: 600;
-}
-
-/* TD */
-.table-dashboard td {
-  padding: 14px 10px;
-  border-bottom: 1px solid #eee;
-}
-
-/* HOVER */
-.table-dashboard tr:hover {
-  background: rgba(1,148,70,0.06);
-}
-
-/* =========================================================
-   ESTADOS
-========================================================= */
-.estado {
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* APROBADO */
-.aprobado {
-  color: var(--primary);
-  background: rgba(1,148,70,0.12);
-}
-
-/* PENDIENTE */
-.pendiente {
+.clock-badge i {
   color: var(--gold-dark);
-  background: rgba(203,161,75,0.15);
+  font-size: 1rem;
 }
 
-/* RECHAZADO */
-.rechazado {
-  color: #dc2626;
-  background: rgba(220,38,38,0.10);
+/* Icon Buttons & Dropdown */
+.dropdown-wrapper {
+  position: relative;
 }
 
-/* =========================================================
-   FOOTER
-========================================================= */
-footer {
-  margin-left: 240px;
-
-  text-align: center;
-
-  padding: 20px;
-
-  color: var(--text-secondary);
-
-  font-size: 14px;
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--surface-card);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
 }
 
-/* =========================================================
-   SCROLLBAR
-========================================================= */
-::-webkit-scrollbar {
+.icon-btn:hover {
+  background: var(--bg-app);
+  color: var(--primary);
+}
+
+.badge-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
   width: 8px;
+  height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  border: 2px solid white;
 }
 
-::-webkit-scrollbar-thumb {
+/* Notifications Dropdown */
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 320px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: none;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  display: block;
+  animation: dropdownFade 0.2s ease;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+}
+
+.dropdown-header h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.count-pill {
+  background: var(--danger-light);
+  color: var(--danger);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.dropdown-body {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.notif-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  transition: var(--transition);
+}
+
+.notif-card:hover {
+  background: var(--bg-app);
+}
+
+.notif-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--secondary-light);
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-info strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+.notif-info p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.empty-notif {
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-notif i {
+  font-size: 1.8rem;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+/* User Meta Topbar */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border-color);
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   background: var(--primary);
-  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(1, 148, 70, 0.25);
 }
 
-::-webkit-scrollbar-track {
-  background: #d9d0bc;
+.user-meta {
+  display: flex;
+  flex-direction: column;
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-@media(max-width: 900px){
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.1;
+}
 
-  .sidebar{
-    width: 70px;
+.user-role {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   3. CONTENT BODY & FOOTER
+   ========================================================================== */
+.content-body {
+  padding: 28px;
+  flex: 1;
+}
+
+.app-footer {
+  padding: 20px 28px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  background: var(--surface-card);
+}
+
+/* ==========================================================================
+   4. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%);
   }
 
-  .sidebar a{
-    justify-content: center;
-    padding: 15px;
+  .sidebar.mobile-open {
+    transform: translateX(0);
   }
 
-  .sidebar a span{
+  .main-wrapper {
+    margin-left: 0;
+  }
+
+  .mobile-toggle-btn {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .content-body {
+    padding: 16px;
+  }
+
+  .clock-badge {
     display: none;
   }
 
-  .main-content{
-    margin-left: 70px;
-    padding: 20px;
-  }
-
-  footer{
-    margin-left: 70px;
-  }
-
-  .nav{
-    padding: 15px;
-  }
-
-  .menu{
-    gap: 10px;
-  }
-
-  .clock-box{
-    padding:8px 12px;
-  }
-
-  #clock-nicaragua{
-    font-size:13px;
+  .user-meta {
+    display: none;
   }
 }
-
-@media(max-width:700px){
-
-  .nav{
-    flex-direction:column;
-    gap:12px;
-  }
-
-  .nav-right{
-    width:100%;
-    justify-content:space-between;
-  }
-
-  .clock-box{
-    flex:1;
-    justify-content:center;
-  }
-
-  .container{
-    margin-top:120px;
-  }
-}
-

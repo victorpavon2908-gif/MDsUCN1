@@ -3,73 +3,94 @@
 <head>
     {% load static %}
     <meta charset="utf-8">
-    <title>Iniciar Sesión</title>
+    <title>Iniciar Sesión | MDsUCN</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Fuente -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Iconos -->
+    <!-- Fuentes y Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'appOne/css/login.css'%}">
+    <link rel="stylesheet" href="{% static 'appOne/css/login.css' %}">
 </head>
-
 <body>
 
-<div class="login-container">
+    <div class="login-wrapper">
+        <!-- Elementos de fondo flotantes para efecto moderno -->
+        <div class="blob-bg blob-1"></div>
+        <div class="blob-bg blob-2"></div>
 
-    <!-- PANEL IZQUIERDO (branding) -->
-    <div class="login-left">
-        <h1>MDsUCN</h1>
-        <p>Gestiona dispositivos, usuarios y préstamos de forma profesional.</p>
-    </div>
+        <div class="login-container">
 
-    <!-- PANEL DERECHO -->
-    <div class="login-right">
-
-        <div class="login-box">
-
-            <h2>Iniciar Sesión</h2>
-
-            <form method="POST" action="{% url 'login' %}">
-                {% csrf_token %}
-
-                <div class="input-group">
-                    <i class="ri-mail-line"></i>
-                    <input type="text" name="username" placeholder="Correo institucional" required>
+            <!-- PANEL IZQUIERDO (Branding & Experience) -->
+            <div class="login-left">
+                <div class="brand-content">
+                    <div class="badge-tag">
+                        <i class="ri-shield-flash-line"><span>Plataforma Oficial</span></i>
+                    </div>
+                    <h1>MDsUCN</h1>
+                    <p>Gestiona dispositivos, usuarios y préstamos de forma profesional, rápida y segura en un solo lugar.</p>
                 </div>
-
-                <div class="input-group">
-                    <i class="ri-lock-line"></i>
-                    <input type="password" name="password" placeholder="Contraseña" required>
+                <div class="left-footer">
+                    <p>&copy; 2026 UCN. Todos los derechos reservados.</p>
                 </div>
-
-                <button type="submit" class="btn-login">
-                    Ingresar
-                </button>
-
-            </form>
-
-            {% if messages %}
-            <div class="mensajes">
-                {% for message in messages %}
-                <p>{{ message }}</p>
-                {% endfor %}
             </div>
-            {% endif %}
 
-            <div class="extras">
-                <a href="#">¿Olvidaste tu contraseña?</a>
-                <a href="{% url 'registro' %}">Crear cuenta</a>
+            <!-- PANEL DERECHO (Formulario de Acceso) -->
+            <div class="login-right">
+                <div class="login-box">
+                    
+                    <div class="box-header">
+                        <h2>Bienvenido de nuevo</h2>
+                        <p>Ingresa tus credenciales para continuar</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'login' %}" class="login-form">
+                        {% csrf_token %}
+
+                        <div class="input-group">
+                            <label for="username">Correo institucional</label>
+                            <div class="input-field">
+                                <i class="ri-mail-line"></i>
+                                <input type="text" id="username" name="username" placeholder="usuario@ucn.edu" required autocomplete="email">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">Contraseña</label>
+                            <div class="input-field">
+                                <i class="ri-lock-password-line"></i>
+                                <input type="password" id="password" name="password" placeholder="••••••••••••" required autocomplete="current-password">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-login">
+                            <span>Ingresar al Sistema</span>
+                            <i class="ri-arrow-right-line"></i>
+                        </button>
+                    </form>
+
+                    {% if messages %}
+                    <div class="mensajes">
+                        {% for message in messages %}
+                        <div class="alert-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="extras">
+                        <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        <a href="{% url 'registro' %}" class="create-link">Crear cuenta nueva</a>
+                    </div>
+
+                </div>
             </div>
 
         </div>
-
     </div>
-
-</div>
 
 </body>
 </html>

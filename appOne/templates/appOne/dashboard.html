@@ -5,10 +5,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - MDsUCN</title>
+  <title>{% block title %}Dashboard - MDsUCN{% endblock %}</title>
 
+  <!-- Fuentes & Iconos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- CSS Base -->
   <link rel="stylesheet" href="{% static 'appOne/css/dashboard.css' %}">
-  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   {% block extra_css %}{% endblock %}
@@ -16,176 +23,174 @@
 
 <body>
 
-  <!-- HEADER -->
-  <header class="navegacion">
-    <nav class="nav">
-
-      <div class="nav-left">
-        <h1>MDsUCN</h1>
-      </div>
-
-      <div class="nav-right">
-
-        <!-- RELOJ NICARAGUA -->
-        <div class="clock-box">
-          <i class="ri-time-line"></i>
-          <span id="clock-nicaragua">00:00:00</span>
-        </div>
-
-        <ul class="menu">
-          <li><a href="#">Inicio</a></li>
-          <li><a href="#">Soporte</a></li>
-
-          <!-- NOTIFICACIONES -->
-          <li class="notif-dropdown">
-            <a href="#">
-              <i class="ri-notification-3-line"></i>
-
-              {% if pendientes_count > 0 %}
-              <span class="notif-badge">{{ pendientes_count }}</span>
-              {% endif %}
-            </a>
-
-            <div class="notif-menu">
-              <h4>Solicitudes</h4>
-
-              {% if usuarios_pendientes %}
-                {% for u in usuarios_pendientes %}
-                  <div class="notif-item">
-                    <strong>{{ u.nombre_completo }}</strong>
-                    <p>{{ u.rol }}</p>
-                  </div>
-                {% endfor %}
-              {% else %}
-                <p>No hay notificaciones</p>
-              {% endif %}
-            </div>
-          </li>
-
-          <li class="user">
-            <i class="ri-user-3-line"></i> {{ request.user.username }}
-          </li>
-        </ul>
-
-      </div>
-    </nav>
-  </header>
-
-  <div class="container">
+  <div class="app-layout">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-      <div class="logo">
-        <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" alt="MDsUCN Logo"
+            class="brand-logo">
+          <span class="brand-name">MDsUCN</span>
+        </div>
+        <button class="toggle-sidebar-btn" id="toggleSidebar" aria-label="Toggle Sidebar">
+          <i class="ri-indent-decrease"></i>
+        </button>
       </div>
 
-      <nav>
-        <a href="{% url 'dashboardinicio' %}" class="active">
-          <i class="ri-home-4-line"></i> Inicio
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">MENÚ PRINCIPAL</div>
+
+        <a href="{% url 'dashboardinicio' %}"
+          class="nav-item {% if request.resolver_match.url_name == 'dashboardinicio' %}active{% endif %}">
+          <i class="ri-dashboard-3-line"></i>
+          <span>Inicio</span>
         </a>
 
-        <a href="{% url 'listardispositivos' %}">
-          <i class="ri-computer-line"></i> Dispositivos
+        <a href="{% url 'listardispositivos' %}"
+          class="nav-item {% if request.resolver_match.url_name == 'listardispositivos' %}active{% endif %}">
+          <i class="ri-computer-line"></i>
+          <span>Dispositivos</span>
         </a>
 
         {% if request.user.rol == "Admin" %}
-        <a href="{% url 'panel_usuarios' %}">
-          <i class="ri-user-fill"></i> Usuarios
+        <div class="nav-section-title">ADMINISTRACIÓN</div>
+
+        <a href="{% url 'panel_usuarios' %}"
+          class="nav-item {% if request.resolver_match.url_name == 'panel_usuarios' %}active{% endif %}">
+          <i class="ri-user-settings-line"></i>
+          <span>Usuarios</span>
         </a>
 
-        <a href="{% url 'solicitudes_prestamos' %}">
-          <i class="ri-add-fill"></i> Solicitudes
+        <a href="{% url 'solicitudes_prestamos' %}"
+          class="nav-item {% if request.resolver_match.url_name == 'solicitudes_prestamos' %}active{% endif %}">
+          <i class="ri-git-pull-request-line"></i>
+          <span>Solicitudes</span>
+          {% if pendientes_count > 0 %}
+          <span class="nav-badge">{{ pendientes_count }}</span>
+          {% endif %}
         </a>
         {% endif %}
 
-        <a href="{% url 'reportes' %}">
-          <i class="ri-file-chart-fill"></i> Reportes
+        <div class="nav-section-title">SISTEMA</div>
+
+        <a href="{% url 'reportes' %}"
+          class="nav-item {% if request.resolver_match.url_name == 'reportes' %}active{% endif %}">
+          <i class="ri-bar-chart-grouped-line"></i>
+          <span>Reportes</span>
         </a>
 
-        <a href="{% url 'configuracion' %}">
-          <i class="ri-settings-3-line"></i> Configuración
-        </a>
-
-        <a href="{% url 'logout' %}">
-          <i class="ri-shut-down-line"></i> Cerrar sesión
+        <a href="{% url 'configuracion' %}"
+          class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">
+          <i class="ri-settings-4-line"></i>
+          <span>Configuración</span>
         </a>
       </nav>
 
+      <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout-btn">
+          <i class="ri-logout-box-r-line"></i>
+          <span>Cerrar Sesión</span>
+        </a>
+      </div>
     </aside>
 
-    <!-- MAIN -->
-    <main class="main-content">
+    <!-- CONTAINER PRINCIPAL -->
+    <div class="main-wrapper">
 
-      {% block contenido %}
-
-      <!-- CARDS -->
-      <div class="stats">
-
-        <div class="stat-card">
-          <i class="ri-computer-line"></i>
-          <h3>120</h3>
-          <p>Dispositivos</p>
+      <!-- HEADER TOPNAV -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle-btn" id="mobileToggle">
+            <i class="ri-menu-2-line"></i>
+          </button>
+          <div class="page-title">
+            <span>Gestión Institucional</span>
+          </div>
         </div>
 
-        <div class="stat-card">
-          <i class="ri-user-line"></i>
-          <h3>80</h3>
-          <p>Usuarios</p>
+        <div class="topbar-right">
+
+          <!-- RELOJ -->
+          <div class="clock-badge">
+            <i class="ri-time-line"></i>
+            <span id="clock-nicaragua">00:00:00</span>
+          </div>
+
+          <!-- NOTIFICACIONES -->
+          <div class="dropdown-wrapper">
+            <button class="icon-btn" id="notifBtn" aria-label="Notificaciones">
+              <i class="ri-notification-3-line"></i>
+              {% if pendientes_count > 0 %}
+              <span class="badge-dot"></span>
+              {% endif %}
+            </button>
+
+            <div class="dropdown-menu notif-dropdown-menu" id="notifDropdown">
+              <div class="dropdown-header">
+                <h4>Solicitudes Pendientes</h4>
+                {% if pendientes_count > 0 %}
+                <span class="count-pill">{{ pendientes_count }}</span>
+                {% endif %}
+              </div>
+
+              <div class="dropdown-body">
+                {% if usuarios_pendientes %}
+                {% for u in usuarios_pendientes %}
+                <div class="notif-card">
+                  <div class="notif-avatar">
+                    <i class="ri-user-received-line"></i>
+                  </div>
+                  <div class="notif-info">
+                    <strong>{{ u.nombre_completo }}</strong>
+                    <p>Solicitó rol de {{ u.rol }}</p>
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-notif">
+                  <i class="ri-checkbox-circle-line"></i>
+                  <p>Todo al día. Sin solicitudes pendientes.</p>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- PERFIL USUARIO -->
+          <div class="user-profile">
+            <div class="user-avatar">
+              {{ request.user.username|slice:":2"|upper }}
+            </div>
+            <div class="user-meta">
+              <span class="user-name">{{ request.user.username }}</span>
+              <span class="user-role">{{ request.user.rol|default:"Usuario" }}</span>
+            </div>
+          </div>
+
         </div>
+      </header>
 
-        <div class="stat-card">
-          <i class="ri-time-line"></i>
-          <h3>15</h3>
-          <p>Préstamos activos</p>
-        </div>
+      <!-- CONTENIDO DINÁMICO -->
+      <main class="content-body">
+        {% block contenido %}
+        <!-- Contenido fallback/ejemplo -->
+        {% endblock %}
+      </main>
 
-      </div>
+      <!-- FOOTER -->
+      <footer class="app-footer">
+        <p>© 2026 <strong>MDsUCN</strong> — Plataforma Profesional de Gestión</p>
+      </footer>
 
-      <!-- TABLA -->
-      <div class="table-wrapper">
-
-        <h3>Actividad reciente</h3>
-
-        <table class="table-dashboard">
-
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Acción</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>Juan</td>
-              <td>Solicitó laptop</td>
-              <td>
-                <span class="estado aprobado">Aprobado</span>
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-      {% endblock %}
-
-    </main>
+    </div>
 
   </div>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2026 MDsUCN — Sistema profesional</p>
-  </footer>
-
-  <!-- SCRIPT RELOJ NICARAGUA -->
+  <!-- SCRIPT BASE -->
   <script>
+    // Reloj Nicaragua
     function actualizarHoraNicaragua() {
-
       const opciones = {
         timeZone: 'America/Managua',
         hour: '2-digit',
@@ -193,17 +198,41 @@
         second: '2-digit',
         hour12: true
       };
+      const hora = new Intl.DateTimeFormat('es-NI', opciones).format(new Date());
+      const clockEl = document.getElementById('clock-nicaragua');
+      if (clockEl) clockEl.innerText = hora;
+    }
+    setInterval(actualizarHoraNicaragua, 1000);
+    actualizarHoraNicaragua();
 
-      const hora = new Intl.DateTimeFormat('es-NI', opciones)
-        .format(new Date());
+    // Toggle Dropdown Notificaciones
+    const notifBtn = document.getElementById('notifBtn');
+    const notifDropdown = document.getElementById('notifDropdown');
 
-      document.getElementById('clock-nicaragua').innerText = hora;
+    if (notifBtn && notifDropdown) {
+      notifBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notifDropdown.classList.toggle('show');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!notifDropdown.contains(e.target)) {
+          notifDropdown.classList.remove('show');
+        }
+      });
     }
 
-    setInterval(actualizarHoraNicaragua, 1000);
+    // Toggle Mobile Sidebar
+    const mobileToggle = document.getElementById('mobileToggle');
+    const sidebar = document.getElementById('sidebar');
 
-    actualizarHoraNicaragua();
+    if (mobileToggle && sidebar) {
+      mobileToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('mobile-open');
+      });
+    }
   </script>
 
 </body>
+
 </html>

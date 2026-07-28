@@ -6,83 +6,147 @@
 {% endblock %}
 
 {% block contenido %}
+<div class="dashboard-wrapper">
 
-<!-- STATS -->
-<div class="stats">
-
-    <div class="stat-card">
-        <i class="ri-user-3-fill"></i>
-        <div>
-            <h3>Usuarios</h3>
-            <p>{{ estadisticas.usuarios }}</p>
+    <!-- WELCOME BANNER -->
+    <header class="welcome-banner">
+        <div class="welcome-text">
+            <h2>¡Hola de nuevo, {{ user.get_short_name|default:user.username }}! 👋</h2>
+            <p>Aquí tienes un resumen en tiempo real de la gestión de equipos y préstamos.</p>
         </div>
-    </div>
-
-    <div class="stat-card">
-        <i class="ri-timer-2-fill"></i>
-        <div>
-            <h3>Préstamos activos</h3>
-            <p>{{ estadisticas.prestamos }}</p>
+        <div class="welcome-badge">
+            <i class="ri-calendar-event-line"></i>
+            <span>{% now "j \d\e F, Y" %}</span>
         </div>
-    </div>
+    </header>
 
-    <div class="stat-card">
-        <i class="ri-computer-fill"></i>
-        <div>
-            <h3>Disponibles</h3>
-            <p>{{ estadisticas.disponibles }}</p>
+    <!-- STATS GRID -->
+    <section class="stats-grid">
+        
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="ri-user-3-line"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Usuarios</h3>
+                <span class="stat-value">{{ estadisticas.usuarios|default:"0" }}</span>
+            </div>
+            <div class="stat-trend neutral">
+                <i class="ri-team-line"></i> Registrados
+            </div>
         </div>
-    </div>
 
-    <div class="stat-card">
-        <i class="ri-notification-line"></i>
-        <div>
-            <h3>Pendientes</h3>
-            <p>{{ pendientes_count }}</p>
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="ri-timer-2-line"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Préstamos Activos</h3>
+                <span class="stat-value">{{ estadisticas.prestamos|default:"0" }}</span>
+            </div>
+            <div class="stat-trend positive">
+                <i class="ri-checkbox-circle-line"></i> En uso
+            </div>
         </div>
-    </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon">
+                <i class="ri-computer-line"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Disponibles</h3>
+                <span class="stat-value">{{ estadisticas.disponibles|default:"0" }}</span>
+            </div>
+            <div class="stat-trend neutral">
+                <i class="ri-cpu-line"></i> En inventario
+            </div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="ri-notification-3-line"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Pendientes</h3>
+                <span class="stat-value">{{ pendientes_count|default:"0" }}</span>
+            </div>
+            <div class="stat-trend warning">
+                <i class="ri-error-warning-line"></i> Por autorizar
+            </div>
+        </div>
+
+    </section>
+
+    <!-- MAIN CONTENT GRID -->
+    <section class="dashboard-content">
+
+        <!-- GRÁFICO -->
+        <article class="content-card chart-card">
+            <div class="card-header">
+                <div>
+                    <h3>Distribución de Usuarios</h3>
+                    <p class="subtitle">Segmentación por roles actuales</p>
+                </div>
+                <button class="btn-icon" title="Opciones"><i class="ri-more-2-fill"></i></button>
+            </div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </article>
+
+        <!-- TABLA ÚLTIMOS PRÉSTAMOS -->
+        <article class="content-card table-card">
+            <div class="card-header">
+                <div>
+                    <h3>Últimos Préstamos</h3>
+                    <p class="subtitle">Actividad reciéntemente registrada</p>
+                </div>
+                <a href="#" class="btn-link">Ver todos <i class="ri-arrow-right-s-line"></i></a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Dispositivo</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in ultimos_prestamos %}
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="avatar">{{ p.usuario.nombre_completo|slice:":1"|upper }}</div>
+                                    <span class="font-medium">{{ p.usuario.nombre_completo }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="device-badge">
+                                    <i class="ri-macbook-line"></i> {{ p.dispositivo.nombre }}
+                                </span>
+                            </td>
+                            <td class="text-muted">
+                                {{ p.fecha|date:"d/m/Y H:i" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">
+                                <div class="empty-state">
+                                    <i class="ri-inbox-archive-line"></i>
+                                    <p>No hay préstamos recientes para mostrar</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+    </section>
 
 </div>
-
-<!-- CHARTS + TABLA -->
-<div class="charts">
-
-    <!-- GRÁFICO -->
-    <div class="chart-card">
-        <h3>Distribución de usuarios</h3>
-        <canvas id="pieChart"></canvas>
-    </div>
-
-    <!-- TABLA -->
-    <div class="table-card">
-        <h3>Últimos préstamos</h3>
-
-        <table class="table-last">
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Dispositivo</th>
-                    <th>Fecha</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for p in ultimos_prestamos %}
-                <tr>
-                    <td>{{ p.usuario.nombre_completo }}</td>
-                    <td>{{ p.dispositivo.nombre }}</td>
-                    <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3" class="empty">No hay préstamos recientes</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-    </div>
-
-</div>
-
 {% endblock %}

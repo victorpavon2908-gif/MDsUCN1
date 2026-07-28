@@ -3,7 +3,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/add_dispositivos.css' %}">
-<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 {% endblock %}
 
 {% block contenido %}
@@ -12,21 +12,66 @@
 
     <!-- HEADER -->
     <div class="form-header">
-        <h2>Agregar Dispositivo</h2>
+        <h2>
+            <i class="ri-add-circle-line"></i>
+            Agregar Dispositivo
+        </h2>
+        <p>Complete la información del equipo para registrarlo en el sistema de inventario.</p>
     </div>
 
-    <!-- FORM -->
+    <!-- MENSAJES / ALERTAS DE DJANGO -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alerta {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- FORMULARIO -->
     <form method="POST" enctype="multipart/form-data" class="formulario">
         {% csrf_token %}
 
         <div class="form-grid">
-            {{ form.as_p }}
+            {% for field in form %}
+                <div class="form-grupo {% if field.widget_type == 'textarea' or field.widget_type == 'clearablefile' or field.name == 'descripcion' or field.name == 'imagen' %}full{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="required-star">*</span>
+                        {% endif %}
+                    </label>
+
+                    <div class="input-wrapper">
+                        {{ field }}
+                    </div>
+
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <div class="error-msg">
+                            {% for error in field.errors %}
+                                <span><i class="ri-error-warning-line"></i> {{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
         </div>
 
-        <button type="submit" class="btn-guardar">
-            <i class="ri-save-3-line"></i>
-            Guardar
-        </button>
+        <!-- ACCIONES -->
+        <div class="form-actions">
+            <button type="submit" class="btn-guardar">
+                <i class="ri-save-3-line"></i>
+                Guardar Dispositivo
+            </button>
+            <a href="javascript:history.back()" class="btn-secundario">
+                <i class="ri-arrow-left-line"></i>
+                Cancelar
+            </a>
+        </div>
 
     </form>
 

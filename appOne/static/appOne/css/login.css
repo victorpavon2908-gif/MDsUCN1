@@ -1,277 +1,375 @@
-/* ========= BASE UCN ========= */
-:root{
-    --bg:#EDE3CC;
-    --card:#ffffff;
-
-    --text:#1f2937;
-    --muted:#64748b;
-
-    --border:#d6c7a8;
-
-    --primary:#15509C;
-    --primary-hover:#104E9B;
-
-    --secondary:#019446;
-
-    --gold:#CBA14B;
-    --gold-dark:#C89B3B;
-
-    --shadow:0 10px 30px rgba(0,0,0,0.08);
+/* ========= CONFIGURACIÓN Y VARIABLES ========= */
+:root {
+    --bg-main: #f4ecd8;
+    --card-bg: rgba(255, 255, 255, 0.92);
+    
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    
+    --border-color: #e2e8f0;
+    
+    --primary: #15509C;
+    --primary-hover: #0e3d7a;
+    --secondary: #019446;
+    
+    --shadow-soft: 0 20px 40px -15px rgba(21, 80, 156, 0.15);
+    --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    font-family:'Inter',sans-serif;
-    background:var(--bg);
-    color:var(--text);
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* ========= CONTENEDOR ========= */
-.login-container{
-    display:flex;
-    min-height:100vh;
+/* ========= CONTENEDOR GENERAL ========= */
+.login-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
-/* ========= LADO IZQUIERDO ========= */
-.login-left{
-    flex:1;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(21,80,156,.95),
-            rgba(16,78,155,.95)
-        ),
-        url('/static/img/ucn-bg.jpg');
-
-    background-size:cover;
-    background-position:center;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    padding:70px;
-    color:white;
-    position:relative;
+/* Efectos de luces de fondo dinámicas */
+.blob-bg {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    opacity: 0.5;
+    animation: floatBlob 10s infinite alternate ease-in-out;
+}
+.blob-1 {
+    background: rgba(21, 80, 156, 0.25);
+    top: -10%;
+    left: -10%;
+}
+.blob-2 {
+    background: rgba(1, 148, 70, 0.2);
+    bottom: -10%;
+    right: -10%;
+    animation-delay: -5s;
 }
 
-/* EFECTO */
-.login-left::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,.10);
+@keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 40px) scale(1.1); }
 }
 
-/* CONTENIDO */
-.login-left > *{
-    position:relative;
-    z-index:2;
+/* Estructura Principal en Dos Columnas */
+.login-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1050px;
+    min-height: 620px;
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 28px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    overflow: hidden;
 }
 
-/* TITULO */
-.login-left h1{
-    font-size:42px;
-    margin-bottom:18px;
-    color:white;
-    font-weight:700;
-    line-height:1.2;
+/* ========= PANEL IZQUIERDO (BRANDING) ========= */
+.login-left {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary) 0%, #0c3870 100%), 
+                url('/static/img/ucn-bg.jpg') center/cover no-repeat;
+    background-blend-mode: overlay;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+    position: relative;
 }
 
-/* TEXTO */
-.login-left p{
-    color:rgba(255,255,255,.88);
-    max-width:450px;
-    font-size:16px;
-    line-height:1.7;
+.login-left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(1, 148, 70, 0.3), transparent 60%);
 }
 
-/* ========= LADO DERECHO ========= */
-.login-right{
-    flex:1;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:30px;
+.brand-content {
+    position: relative;
+    z-index: 2;
 }
 
-/* ========= BOX ========= */
-.login-box{
-    width:380px;
-    background:var(--card);
-    padding:35px;
-    border-radius:20px;
-    border-top:6px solid var(--primary);
-    box-shadow:var(--shadow);
+.badge-tag {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    backdrop-filter: blur(5px);
 }
 
-/* LOGO OPCIONAL */
-.login-logo{
-    text-align:center;
-    margin-bottom:18px;
+.badge-tag i {
+    margin-right: 6px;
+    color: #4ade80;
 }
 
-.login-logo img{
-    width:90px;
+.login-left h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
 }
 
-/* TITULO */
-.login-box h2{
-    margin-bottom:28px;
-    text-align:center;
-    color:var(--primary);
-    font-size:28px;
-    font-weight:700;
+.login-left p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 380px;
 }
 
-/* ========= INPUTS ========= */
-.input-group{
-    position:relative;
-    margin-bottom:18px;
+.left-footer {
+    position: relative;
+    z-index: 2;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
 }
 
-/* ICONO */
-.input-group i{
-    position:absolute;
-    left:14px;
-    top:50%;
-    transform:translateY(-50%);
-    color:var(--primary);
-    font-size:15px;
+/* ========= PANEL DERECHO (FORMULARIO) ========= */
+.login-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background: #ffffff;
 }
 
-/* INPUT */
-.input-group input{
-    width:100%;
-    padding:14px 14px 14px 42px;
-    border-radius:12px;
-    border:1px solid var(--border);
-    background:#ffffff;
-    color:var(--text);
-    font-size:14px;
-    transition:.2s ease;
+.login-box {
+    width: 100%;
+    max-width: 380px;
 }
 
-/* PLACEHOLDER */
-.input-group input::placeholder{
-    color:#94a3b8;
+.box-header {
+    margin-bottom: 30px;
 }
 
-/* FOCUS */
-.input-group input:focus{
-    outline:none;
-    border-color:var(--primary);
-    box-shadow:0 0 0 4px rgba(21,80,156,.12);
+.box-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
 }
 
-/* ========= BOTON ========= */
-.btn-login{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-
-    background:linear-gradient(
-        135deg,
-        var(--primary),
-        var(--secondary)
-    );
-
-    color:white;
-    font-weight:700;
-    font-size:15px;
-    cursor:pointer;
-    margin-top:10px;
-
-    transition:.25s ease;
-    box-shadow:0 8px 18px rgba(21,80,156,.18);
+.box-header p {
+    font-size: 14px;
+    color: var(--text-muted);
 }
 
-/* HOVER */
-.btn-login:hover{
-    transform:translateY(-2px);
-    box-shadow:0 12px 25px rgba(1,148,70,.22);
+/* ========= CAMPOS DE ENTRADA ========= */
+.input-group {
+    margin-bottom: 20px;
 }
 
-/* ========= MENSAJES ========= */
-.mensajes{
-    margin-top:14px;
+.input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
 }
 
-.mensajes p{
-    background:rgba(220,38,38,.08);
-    color:#dc2626;
-    padding:10px 12px;
-    border-radius:10px;
-    font-size:13px;
-    border-left:4px solid #dc2626;
+.input-field {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-/* ========= LINKS ========= */
-.extras{
-    margin-top:22px;
-    display:flex;
-    justify-content:space-between;
-    font-size:13px;
+.input-field i {
+    position: absolute;
+    left: 16px;
+    color: var(--text-muted);
+    font-size: 18px;
+    transition: color 0.2s ease;
 }
 
-/* LINKS */
-.extras a{
-    color:var(--muted);
-    text-decoration:none;
-    font-weight:500;
+.input-field input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    background: #f8fafc;
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    font-size: 14px;
+    color: var(--text-main);
+    font-family: inherit;
+    transition: all 0.25s ease;
 }
 
-/* HOVER */
-.extras a:hover{
-    color:var(--primary);
+.input-field input::placeholder {
+    color: #94a3b8;
 }
 
-/* ========= RESPONSIVE ========= */
-@media(max-width:900px){
+.input-field input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(21, 80, 156, 0.1);
+}
 
-    .login-left{
-        display:none;
+.input-field input:focus + i,
+.input-field:focus-within i {
+    color: var(--primary);
+}
+
+/* ========= BOTÓN DE ACCESO ========= */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--primary) 0%, #0d448a 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-login i {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #114282 0%, var(--primary) 100%);
+    box-shadow: 0 15px 30px -10px rgba(21, 80, 156, 0.3);
+}
+
+.btn-login:hover i {
+    transform: translateX(4px);
+}
+
+/* ========= ALERTAS / MENSAJES ========= */
+.mensajes {
+    margin-top: 16px;
+}
+
+.alert-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* ========= ENLACES EXTRAS ========= */
+.extras {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.extras a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.extras a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+/* ========= DISEÑO RESPONSIVO (ADAPTABLE A TODO) ========= */
+@media (max-width: 900px) {
+    .login-wrapper {
+        padding: 15px;
     }
 
-    .login-container{
-        justify-content:center;
-        align-items:center;
-        padding:20px;
+    .login-container {
+        max-width: 480px;
+        min-height: auto;
+        flex-direction: column;
     }
 
-    .login-right{
-        width:100%;
-        padding:0;
+    .login-left {
+        padding: 35px 25px;
+        text-align: center;
     }
 
-    .login-box{
-        width:100%;
-        max-width:400px;
-        padding:28px;
-    }
-}
-
-/* ========= MOBILE ========= */
-@media(max-width:500px){
-
-    .login-box{
-        padding:22px;
-        border-radius:16px;
+    .login-left p, .left-footer {
+        display: none; /* Oculta elementos pesados en pantallas medianas móviles */
     }
 
-    .login-box h2{
-        font-size:24px;
+    .badge-tag {
+        margin: 0 auto 12px auto;
     }
 
-    .extras{
-        flex-direction:column;
-        gap:10px;
-        align-items:center;
+    .login-left h1 {
+        font-size: 30px;
+        margin-bottom: 0;
+    }
+
+    .login-right {
+        padding: 30px 20px;
     }
 }
 
+@media (max-width: 480px) {
+    .login-container {
+        border-radius: 20px;
+    }
+
+    .login-right {
+        padding: 24px 16px;
+    }
+
+    .box-header h2 {
+        font-size: 22px;
+    }
+
+    .extras {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+}
