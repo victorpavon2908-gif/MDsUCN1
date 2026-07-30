@@ -9,15 +9,25 @@
 {% block contenido %}
 
 <div class="solicitudes-container">
-
     <!-- HEADER -->
-    <div class="header">
-        <h2>Solicitudes de Préstamos</h2>
+    <div class="header header-flex">
+        <div>
+            <h2>Solicitudes de Préstamos</h2>
+            <p>Gestiona los préstamos de dispositivos e historial de usuarios.</p>
+        </div>
+
+        {% if request.user.rol == "Admin" %}
+        {% if estado_actual == 'todos' or not estado_actual %}
+        <button type="button" class="btn-danger-outline" onclick="abrirModalBorrarHistorial()">
+            <i class="ri-delete-bin-line"></i> Limpiar Historial
+        </button>
+        {% endif %}
+        {% endif %}
     </div>
 
     <!-- FILTROS -->
     <div class="filtros">
-        <a href="?estado=todos" class="filtro {% if estado_actual == 'todos' %}activo{% endif %}">Todos</a>
+        <a href="?estado=todos" class="filtro {% if estado_actual == 'todos' or not estado_actual %}activo{% endif %}">Todos</a>
         <a href="?estado=pendiente" class="filtro {% if estado_actual == 'pendiente' %}activo{% endif %}">Pendientes</a>
         <a href="?estado=aprobado" class="filtro {% if estado_actual == 'aprobado' %}activo{% endif %}">Aprobados</a>
         <a href="?estado=devuelto" class="filtro {% if estado_actual == 'devuelto' %}activo{% endif %}">Devueltos</a>
@@ -26,7 +36,6 @@
     <!-- TABLA -->
     <div class="table-wrapper">
         <table class="table-dashboard">
-
             <thead>
                 <tr>
                     <th>Usuario</th>
@@ -34,71 +43,325 @@
                     <th>Fecha</th>
                     <th>Horario</th>
                     <th>Estado</th>
-                    {% if request.user.rol == "Admin" %}
-                    <th></th>
-                    {% endif %}
+                    <th>Acciones</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for p in prestamos %}
                 <tr>
-
-                    <td class="user-cell">
+                    <td class="user-cell" data-label="Usuario">
                         <div class="avatar">
                             {{ p.usuario.nombre_completo|slice:":1" }}
                         </div>
                         <span>{{ p.usuario.nombre_completo }}</span>
                     </td>
 
-                    <td>{{ p.dispositivo.nombre_dispositivo }}</td>
-                    <td>{{ p.fecha_uso|date:"d/m/Y" }}</td>
-                    <td>{{ p.hora_inicio|time:"H:i" }} - {{ p.hora_entrega|time:"H:i" }}</td>
+                    <td data-label="Dispositivo">{{ p.dispositivo.nombre_dispositivo }}</td>
+                    <td data-label="Fecha">{{ p.fecha_uso|date:"d/m/Y" }}</td>
+                    <td data-label="Horario">{{ p.hora_inicio|time:"H:i" }} - {{ p.hora_entrega|time:"H:i" }}</td>
 
-                    <td>
+                    <td data-label="Estado">
                         <span class="estado {{ p.estado|lower }}">
                             {{ p.estado|capfirst }}
                         </span>
                     </td>
 
-                    {% if request.user.rol == "Admin" %}
-                    <td class="acciones">
+                    <td class="acciones" data-label="Acciones">
+                        <!-- BOTÓN VER DETALLES -->
+                        <button type="button" class="btn info" title="Ver Detalles"
+                            onclick="abrirModalDetalles(
+                                '{{ p.usuario.nombre_completo|escapejs }}',
+                                '{{ p.usuario.email|default:''|escapejs }}',
+                                '{{ p.dispositivo.nombre_dispositivo|escapejs }}',
+                                '{{ p.dispositivo.codigo_inventario|default:'N/A'|escapejs }}',
+                                '{{ p.dispositivo.marca|default:'N/A'|escapejs }}',
+                                '{{ p.motivo|default:'Sin especificar'|escapejs }}',
+                                '{{ p.fecha_solicitud|date:'d/m/Y H:i'|default:'—' }}',
+                                '{{ p.fecha_aprobacion|date:'d/m/Y H:i'|default:'—' }}',
+                                '{{ p.fecha_uso|date:'d/m/Y' }} {{ p.hora_inicio|time:'H:i' }}',
+                                '{{ p.fecha_devolucion_real|date:'d/m/Y H:i'|default:'Pendiente' }}',
+                                '{{ p.estado|capfirst }}',
+                                '{{ p.observaciones_devolucion|default:'Sin observaciones'|escapejs }}'
+                            )">
+                            <i class="ri-eye-line"></i>
+                        </button>
 
-                        {% if p.estado == "pendiente" %}
-                            <a href="{% url 'aprobar_prestamo' p.id %}" class="btn success">
+                        {% if request.user.rol == "Admin" %}
+                            {% if p.estado == "pendiente" %}
+                            <a href="{% url 'aprobar_prestamo' p.id %}" class="btn success" title="Aprobar">
                                 <i class="ri-check-line"></i>
                             </a>
 
-                            <a href="{% url 'rechazar_prestamo' p.id %}" class="btn danger">
+                            <a href="{% url 'rechazar_prestamo' p.id %}" class="btn danger" title="Rechazar">
                                 <i class="ri-close-line"></i>
                             </a>
 
-                        {% elif p.estado == "aprobado" %}
-                            <a href="{% url 'devolver_prestamo' p.id %}" class="btn warning">
+                            {% elif p.estado == "aprobado" %}
+                            <button type="button" class="btn warning" title="Devolver Dispositivo"
+                                onclick="abrirModalDevolucion('{{ p.id }}', '{{ p.dispositivo.nombre_dispositivo|escapejs }}', '{{ p.usuario.nombre_completo|escapejs }}')">
                                 <i class="ri-refresh-line"></i>
-                            </a>
-
-                        {% else %}
-                            <span class="text-muted">—</span>
+                            </button>
+                            {% endif %}
                         {% endif %}
-
                     </td>
-                    {% endif %}
-
                 </tr>
 
                 {% empty %}
                 <tr>
-                    <td colspan="{% if request.user.rol == 'Admin' %}6{% else %}5{% endif %}" class="no-data">
+                    <td colspan="6" class="no-data">
                         No hay solicitudes registradas
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
-
         </table>
     </div>
-
 </div>
+
+<!-- ================= MODAL DETALLES DE SOLICITUD ================= -->
+<div id="modalDetalles" class="modal-overlay">
+    <div class="modal-content modal-content-md">
+        <div class="modal-header">
+            <div>
+                <h3><i class="ri-information-line"></i> Detalles de la Solicitud</h3>
+                <p>Información completa del préstamo y trazabilidad de tiempos.</p>
+            </div>
+            <button type="button" class="modal-close" onclick="cerrarModalDetalles()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <!-- SECCIÓN: ESTADO GENERAL -->
+            <div class="detalles-status-bar">
+                <span>Estado actual:</span>
+                <span id="detEstado" class="estado">—</span>
+            </div>
+
+            <!-- SECCIÓN: USUARIO Y MOTIVO -->
+            <div class="detalles-seccion">
+                <h4 class="detalles-titulo"><i class="ri-user-3-line"></i> Solicitante</h4>
+                <div class="grid-detalles">
+                    <div class="detalle-item">
+                        <span class="det-label">Nombre Completo</span>
+                        <strong id="detUsuario">—</strong>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="det-label">Correo / Identificación</span>
+                        <span id="detEmail">—</span>
+                    </div>
+                    <div class="detalle-item full">
+                        <span class="det-label">¿Por qué lo tiene? (Motivo / Uso)</span>
+                        <p id="detMotivo" class="det-box-text">—</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: DATOS DEL DISPOSITIVO -->
+            <div class="detalles-seccion">
+                <h4 class="detalles-titulo"><i class="ri-computer-line"></i> Datos del Dispositivo</h4>
+                <div class="grid-detalles">
+                    <div class="detalle-item">
+                        <span class="det-label">Dispositivo</span>
+                        <strong id="detDispositivo">—</strong>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="det-label">Marca</span>
+                        <span id="detMarca">—</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="det-label">Cód. Inventario</span>
+                        <span id="detCodigo" class="badge-code">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: TIEMPOS Y HORARIOS -->
+            <div class="detalles-seccion">
+                <h4 class="detalles-titulo"><i class="ri-time-line"></i> Trazabilidad de Horarios</h4>
+                <div class="grid-detalles">
+                    <div class="detalle-item">
+                        <span class="det-label">Hora de Solicitud</span>
+                        <span id="detFechaSolicitud">—</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="det-label">Hora de Aprobación</span>
+                        <span id="detFechaAprobacion">—</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="det-label">Hora de Inicio (Reserva)</span>
+                        <span id="detHoraInicio">—</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="det-label">Hora de Devolución</span>
+                        <span id="detHoraDevolucion">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: OBSERVACIONES FINAL -->
+            <div class="detalles-seccion">
+                <h4 class="detalles-titulo"><i class="ri-chat-1-line"></i> Observaciones de Devolución</h4>
+                <p id="detObservaciones" class="det-box-text">—</p>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="cerrarModalDetalles()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN OCULTAR HISTORIAL EN 'TODOS' -->
+<div id="modalBorrarHistorial" class="modal-overlay">
+    <div class="modal-content modal-content-sm">
+        <form action="{% url 'eliminar_historial_prestamos' %}" method="POST" class="modal-form-flex">
+            {% csrf_token %}
+            <div class="modal-header header-danger">
+                <div>
+                    <h3><i class="ri-eye-off-line"></i> ¿Limpiar vista de "Todos"?</h3>
+                    <p>Ocultará los registros de esta pestaña.</p>
+                </div>
+                <button type="button" class="modal-close" onclick="cerrarModalBorrarHistorial()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-alert">
+                    Esta acción limpiará la vista general ("Todos"). Las solicitudes continuarán visibles en sus pestañas individuales (Pendientes, Aprobados y Devueltos).
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="cerrarModalBorrarHistorial()">Cancelar</button>
+                <button type="submit" class="btn-danger-confirm">
+                    <i class="ri-delete-bin-line"></i> Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL DE DEVOLUCIÓN -->
+<div id="modalDevolucion" class="modal-overlay">
+    <div class="modal-content">
+        <form id="formDevolucion" action="" method="POST" class="modal-form-flex">
+            {% csrf_token %}
+            <div class="modal-header">
+                <div>
+                    <h3><i class="ri-box-3-line"></i> Devolución de Dispositivo</h3>
+                    <p>Registra las condiciones del equipo al momento de la entrega.</p>
+                </div>
+                <button type="button" class="modal-close" onclick="cerrarModalDevolucion()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="info-card">
+                    <div class="info-item">
+                        <span class="label">Dispositivo</span>
+                        <strong id="modalEquipoNombre">—</strong>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Solicitante</span>
+                        <strong id="modalUsuarioNombre">—</strong>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="estado_dispositivo">Condición de Recepción <span class="required">*</span></label>
+                    <select name="estado_dispositivo" id="estado_dispositivo" class="form-control" required>
+                        <option value="disponible" selected>🟢 En Buen Estado (Disponible)</option>
+                        <option value="mantenimiento">🟡 Requiere Mantenimiento</option>
+                        <option value="danado">🔴 Dañado / Con Fallas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="observaciones_devolucion">Observaciones / Novedades</label>
+                    <textarea name="observaciones_devolucion" id="observaciones_devolucion" class="form-control"
+                        rows="3"
+                        placeholder="Ej: Se entrega completo, sin cargador o con rayón en la pantalla..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="cerrarModalDevolucion()">Cancelar</button>
+                <button type="submit" class="btn-primary">
+                    <i class="ri-check-line"></i> Confirmar Devolución
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+    // Modal Ver Detalles
+    function abrirModalDetalles(usuario, email, dispositivo, codigo, marca, motivo, fSolicitud, fAprobacion, hInicio, hDevolucion, estado, observaciones) {
+        document.getElementById('detUsuario').innerText = usuario;
+        document.getElementById('detEmail').innerText = email || '—';
+        document.getElementById('detDispositivo').innerText = dispositivo;
+        document.getElementById('detCodigo').innerText = codigo;
+        document.getElementById('detMarca').innerText = marca;
+        document.getElementById('detMotivo').innerText = motivo;
+        document.getElementById('detFechaSolicitud').innerText = fSolicitud;
+        document.getElementById('detFechaAprobacion').innerText = fAprobacion;
+        document.getElementById('detHoraInicio').innerText = hInicio;
+        document.getElementById('detHoraDevolucion').innerText = hDevolucion;
+        document.getElementById('detObservaciones').innerText = observaciones;
+
+        const badgeEstado = document.getElementById('detEstado');
+        badgeEstado.innerText = estado;
+        badgeEstado.className = 'estado ' + estado.toLowerCase();
+
+        document.getElementById('modalDetalles').classList.add('active');
+    }
+
+    function cerrarModalDetalles() {
+        document.getElementById('modalDetalles').classList.remove('active');
+    }
+
+    // Modal Devolución
+    function abrirModalDevolucion(id, dispositivo, usuario) {
+        const modal = document.getElementById('modalDevolucion');
+        const form = document.getElementById('formDevolucion');
+
+        form.action = `/devolver_prestamo/${id}/`;
+        document.getElementById('modalEquipoNombre').innerText = dispositivo;
+        document.getElementById('modalUsuarioNombre').innerText = usuario;
+        document.getElementById('observaciones_devolucion').value = '';
+        document.getElementById('estado_dispositivo').value = 'disponible';
+
+        modal.classList.add('active');
+    }
+
+    function cerrarModalDevolucion() {
+        document.getElementById('modalDevolucion').classList.remove('active');
+    }
+
+    // Modal Borrar Historial
+    function abrirModalBorrarHistorial() {
+        document.getElementById('modalBorrarHistorial').classList.add('active');
+    }
+
+    function cerrarModalBorrarHistorial() {
+        document.getElementById('modalBorrarHistorial').classList.remove('active');
+    }
+
+    // Cerrar modales haciendo clic afuera
+    window.onclick = function (event) {
+        const modalDet = document.getElementById('modalDetalles');
+        const modalDev = document.getElementById('modalDevolucion');
+        const modalBorrar = document.getElementById('modalBorrarHistorial');
+
+        if (event.target === modalDet) cerrarModalDetalles();
+        if (event.target === modalDev) cerrarModalDevolucion();
+        if (event.target === modalBorrar) cerrarModalBorrarHistorial();
+    }
+</script>
 
 {% endblock %}

@@ -2,185 +2,211 @@
 
 <div class="perfil">
 
+    <!-- ================= HEADER PERFIL ================= -->
     <div class="perfil-header">
-
         <div class="foto">
-
             {% if request.user.foto %}
-                <img src="{{ request.user.foto.url }}">
+                <img src="{{ request.user.foto.url }}" alt="Foto de perfil">
             {% else %}
-                <img src="{% static 'appOne/img/user.png' %}">
+                <img src="{% static 'appOne/img/user.png' %}" alt="Foto por defecto">
             {% endif %}
-
         </div>
 
         <div>
-
             <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
-
             <span class="badge badge-success">
-
                 {{ request.user.rol }}
-
             </span>
-
             <p>{{ request.user.email }}</p>
-
         </div>
-
     </div>
 
-    <div class="card">
+    <!-- Contenedor de Alertas Dinámicas (AJAX) -->
+    <div id="alertContainer" style="display: none; margin-top: 15px;"></div>
 
+    <!-- ================= INFORMACIÓN PERSONAL ================= -->
+    <div class="card">
         <h2>Información Personal</h2>
 
-        <form id="formPerfil">
-
+        <form method="POST" action="{% url 'config_perfil' %}" id="formPerfil">
             {% csrf_token %}
 
             <div class="row">
-
                 <div class="form-group">
-
-                    <label>Nombre</label>
-
-                    <input
+                    <label for="first_name">Nombre</label>
+                    <input 
+                        type="text"
                         class="form-control"
+                        id="first_name"
                         name="first_name"
-                        value="{{ request.user.first_name }}">
-
+                        value="{{ request.user.first_name }}"
+                        required>
                 </div>
 
                 <div class="form-group">
-
-                    <label>Apellido</label>
-
-                    <input
+                    <label for="last_name">Apellido</label>
+                    <input 
+                        type="text"
                         class="form-control"
+                        id="last_name"
                         name="last_name"
-                        value="{{ request.user.last_name }}">
-
+                        value="{{ request.user.last_name }}"
+                        required>
                 </div>
-
             </div>
 
             <div class="row">
-
                 <div class="form-group">
-
                     <label>Usuario</label>
-
-                    <input
+                    <input 
+                        type="text"
                         class="form-control"
                         value="{{ request.user.username }}"
-                        readonly>
-
+                        readonly disabled>
                 </div>
 
                 <div class="form-group">
-
-                    <label>Correo</label>
-
-                    <input
+                    <label for="email">Correo electrónico</label>
+                    <input 
+                        type="email"
                         class="form-control"
+                        id="email"
                         name="email"
-                        value="{{ request.user.email }}">
-
+                        value="{{ request.user.email }}"
+                        required>
                 </div>
-
             </div>
 
             <div class="row">
-
                 <div class="form-group">
-
                     <label>Rol</label>
-
-                    <input
+                    <input 
+                        type="text"
                         class="form-control"
                         value="{{ request.user.rol }}"
-                        readonly>
-
+                        readonly disabled>
                 </div>
 
                 <div class="form-group">
-
-                    <label>Fecha Registro</label>
-
-                    <input
+                    <label>Fecha de Registro</label>
+                    <input 
+                        type="text"
                         class="form-control"
                         value="{{ request.user.date_joined|date:'d/m/Y' }}"
-                        readonly>
-
+                        readonly disabled>
                 </div>
-
             </div>
 
-            <button class="btn btn-primary">
-
+            <button type="submit" class="btn btn-primary">
                 Guardar Cambios
-
             </button>
-
         </form>
-
     </div>
 
     <br>
 
+    <!-- ================= CAMBIO DE CONTRASEÑA ================= -->
     <div class="card">
-
         <h2>Seguridad</h2>
 
-        <form id="formPassword">
-
+        <form method="POST" action="{% url 'config_seguridad' %}" id="formCambiarPassword">
             {% csrf_token %}
 
             <div class="form-group">
-
-                <label>Contraseña actual</label>
-
-                <input
-                    class="form-control"
+                <label for="id_old_password">Contraseña actual <span style="color:red;">*</span></label>
+                <input 
                     type="password"
-                    name="actual">
-
+                    class="form-control"
+                    id="id_old_password"
+                    name="old_password"
+                    placeholder="Escriba su contraseña actual"
+                    required>
             </div>
 
             <div class="row">
-
                 <div class="form-group">
-
-                    <label>Nueva contraseña</label>
-
-                    <input
-                        class="form-control"
+                    <label for="id_new_password1">Nueva contraseña <span style="color:red;">*</span></label>
+                    <input 
                         type="password"
-                        name="nueva">
-
+                        class="form-control"
+                        id="id_new_password1"
+                        name="new_password1"
+                        placeholder="Mínimo 8 caracteres"
+                        required>
                 </div>
 
                 <div class="form-group">
-
-                    <label>Confirmar contraseña</label>
-
-                    <input
-                        class="form-control"
+                    <label for="id_new_password2">Confirmar nueva contraseña <span style="color:red;">*</span></label>
+                    <input 
                         type="password"
-                        name="confirmar">
-
+                        class="form-control"
+                        id="id_new_password2"
+                        name="new_password2"
+                        placeholder="Repita la nueva contraseña"
+                        required>
                 </div>
-
             </div>
 
-            <button class="btn btn-warning">
-
+            <button type="submit" class="btn btn-warning">
                 Cambiar contraseña
-
             </button>
-
         </form>
-
     </div>
 
 </div>
+
+<!-- ================= MANEJO AJAX PARA AMBOS FORMULARIOS ================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // Función genérica para enviar formularios vía AJAX
+    function enviarFormularioAjax(formId, successMessage) {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const actionUrl = form.getAttribute("action");
+
+            fetch(actionUrl, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(res => {
+                if (res.body.success) {
+                    mostrarMensaje("success", res.body.message || successMessage);
+                    if (formId === "formCambiarPassword") form.reset();
+                } else {
+                    mostrarMensaje("error", res.body.message || "Ocurrió un error inesperado.");
+                }
+            })
+            .catch(err => {
+                mostrarMensaje("error", "Error de conexión con el servidor.");
+            });
+        });
+    }
+
+    function mostrarMensaje(tipo, mensaje) {
+        const alertBox = document.getElementById("alertContainer");
+        const colorClass = tipo === "success" ? "alert-success" : "alert-danger";
+        
+        alertBox.className = `alert ${colorClass}`;
+        alertBox.innerText = mensaje;
+        alertBox.style.display = "block";
+
+        setTimeout(() => {
+            alertBox.style.display = "none";
+        }, 5000);
+    }
+
+    // Inicializar listeners
+    enviarFormularioAjax("formPerfil", "Perfil actualizado correctamente.");
+    enviarFormularioAjax("formCambiarPassword", "Contraseña cambiada con éxito.");
+});
+</script>

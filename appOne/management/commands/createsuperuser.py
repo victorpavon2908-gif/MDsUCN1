@@ -1,23 +1,24 @@
-from django.contrib.auth.management.commands.createsuperuser import Command as BaseCommand
+from django.contrib.auth.management.commands import createsuperuser
+from django.core.management import CommandError
+from django.contrib.auth import get_user_model
 
-class Command(BaseCommand):
-    help = "Crea un superusuario con campos extra"
+
+class Command(createsuperuser.Command):
+    help = 'Crea un superusuario con los campos personalizados del modelo Usuario'
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
-
-        parser.add_argument('--nombre_completo', type=str)
-        parser.add_argument('--codigo', type=str)
+        parser.add_argument('--nombre_completo', type=str, help='Nombre completo del superusuario')
+        parser.add_argument('--codigo', type=str, help='Código o carné del superusuario')
 
     def handle(self, *args, **options):
-        # Preguntar si no se pasa como argumento
-        if not options.get("nombre_completo"):
-            options["nombre_completo"] = input("Nombre completo: ")
+        UserModel = get_user_model()
+        
+        nombre_completo = options.get('nombre_completo') or 'Administrador Principal'
+        codigo = options.get('codigo') or 'ADMIN001'
 
-        if not options.get("codigo"):
-            options["codigo"] = input("Código institucional: ")
-
-        # Rol admin por defecto
-        options["rol"] = "Admin"
+        options['nombre_completo'] = nombre_completo
+        options['codigo'] = codigo
+        options['rol'] = 'Admin'
 
         super().handle(*args, **options)

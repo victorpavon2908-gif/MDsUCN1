@@ -49,15 +49,37 @@ class DispositivoForm(forms.ModelForm):
         model = Dispositivo
         fields = [
             'nombre_dispositivo', 'marca', 'codigo_inventario', 
-            'imagen', 'descripcion', 'accesorios', 'observacion'
+            'estado', 'descripcion', 'accesorios', 'observacion', 'imagen'
         ]
+        labels = {
+            'nombre_dispositivo': 'Nombre del Dispositivo',
+            'marca': 'Marca',
+            'codigo_inventario': 'Código de Inventario',
+            'estado': 'Estado del Dispositivo',
+            'descripcion': 'Descripción del Equipo',
+            'accesorios': 'Accesorios Incluidos',
+            'observacion': 'Observaciones Adicionales',
+            'imagen': 'Fotografía del Equipo',
+        }
         widgets = {
-            'descripcion': forms.Textarea(attrs={'rows':3}),
-            'accesorios': forms.Textarea(attrs={'rows':2}),
-            'observacion': forms.Textarea(attrs={'rows':2}),
+            'nombre_dispositivo': forms.TextInput(attrs={'placeholder': 'Ej. Laptop Lenovo ThinkPad'}),
+            'marca': forms.TextInput(attrs={'placeholder': 'Ej. Lenovo'}),
+            'codigo_inventario': forms.TextInput(attrs={'placeholder': 'Ej. INV-2026-001'}),
+            'estado': forms.Select(),
+            'descripcion': forms.Textarea(attrs={'rows': 3}),
+            'accesorios': forms.Textarea(attrs={'rows': 2}),
+            'observacion': forms.Textarea(attrs={'rows': 2}),
         }
 
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Excluir la opción 'prestado' del select de estados
+        if 'estado' in self.fields:
+            opciones_permitidas = [
+                choice for choice in Dispositivo.ESTADO_CHOICES 
+                if choice[0] != Dispositivo.ESTADO_PRESTADO
+            ]
+            self.fields['estado'].choices = opciones_permitidas
 
 
 class PrestamoForm(forms.ModelForm):

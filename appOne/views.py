@@ -1,15 +1,14 @@
+from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import RegistroForm, DispositivoForm, PrestamoForm
-from .models import Usuario, Dispositivo, Prestamo
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
-from datetime import timedelta
-from django.db.models import Q
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.contrib.auth.forms import PasswordChangeForm
+from .forms import RegistroForm, DispositivoForm
 from .models import Usuario, Dispositivo, Prestamo
 
 
@@ -18,7 +17,7 @@ from .models import Usuario, Dispositivo, Prestamo
 # ============================
 def login_view(request):
     if request.method == "POST":
-        correo = request.POST.get("username")   # Login usando correo institucional
+        correo = request.POST.get("username")  # Login usando correo institucional
         password = request.POST.get("password")
 
         user = authenticate(request, correo_institucional=correo, password=password)
@@ -48,8 +47,6 @@ def registro(request):
         form = RegistroForm(request.POST)
         if form.is_valid():
             usuario = form.save(commit=False)
-
-            # Los usuarios nuevos NO están activos hasta aprobación
             usuario.is_active = False
             usuario.save()
 
@@ -68,13 +65,11 @@ def registro(request):
 def dashboard(request):
     usuario = request.user
 
-    # Si NO está activo → mensaje y sacar al login
     if not usuario.is_active:
         messages.error(request, "Tu cuenta aún no ha sido aprobada.")
         logout(request)
         return redirect('login')
 
-    # Si es admin → mostrar usuarios pendientes
     if usuario.rol == "Admin" or usuario.is_superuser:
         usuarios_pendientes = Usuario.objects.filter(is_active=False)
         pendientes_count = usuarios_pendientes.count()
@@ -88,16 +83,18 @@ def dashboard(request):
         "pendientes_count": pendientes_count
     })
 
+
 @login_required
 def layaut_Principal(request):
     return render(request, 'appOne/layaut_Principal.html')
+
 
 # ============================
 # ------ PANEL ADMIN ---------
 # ============================
 @login_required
 def panel_usuarios(request):
-    if request.user.rol != "Admin":
+    if request.user.rol != "Admin" and not request.user.is_superuser:
         messages.error(request, "No tienes permisos para ver esta sección.")
         return redirect('dashboard')
 
@@ -107,53 +104,30 @@ def panel_usuarios(request):
 
     usuarios = Usuario.objects.all()
 
-    # 🔎 BUSCADOR
     if buscar:
         usuarios = usuarios.filter(
             Q(nombre_completo__icontains=buscar) |
             Q(correo_institucional__icontains=buscar) |
-            Q(codigo__icontains=buscar) |
-            Q(dispositivos__nombre_dispositivo__icontains=buscar)  # <-- magia
+            Q(codigo__icontains=buscar)
         ).distinct()
 
-    # 🎭 FILTRO POR ROL
     if rol:
         usuarios = usuarios.filter(rol=rol)
 
-    # 🟢 FILTRO POR ESTADO
     if estado == "activo":
         usuarios = usuarios.filter(is_active=True)
     elif estado == "inactivo":
         usuarios = usuarios.filter(is_active=False)
 
-    context = {
-        'usuarios': usuarios,
-    }
-    return render(request, 'appOne/panel_usuarios.html', context)
+    return render(request, 'appOne/panel_usuarios.html', {'usuarios': usuarios})
 
 
 # ============================
 # ---- APROBAR USUARIO -------
 # ============================
 @login_required
-def rechazar_usuario(request, id):
-    if request.user.rol != "Admin":
-        messages.error(request, "No tienes permiso para realizar esta acción.")
-        return redirect('dashboard')
-
-    usuario = get_object_or_404(Usuario, id=id)
-    usuario.is_active = False
-    usuario.save()
-
-    messages.warning(request, f"Usuario {usuario.nombre_completo} ha sido marcado como rechazado.")
-    return redirect('panel_usuarios')
-
-# ============================
-# ---- RECHAZAR USUARIO ------
-# ============================
-@login_required
 def aprobar_usuario(request, id):
-    if request.user.rol != "Admin":
+    if request.user.rol != "Admin" and not request.user.is_superuser:
         messages.error(request, "No tienes permiso para realizar esta acción.")
         return redirect('dashboard')
 
@@ -165,6 +139,21 @@ def aprobar_usuario(request, id):
     return redirect('panel_usuarios')
 
 
+# ============================
+# ---- RECHAZAR USUARIO ------
+# ============================
+@login_required
+def rechazar_usuario(request, id):
+    if request.user.rol != "Admin" and not request.user.is_superuser:
+        messages.error(request, "No tienes permiso para realizar esta acción.")
+        return redirect('dashboard')
+
+    usuario = get_object_or_404(Usuario, id=id)
+    usuario.is_active = False
+    usuario.save()
+
+    messages.warning(request, f"Usuario {usuario.nombre_completo} ha sido rechazado.")
+    return redirect('panel_usuarios')
 
 
 # ============================
@@ -178,7 +167,6 @@ def eliminar_usuario(request, id):
 
     usuario = get_object_or_404(Usuario, id=id)
 
-    # Evitar autoeliminarse
     if usuario == request.user:
         messages.error(request, "No puedes eliminar tu propia cuenta.")
         return redirect('panel_usuarios')
@@ -191,24 +179,46 @@ def eliminar_usuario(request, id):
 # ============================
 # --- DISPOSITIVOS (CRUD) ----
 # ============================
-
 @login_required
 def listardispositivos(request):
+    # IDs de dispositivos con préstamos vigentes (Pendientes o Aprobados)
+    ids_ocupados = Prestamo.objects.filter(
+        estado__in=[Prestamo.ESTADO_PENDIENTE, Prestamo.ESTADO_APROBADO]
+    ).values_list('dispositivo_id', flat=True)
 
-    dispositivos = Dispositivo.objects.all()
+    # 1. Equipos Disponibles (Físicamente disponibles y SIN préstamos activos)
+    dispositivos_disponibles = Dispositivo.objects.filter(
+        estado=Dispositivo.ESTADO_DISPONIBLE
+    ).exclude(id__in=ids_ocupados)
 
-    prestamos_usuario = Prestamo.objects.filter(
-        usuario=request.user
+    # 2. Equipos Ocupados / Prestados
+    dispositivos_ocupados = Dispositivo.objects.filter(
+        id__in=ids_ocupados
     )
 
-    return render(
-        request,
-        "appOne/Dispositivos.html",
-        {
-            "dispositivo": dispositivos,
-            "prestamos_usuario": prestamos_usuario
-        }
+    # 3. Equipos En Mantenimiento
+    dispositivos_mantenimiento = Dispositivo.objects.filter(
+        estado=Dispositivo.ESTADO_MANTENIMIENTO
     )
+
+    # 4. Equipos Dañados
+    dispositivos_danados = Dispositivo.objects.filter(
+        estado=Dispositivo.ESTADO_DANADO
+    )
+
+    # Préstamos pertenecientes al usuario actual
+    prestamos_usuario = Prestamo.objects.filter(usuario=request.user)
+
+    context = {
+        "disponibles": dispositivos_disponibles,
+        "ocupados": dispositivos_ocupados,
+        "mantenimiento": dispositivos_mantenimiento,
+        "danados": dispositivos_danados,
+        "prestamos_usuario": prestamos_usuario,
+    }
+
+    return render(request, "appOne/Dispositivos.html", context)
+
 
 @login_required
 def agregar_dispositivo(request):
@@ -226,42 +236,16 @@ def agregar_dispositivo(request):
 
 @login_required
 def editar_dispositivo(request, id):
-
     dispositivo = get_object_or_404(Dispositivo, id=id)
 
     if request.method == "POST":
-
-        form = DispositivoForm(
-            request.POST,
-            request.FILES,
-            instance=dispositivo
-        )
-
+        form = DispositivoForm(request.POST, request.FILES, instance=dispositivo)
         if form.is_valid():
             form.save()
-
-            messages.success(
-                request,
-                "Dispositivo actualizado correctamente."
-            )
-
+            messages.success(request, "Dispositivo actualizado correctamente.")
             return redirect('listardispositivos')
-
     else:
-
         form = DispositivoForm(instance=dispositivo)
-
-    # AJAX
-    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-
-        return render(
-            request,
-            'appOne/form_editar_dispositivo.html',
-            {
-                'form': form,
-                'dispositivo': dispositivo
-            }
-        )
 
     return render(
         request,
@@ -280,14 +264,12 @@ def eliminar_dispositivo(request, id):
     messages.warning(request, "Dispositivo eliminado.")
     return redirect('listardispositivos')
 
-# ============================
-# --- configuraciones------
-# ============================
 
+# ============================
+# ----- CONFIGURACIONES ------
+# ============================
 @login_required
 def panel_config(request):
-
-    # Solo admins
     if request.user.rol != "Admin" and not request.user.is_superuser:
         messages.error(request, "No tienes permisos para acceder a esta sección.")
         return redirect('dashboard')
@@ -295,30 +277,32 @@ def panel_config(request):
     return render(request, 'appOne/panel_config.html')
 
 
+# ============================
+# -------- PRÉSTAMOS ---------
+# ============================
 @login_required
 def modal_prestamo(request, id):
-
-    dispositivo = get_object_or_404(
-        Dispositivo,
-        id=id
-    )
-
-    return render(
-        request,
-        "appOne/modal_prestamo.html",
-        {
-            "dispositivo": dispositivo
-        }
-    )
+    dispositivo = get_object_or_404(Dispositivo, id=id)
+    return render(request, "appOne/modal_prestamo.html", {"dispositivo": dispositivo})
 
 
 @login_required
 def crear_prestamo(request):
-    if request.method == "POST":
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
+    if request.method == "POST":
         dispositivo_id = request.POST.get("dispositivo_id")
         dispositivo = get_object_or_404(Dispositivo, id=dispositivo_id)
 
+        # 1. Validar disponibilidad física inicial
+        if dispositivo.estado != Dispositivo.ESTADO_DISPONIBLE:
+            msg = f"No es posible solicitar este equipo. Estado actual: {dispositivo.get_estado_display()}."
+            if is_ajax:
+                return JsonResponse({"success": False, "message": msg}, status=400)
+            messages.error(request, msg)
+            return redirect("listardispositivos")
+
+        # 2. Validar préstamos activos
         prestamo_activo = Prestamo.objects.filter(
             usuario=request.user,
             dispositivo=dispositivo,
@@ -329,42 +313,82 @@ def crear_prestamo(request):
         ).exists()
 
         if prestamo_activo:
-            messages.warning(
-                request,
-                "Ya tienes una solicitud activa para este dispositivo."
-            )
+            msg = "Ya tienes una solicitud activa para este dispositivo."
+            if is_ajax:
+                return JsonResponse({"success": False, "message": msg}, status=400)
+            messages.warning(request, msg)
             return redirect("listardispositivos")
 
-        Prestamo.objects.create(
+        # 3. Extraer valores del POST
+        motivo = request.POST.get("motivo", "").strip()
+        fecha_uso = request.POST.get("fecha_uso")
+        hora_inicio = request.POST.get("hora_inicio")
+        hora_entrega = request.POST.get("hora_entrega")
+
+        if not all([motivo, fecha_uso, hora_inicio, hora_entrega]):
+            msg = "Todos los campos son obligatorios."
+            if is_ajax:
+                return JsonResponse({"success": False, "message": msg}, status=400)
+            messages.error(request, msg)
+            return redirect("listardispositivos")
+
+        # 4. Crear instancia de Préstamo
+        nuevo_prestamo = Prestamo(
             usuario=request.user,
             dispositivo=dispositivo,
-            motivo=request.POST.get("motivo"),
-            fecha_uso=request.POST.get("fecha_uso"),
-            hora_inicio=request.POST.get("hora_inicio"),
-            hora_entrega=request.POST.get("hora_entrega"),
+            motivo=motivo,
+            fecha_uso=fecha_uso,
+            hora_inicio=hora_inicio,
+            hora_entrega=hora_entrega,
             estado=Prestamo.ESTADO_PENDIENTE
         )
 
-        messages.success(request, "Solicitud enviada correctamente.")
-        return redirect("listardispositivos")
-    
+        try:
+            nuevo_prestamo.full_clean()
+            nuevo_prestamo.save()
+            messages.success(request, "Solicitud enviada correctamente.")
+            return redirect("listardispositivos")
+
+        except ValidationError as e:
+            if hasattr(e, 'message_dict'):
+                error_msg = "; ".join([f"{k}: {', '.join(v)}" for k, v in e.message_dict.items()])
+            else:
+                error_msg = ", ".join(e.messages)
+
+            if is_ajax:
+                return JsonResponse({"success": False, "message": f"Error de validación: {error_msg}"}, status=400)
+
+            messages.error(request, f"Error al procesar la solicitud: {error_msg}")
+            return redirect("listardispositivos")
+
+    return redirect("listardispositivos")
+
+
 @login_required
 def aprobar_prestamo(request, id):
-    if request.user.rol != "Admin":
+    if request.user.rol != "Admin" and not request.user.is_superuser:
         return redirect("dashboard")
 
     prestamo = get_object_or_404(Prestamo, id=id)
+
+    # 1. Cambiar estado del préstamo y registrar timestamp de aprobación
     prestamo.estado = Prestamo.ESTADO_APROBADO
+    if hasattr(prestamo, 'fecha_aprobacion'):
+        prestamo.fecha_aprobacion = timezone.now()
     prestamo.save()
 
-    messages.success(request, "Préstamo aprobado.")
-    return redirect("solicitudes_prestamos")
+    # 2. Marcar el dispositivo como 'prestado'
+    dispositivo = prestamo.dispositivo
+    dispositivo.estado = Dispositivo.ESTADO_PRESTADO
+    dispositivo.save()
 
+    messages.success(request, f"Préstamo aprobado. {dispositivo.nombre_dispositivo} marcado como 'En Préstamo'.")
+    return redirect("solicitudes_prestamos")
 
 
 @login_required
 def rechazar_prestamo(request, id):
-    if request.user.rol != "Admin":
+    if request.user.rol != "Admin" and not request.user.is_superuser:
         return redirect('dashboard')
 
     prestamo = get_object_or_404(Prestamo, id=id)
@@ -377,57 +401,105 @@ def rechazar_prestamo(request, id):
 
 @login_required
 def devolver_prestamo(request, id):
-    if request.user.rol != "Admin":
+    if request.user.rol != "Admin" and not request.user.is_superuser:
+        messages.error(request, "No tienes permisos para esta acción.")
         return redirect("dashboard")
 
     prestamo = get_object_or_404(Prestamo, id=id)
 
-    # Solo se puede devolver si está aprobado
-    if prestamo.estado == Prestamo.ESTADO_APROBADO:
+    if prestamo.estado != Prestamo.ESTADO_APROBADO:
+        messages.warning(request, "Este préstamo no está activo para ser devuelto.")
+        return redirect("solicitudes_prestamos")
+
+    if request.method == "POST":
+        observaciones = request.POST.get("observaciones_devolucion", "").strip()
+        estado_dispositivo = request.POST.get("estado_dispositivo", Dispositivo.ESTADO_DISPONIBLE)
+
+        # 1. Registrar fecha/hora de devolución real y guardar notas
         prestamo.estado = Prestamo.ESTADO_DEVUELTO
+        prestamo.fecha_devolucion_real = timezone.now()
+        prestamo.observaciones_devolucion = observaciones
         prestamo.save()
-        messages.success(request, "Dispositivo devuelto correctamente.")
-    else:
-        messages.warning(request, "Este préstamo no puede ser devuelto.")
+
+        # 2. Actualizar estado del dispositivo según la recepción
+        dispositivo = prestamo.dispositivo
+        dispositivo.estado = estado_dispositivo
+        dispositivo.save()
+
+        if estado_dispositivo == Dispositivo.ESTADO_DANADO:
+            messages.warning(request, f"Devolución registrada. {dispositivo.nombre_dispositivo} fue marcado como 'Dañado'.")
+        elif estado_dispositivo == Dispositivo.ESTADO_MANTENIMIENTO:
+            messages.warning(request, f"Devolución registrada. {dispositivo.nombre_dispositivo} pasó a 'Mantenimiento'.")
+        else:
+            messages.success(request, f"Dispositivo {dispositivo.nombre_dispositivo} devuelto y marcado como 'Disponible'.")
+
+        return redirect("solicitudes_prestamos")
 
     return redirect("solicitudes_prestamos")
 
+
+# ============================
+# --- GESTIÓN SOLICITUDES ----
+# ============================
 @login_required
 def solicitudes_prestamos(request):
-
     estado = request.GET.get("estado")
+    estado_actual = estado if estado else "todos"
 
-    if request.user.rol == "Admin":
-        prestamos = Prestamo.objects.all()
+    # Si se selecciona "todos" y la sesión tiene activa la bandera de limpiado:
+    if estado_actual == "todos" and request.session.get("ocultar_todos", False):
+        prestamos = Prestamo.objects.none()
     else:
-        prestamos = Prestamo.objects.filter(usuario=request.user)
+        # Consulta base respetando el rol del usuario optimizada con select_related
+        if request.user.rol == "Admin" or request.user.is_superuser:
+            prestamos = Prestamo.objects.select_related('usuario', 'dispositivo').all()
+        else:
+            prestamos = Prestamo.objects.select_related('usuario', 'dispositivo').filter(usuario=request.user)
 
-    # ===== FILTRO POR ESTADO =====
-    if estado and estado != "todos":
-        prestamos = prestamos.filter(estado=estado)
+        # Filtrar por el estado exacto si la pestaña no es "todos"
+        if estado_actual != "todos":
+            prestamos = prestamos.filter(estado=estado_actual)
 
-    prestamos = prestamos.order_by("-fecha_solicitud")
+        prestamos = prestamos.order_by("-fecha_solicitud")
 
     return render(request, "appOne/solicitudes.html", {
         "prestamos": prestamos,
-        "estado_actual": estado or "todos"
+        "estado_actual": estado_actual
     })
 
 
 @login_required
+def eliminar_historial_prestamos(request):
+    """Limpia la pestaña 'Todos' sin eliminar físicamente los registros de la base de datos."""
+    if request.method == "POST" and (request.user.rol == "Admin" or request.user.is_superuser):
+        request.session["ocultar_todos"] = True
+        messages.success(request, "La vista 'Todos' se ha limpiado. Las solicitudes siguen accesibles en sus respectivas pestañas.")
+
+    return redirect(request.META.get("HTTP_REFERER", "solicitudes_prestamos"))
+
+
+@login_required
+def restaurar_historial_todos(request):
+    """Permite volver a mostrar los registros en la pestaña 'Todos'."""
+    if "ocultar_todos" in request.session:
+        del request.session["ocultar_todos"]
+        messages.info(request, "Se ha restaurado la vista general de la pestaña 'Todos'.")
+    return redirect(request.META.get("HTTP_REFERER", "solicitudes_prestamos"))
+
+
+# ============================
+# --------- REPORTES ---------
+# ============================
+@login_required
 def reportes(request):
-    # ===== Métricas generales =====
     total_dispositivos = Dispositivo.objects.count()
     total_usuarios = Usuario.objects.filter(is_active=True).count()
     total_prestamos = Prestamo.objects.count()
 
-    # ===== Préstamos por estado =====
     estados = Prestamo.objects.values('estado').annotate(total=Count('id'))
-
     estados_labels = [e['estado'] for e in estados]
     estados_data = [e['total'] for e in estados]
 
-    # ===== Préstamos últimos 7 días =====
     hoy = timezone.now().date()
     dias = []
     prestamos_por_dia = []
@@ -438,7 +510,6 @@ def reportes(request):
         dias.append(dia.strftime("%d/%m"))
         prestamos_por_dia.append(cantidad)
 
-    # ===== Dispositivos más solicitados =====
     dispositivos = (
         Prestamo.objects.values('dispositivo__nombre_dispositivo')
         .annotate(total=Count('id'))
@@ -462,61 +533,63 @@ def reportes(request):
 
     return render(request, 'appOne/reportes.html', context)
 
-#configuracion
 
+# ============================
+# - VISTAS AJAX CONFIGURACIÓN -
+# ============================
+@login_required
 def config_inicio(request):
-
     if not request.headers.get("x-requested-with") == "XMLHttpRequest":
         return render(request, "appOne/panel_config.html")
 
     context = {
-
         "total_usuarios": Usuario.objects.count(),
-
         "total_dispositivos": Dispositivo.objects.count(),
-
         "total_prestamos": Prestamo.objects.count(),
-
-        "prestamos_aprobados":
-            Prestamo.objects.filter(estado="aprobado").count(),
-
-        "prestamos_pendientes":
-            Prestamo.objects.filter(estado="pendiente").count(),
-
-        "prestamos_rechazados":
-            Prestamo.objects.filter(estado="rechazado").count(),
-
+        "prestamos_aprobados": Prestamo.objects.filter(estado=Prestamo.ESTADO_APROBADO).count(),
+        "prestamos_pendientes": Prestamo.objects.filter(estado=Prestamo.ESTADO_PENDIENTE).count(),
+        "prestamos_rechazados": Prestamo.objects.filter(estado=Prestamo.ESTADO_RECHAZADO).count(),
     }
 
-    return render(
-        request,
-        "appOne/configuracion/inicio.html",
-        context
-    )
+    return render(request, "appOne/configuracion/inicio.html", context)
 
-def config_perfil(request):
 
-    return render(
-        request,
-        "appOne/configuracion/perfil.html"
-    )
-
-def config_seguridad(request):
-
-    return render(
-
-        request,
-
-        "appOne/configuracion/seguridad.html"
-
-    )
-
+@login_required
 def config_database(request):
+    return render(request, "appOne/configuracion/database.html")
 
-    return render(
 
-        request,
+@login_required
+def config_perfil(request):
+    """Actualiza la información personal básica del usuario."""
+    if request.method == "POST":
+        user = request.user
+        user.first_name = request.POST.get("first_name", "").strip()
+        user.last_name = request.POST.get("last_name", "").strip()
+        user.email = request.POST.get("email", "").strip()
+        user.save()
 
-        "appOne/configuracion/database.html"
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"success": True, "message": "Perfil actualizado correctamente."})
 
-    )
+    return render(request, "appOne/configuracion/perfil.html")
+
+
+@login_required
+def config_seguridad(request):
+    """Cambia la contraseña utilizando PasswordChangeForm nativo de Django."""
+    if request.method == "POST":
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Mantiene al usuario con la sesión iniciada tras cambiar la clave
+            update_session_auth_hash(request, user)
+
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"success": True, "message": "Contraseña actualizada con éxito."})
+        else:
+            errors = "; ".join([f"{', '.join(v)}" for k, v in form.errors.items()])
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"success": False, "message": errors}, status=400)
+
+    return render(request, "appOne/configuracion/seguridad.html")

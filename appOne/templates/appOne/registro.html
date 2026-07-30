@@ -27,7 +27,8 @@
             <div class="registro-left">
                 <div class="brand-content">
                     <div class="badge-tag">
-                        <i class="ri-user-shared-line"><span>Registro Seguro</span></i>
+                        <i class="ri-user-shared-line"></i>
+                        <span>Registro Seguro</span>
                     </div>
                     <h1>Vamos a Registrarte</h1>
                     <p>Crea tu cuenta institucional para solicitar dispositivos y gestionar tus préstamos de manera eficiente.</p>
@@ -70,6 +71,44 @@
 
         </div>
     </div>
+
+    <!-- JavaScript para alternar la visibilidad de la contraseña -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Busca todos los inputs de contraseña renderizados por Django
+            const passwordInputs = document.querySelectorAll('.form-grid input[type="password"]');
+
+            passwordInputs.forEach(input => {
+                // Crea un contenedor envolvente relativo
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('password-input-wrapper');
+                
+                // Inserta el contenedor antes del input y mete el input dentro
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+
+                // Crea el botón/ícono de ojo
+                const toggleIcon = document.createElement('i');
+                toggleIcon.classList.add('ri-eye-off-line', 'toggle-password');
+                toggleIcon.setAttribute('title', 'Mostrar contraseña');
+                
+                // Agrega el ícono dentro del wrapper
+                wrapper.appendChild(toggleIcon);
+
+                // Evento click para alternar el tipo de input y el ícono
+                toggleIcon.addEventListener('click', function () {
+                    const isPassword = input.getAttribute('type') === 'password';
+                    
+                    input.setAttribute('type', isPassword ? 'text' : 'password');
+                    
+                    // Cambia la clase del ícono
+                    this.classList.toggle('ri-eye-off-line', !isPassword);
+                    this.classList.toggle('ri-eye-line', isPassword);
+                    this.setAttribute('title', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>

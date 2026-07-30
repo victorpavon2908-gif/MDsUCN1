@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 # ============================
@@ -65,7 +66,23 @@ class Usuario(AbstractUser):
 #         DISPOSITIVOS
 # ============================
 
+# ============================
+#         DISPOSITIVOS
+# ============================
 class Dispositivo(models.Model):
+
+    ESTADO_DISPONIBLE = 'disponible'
+    ESTADO_PRESTADO = 'prestado'
+    ESTADO_MANTENIMIENTO = 'mantenimiento'
+    ESTADO_DANADO = 'danado'
+
+    ESTADO_CHOICES = [
+        (ESTADO_DISPONIBLE, 'Disponible'),
+        (ESTADO_PRESTADO, 'En Préstamo'),
+        (ESTADO_MANTENIMIENTO, 'En Mantenimiento'),
+        (ESTADO_DANADO, 'Dañado / Inoperativo'),
+    ]
+
     nombre_dispositivo = models.CharField(max_length=100)
     marca = models.CharField(max_length=50)
     codigo_inventario = models.CharField(max_length=50, unique=True)
@@ -73,19 +90,19 @@ class Dispositivo(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     accesorios = models.TextField(blank=True, null=True)
     observacion = models.TextField(blank=True, null=True)
+    
+    # NUEVO CAMPO: Estado operativo/físico del dispositivo
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADO_CHOICES,
+        default=ESTADO_DISPONIBLE
+    )
 
     def __str__(self):
-        return f"{self.nombre_dispositivo} ({self.codigo_inventario})"
+        return f"{self.nombre_dispositivo} ({self.codigo_inventario}) - {self.get_estado_display()}"
 
-
-# ============================
 #           PRÉSTAMOS
 # ============================
-
-from django.db import models
-from django.core.exceptions import ValidationError
-
-
 class Prestamo(models.Model):
 
     ESTADO_PENDIENTE = 'pendiente'
@@ -113,7 +130,6 @@ class Prestamo(models.Model):
     )
 
     motivo = models.TextField()
-
     fecha_uso = models.DateField()
     hora_inicio = models.TimeField()
     hora_entrega = models.TimeField()
@@ -126,26 +142,38 @@ class Prestamo(models.Model):
 
     fecha_solicitud = models.DateTimeField(auto_now_add=True)
 
-    # ============================
-    # VALIDACIONES PROFESIONALES
-    # ============================
+    # CAMPOS DE TRAZABILIDAD Y DEVOLUCIÓN REAL
+    fecha_devolucion_real = models.DateTimeField(
+        blank=True, 
+        null=True,
+        help_text="Fecha y hora exacta en que se registró la devolución"
+    )
+    observaciones_devolucion = models.TextField(
+        blank=True, 
+        null=True,
+        help_text="Estado físico en que se recibe el equipo (daños, accesorios faltantes, etc.)"
+    )
+
     def clean(self):
-        # Hora entrega debe ser mayor a inicio
-        if self.hora_entrega <= self.hora_inicio:
+        if self.hora_entrega and self.hora_inicio and self.hora_entrega <= self.hora_inicio:
             raise ValidationError("La hora de entrega debe ser mayor a la hora de inicio.")
 
-        # Evitar doble préstamo del mismo dispositivo en el mismo horario aprobado
+        if self.dispositivo.estado in [Dispositivo.ESTADO_MANTENIMIENTO, Dispositivo.ESTADO_DANADO]:
+            raise ValidationError(
+                f"El dispositivo no está disponible ({self.dispositivo.get_estado_display()})."
+            )
+
         prestamos_conflictivos = Prestamo.objects.filter(
             dispositivo=self.dispositivo,
             fecha_uso=self.fecha_uso,
-            estado=self.ESTADO_APROBADO,
+            estado__in=[self.ESTADO_APROBADO, self.ESTADO_PENDIENTE],
             hora_inicio__lt=self.hora_entrega,
             hora_entrega__gt=self.hora_inicio
         ).exclude(pk=self.pk)
 
         if prestamos_conflictivos.exists():
             raise ValidationError(
-                "Este dispositivo ya está prestado en ese rango de horario."
+                "El dispositivo ya cuenta con una solicitud activa en este horario."
             )
 
     def __str__(self):

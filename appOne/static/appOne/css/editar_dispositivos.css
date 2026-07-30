@@ -1,44 +1,83 @@
 /* =========================================================
-   CARD CONTENEDORA FORMULARIO
+   CONTAINER DEL MODAL Y ESTRUCTURA GENERAL
 ========================================================= */
+.modal-md {
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    border-radius: 20px;
+}
+
+/* Botón flotante para cerrar el modal */
+.modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f1f5f9;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #64748b;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.modal-close-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
 .form-card {
-    background: var(--card, #ffffff);
-    border-radius: var(--radius, 20px);
-    padding: 32px;
-    border: 1px solid var(--border, #e2e8f0);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
-    max-width: 720px;
-    margin: 0 auto;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #ffffff;
+    padding: 36px 40px;
+    border: none;
+    box-shadow: none;
+    max-width: 100%;
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.form-title-group {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .form-title {
-    font-size: 20px;
+    font-size: 1.4rem;
     font-weight: 800;
-    color: var(--text, #0f172a);
-    margin: 0 0 24px 0;
+    color: #0f172a;
+    margin: 0 0 4px 0;
     letter-spacing: -0.3px;
-    border-bottom: 2px solid var(--border, #f1f5f9);
-    padding-bottom: 12px;
+}
+
+.form-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
 }
 
 /* =========================================================
-   GRID DEL FORMULARIO
+   GRID DEL FORMULARIO EN 2 COLUMNAS
 ========================================================= */
 .form-editar {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 20px 24px;
 }
 
-/* =========================================================
-   GRUPOS Y CAMPOS
-========================================================= */
 .form-grupo {
     display: flex;
     flex-direction: column;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .form-grupo.full {
@@ -47,12 +86,17 @@
 
 .form-grupo label {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 0.85rem;
     margin-bottom: 8px;
-    color: var(--text, #0f172a);
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-/* INPUTS, TEXTAREA & SELECT */
+/* =========================================================
+   INPUTS, SELECTS Y TEXTAREAS
+========================================================= */
 .form-grupo input:not([type="file"]),
 .form-grupo textarea,
 .form-grupo select {
@@ -60,54 +104,54 @@
     box-sizing: border-box;
     padding: 12px 16px;
     border-radius: 10px;
-    border: 1px solid var(--border, #e2e8f0);
-    font-size: 14px;
+    border: 1.5px solid #cbd5e1;
+    font-size: 0.925rem;
     background: #ffffff;
-    color: var(--text, #0f172a);
+    color: #0f172a;
     transition: all 0.2s ease;
     font-family: inherit;
 }
 
 .form-grupo textarea {
     resize: vertical;
-    min-height: 110px;
+    min-height: 90px;
     line-height: 1.5;
 }
 
-/* FOCUS */
 .form-grupo input:focus,
 .form-grupo textarea:focus,
 .form-grupo select:focus {
     outline: none;
-    border-color: var(--primary, #019446);
+    border-color: #019446;
     box-shadow: 0 0 0 4px rgba(1, 148, 70, 0.12);
 }
 
-.form-grupo input::placeholder,
-.form-grupo textarea::placeholder {
-    color: var(--muted, #94a3b8);
-}
-
-/* ERRORES DE VALIDACIÓN */
 .error-msg {
-    color: var(--danger, #dc2626);
-    font-size: 12px;
-    font-weight: 500;
+    color: #dc2626;
+    font-size: 0.775rem;
+    font-weight: 600;
     margin-top: 6px;
 }
 
 /* =========================================================
-   MANEJO DE IMAGEN Y PREVIEW
+   GESTIÓN Y PREVIEW DE IMAGEN
 ========================================================= */
-.preview-container {
+.image-upload-wrapper {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 12px;
-    padding: 12px;
-    background: var(--bg, #f8fafc);
+    gap: 20px;
+    align-items: flex-start;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
     border-radius: 12px;
-    border: 1px solid var(--border, #e2e8f0);
+    padding: 16px;
+}
+
+.preview-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 90px;
 }
 
 .preview-img {
@@ -116,40 +160,42 @@
     object-fit: contain;
     border-radius: 8px;
     background: #ffffff;
-    border: 1px solid var(--border, #e2e8f0);
+    border: 1px solid #e2e8f0;
     padding: 4px;
 }
 
 .preview-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted, #64748b);
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
 }
 
-/* FILE INPUT CUSTOM */
-.file-dropzone input[type="file"] {
+.dropzone-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.dropzone-box input[type="file"] {
     width: 100%;
-    padding: 12px;
-    border: 2px dashed var(--border, #cbd5e1);
-    background: var(--bg, #f8fafc);
-    cursor: pointer;
-    border-radius: 10px;
-    transition: all 0.2s ease;
-    font-size: 13px;
-    color: var(--muted, #64748b);
-    box-sizing: border-box;
-}
-
-.file-dropzone input[type="file"]:hover {
+    padding: 10px;
+    font-size: 0.85rem;
+    color: #64748b;
     background: #ffffff;
-    border-color: var(--primary, #019446);
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 /* =========================================================
-   ACCIONES Y BOTONES
+   BOTONES DE ACCIÓN
 ========================================================= */
 .form-acciones {
     margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
@@ -157,67 +203,66 @@
 
 .btn-cancelar {
     padding: 12px 24px;
-    border: 1px solid var(--border, #e2e8f0);
+    border: 1px solid #cbd5e1;
     border-radius: 10px;
     background: #ffffff;
-    color: var(--muted, #64748b);
-    font-size: 14px;
+    color: #475569;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .btn-cancelar:hover {
-    background: var(--bg, #f8fafc);
-    color: var(--text, #0f172a);
-    border-color: #cbd5e1;
+    background: #f1f5f9;
+    color: #0f172a;
 }
 
 .btn-actualizar {
     padding: 12px 28px;
     border: none;
     border-radius: 10px;
-    background: var(--primary, #019446);
+    background: #019446;
     color: #ffffff;
-    font-size: 14px;
+    font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(1, 148, 70, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .btn-actualizar:hover {
-    background: var(--primary-hover, #017a39);
+    background: #017a39;
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(1, 148, 70, 0.35);
 }
 
-.btn-actualizar:active {
-    transform: translateY(0);
-}
-
 /* =========================================================
-   RESPONSIVE
+   ADAPTATIVO / RESPONSIVE
 ========================================================= */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
     .form-editar {
         grid-template-columns: 1fr;
     }
+    
+    .image-upload-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
 
     .form-card {
-        padding: 24px;
+        padding: 24px 20px;
     }
-}
 
-@media (max-width: 480px) {
     .form-acciones {
         flex-direction: column-reverse;
-        gap: 10px;
     }
 
-    .btn-cancelar,
-    .btn-actualizar {
+    .btn-cancelar, .btn-actualizar {
         width: 100%;
-        text-align: center;
+        justify-content: center;
     }
 }

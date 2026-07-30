@@ -2,16 +2,16 @@
 :root {
     --bg-main: #f4ecd8;
     --card-bg: rgba(255, 255, 255, 0.94);
-    
+
     --text-main: #0f172a;
     --text-muted: #64748b;
-    
+
     --border-color: #e2e8f0;
-    
+
     --primary: #15509C;
     --primary-hover: #0e3d7a;
     --secondary: #019446;
-    
+
     --shadow-soft: 0 20px 40px -15px rgba(21, 80, 156, 0.15);
     --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
     --radius: 20px;
@@ -53,11 +53,13 @@ body {
     opacity: 0.5;
     animation: floatBlob 10s infinite alternate ease-in-out;
 }
+
 .blob-1 {
     background: rgba(21, 80, 156, 0.25);
     top: -10%;
     left: -10%;
 }
+
 .blob-2 {
     background: rgba(1, 148, 70, 0.2);
     bottom: -10%;
@@ -66,8 +68,13 @@ body {
 }
 
 @keyframes floatBlob {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(30px, 40px) scale(1.1); }
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(30px, 40px) scale(1.1);
+    }
 }
 
 /* Estructura Principal en Dos Columnas */
@@ -89,8 +96,8 @@ body {
 /* ========= PANEL IZQUIERDO (BRANDING) ========= */
 .registro-left {
     flex: 1;
-    background: linear-gradient(135deg, var(--primary) 0%, #0c3870 100%), 
-                url('/static/img/ucn-bg.jpg') center/cover no-repeat;
+    background: linear-gradient(135deg, var(--primary) 0%, #0c3870 100%),
+        url('/static/img/ucn-bg.jpg') center/cover no-repeat;
     background-blend-mode: overlay;
     padding: 50px;
     display: flex;
@@ -166,6 +173,7 @@ body {
 .registro-right::-webkit-scrollbar {
     width: 6px;
 }
+
 .registro-right::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 10px;
@@ -341,7 +349,8 @@ body {
         text-align: center;
     }
 
-    .registro-left p, .left-footer {
+    .registro-left p,
+    .left-footer {
         display: none;
     }
 
@@ -372,4 +381,32 @@ body {
     .box-header h2 {
         font-size: 22px;
     }
+}
+
+/* ========= VISIBILIDAD DE CONTRASEÑA ========= */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-wrapper input {
+    padding-right: 42px !important;
+    /* Espacio para que el texto no choque con el ojo */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 18px;
+    transition: color 0.2s ease;
+    user-select: none;
+    z-index: 2;
+}
+
+.toggle-password:hover {
+    color: var(--primary);
 }

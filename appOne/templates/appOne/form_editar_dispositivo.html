@@ -1,6 +1,9 @@
 <div class="form-card">
 
-    <h3 class="form-title">Editar dispositivo</h3>
+    <div class="form-title-group">
+        <h3 class="form-title">Editar Dispositivo</h3>
+        <p class="form-subtitle">Actualiza la información técnica, estado y visual del equipo registrado en el sistema.</p>
+    </div>
 
     <form method="POST"
           enctype="multipart/form-data"
@@ -10,10 +13,10 @@
 
         <div class="form-editar">
 
-            <!-- NOMBRE DISPOSITIVO (Full Width) -->
+            <!-- NOMBRE DEL DISPOSITIVO -->
             <div class="form-grupo full">
                 <label for="{{ form.nombre_dispositivo.id_for_label }}">
-                    {{ form.nombre_dispositivo.label }}
+                    <i class="fa-solid fa-laptop"></i> {{ form.nombre_dispositivo.label }}
                 </label>
                 {{ form.nombre_dispositivo }}
                 {% if form.nombre_dispositivo.errors %}
@@ -21,10 +24,10 @@
                 {% endif %}
             </div>
 
-            <!-- CÓDIGO INVENTARIO -->
+            <!-- CÓDIGO DE INVENTARIO -->
             <div class="form-grupo">
                 <label for="{{ form.codigo_inventario.id_for_label }}">
-                    {{ form.codigo_inventario.label }}
+                    <i class="fa-solid fa-barcode"></i> {{ form.codigo_inventario.label }}
                 </label>
                 {{ form.codigo_inventario }}
                 {% if form.codigo_inventario.errors %}
@@ -35,7 +38,7 @@
             <!-- MARCA -->
             <div class="form-grupo">
                 <label for="{{ form.marca.id_for_label }}">
-                    {{ form.marca.label }}
+                    <i class="fa-solid fa-tag"></i> {{ form.marca.label }}
                 </label>
                 {{ form.marca }}
                 {% if form.marca.errors %}
@@ -43,10 +46,21 @@
                 {% endif %}
             </div>
 
-            <!-- DESCRIPCIÓN (Full Width) -->
+            <!-- ESTADO DEL DISPOSITIVO -->
+            <div class="form-grupo full">
+                <label for="{{ form.estado.id_for_label }}">
+                    <i class="fa-solid fa-list-check"></i> {{ form.estado.label }}
+                </label>
+                {{ form.estado }}
+                {% if form.estado.errors %}
+                    <span class="error-msg">{{ form.estado.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- DESCRIPCIÓN -->
             <div class="form-grupo full">
                 <label for="{{ form.descripcion.id_for_label }}">
-                    {{ form.descripcion.label }}
+                    <i class="fa-solid fa-align-left"></i> {{ form.descripcion.label }}
                 </label>
                 {{ form.descripcion }}
                 {% if form.descripcion.errors %}
@@ -54,22 +68,47 @@
                 {% endif %}
             </div>
 
-            <!-- IMAGEN Y PREVIEW (Full Width) -->
+            <!-- ACCESORIOS -->
+            <div class="form-grupo full">
+                <label for="{{ form.accesorios.id_for_label }}">
+                    <i class="fa-solid fa-plug"></i> {{ form.accesorios.label }}
+                </label>
+                {{ form.accesorios }}
+                {% if form.accesorios.errors %}
+                    <span class="error-msg">{{ form.accesorios.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- OBSERVACIONES -->
+            <div class="form-grupo full">
+                <label for="{{ form.observacion.id_for_label }}">
+                    <i class="fa-solid fa-clipboard-list"></i> {{ form.observacion.label }}
+                </label>
+                {{ form.observacion }}
+                {% if form.observacion.errors %}
+                    <span class="error-msg">{{ form.observacion.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- IMAGEN Y PREVIEW -->
             <div class="form-grupo full">
                 <label for="{{ form.imagen.id_for_label }}">
-                    Imagen del equipo
+                    <i class="fa-solid fa-image"></i> {{ form.imagen.label }}
                 </label>
                 
-                {% if dispositivo.imagen %}
-                    <div class="preview-container">
-                        <img src="{{ dispositivo.imagen.url }}" alt="{{ dispositivo.nombre_dispositivo }}" class="preview-img">
-                        <span class="preview-label">Imagen actual</span>
-                    </div>
-                {% endif %}
+                <div class="image-upload-wrapper">
+                    {% if dispositivo.imagen %}
+                        <div class="preview-box">
+                            <img src="{{ dispositivo.imagen.url }}" alt="{{ dispositivo.nombre_dispositivo }}" class="preview-img">
+                            <span class="preview-label">Actual</span>
+                        </div>
+                    {% endif %}
 
-                <div class="file-dropzone">
-                    {{ form.imagen }}
+                    <div class="dropzone-box">
+                        {{ form.imagen }}
+                    </div>
                 </div>
+
                 {% if form.imagen.errors %}
                     <span class="error-msg">{{ form.imagen.errors.0 }}</span>
                 {% endif %}
@@ -77,13 +116,13 @@
 
         </div>
 
-        <!-- ACCIONES Y BOTONES -->
+        <!-- ACCIONES -->
         <div class="form-acciones">
             <button type="button" onclick="cerrarModalEditar()" class="btn-cancelar">
                 Cancelar
             </button>
             <button type="submit" class="btn-actualizar">
-                Guardar cambios
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
             </button>
         </div>
 

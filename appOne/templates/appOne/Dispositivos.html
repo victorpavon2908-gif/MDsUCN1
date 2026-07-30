@@ -5,9 +5,65 @@
 <link rel="stylesheet" href="{% static 'appOne/css/Dispositivos.css' %}">
 <link rel="stylesheet" href="{% static 'appOne/css/editar_dispositivos.css' %}">
 <link rel="stylesheet" href="{% static 'appOne/css/modal_prestamo.css' %}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<!-- Carga FontAwesome para íconos UI modernos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* Estilos de Pestañas (Tabs) */
+    .tabs-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #e2e8f0;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+        color: #2563eb;
+    }
+
+    .tab-btn.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+    }
+
+    .tab-badge {
+        background: #e2e8f0;
+        color: #475569;
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+    }
+
+    .tab-btn.active .tab-badge {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
+    }
+</style>
 {% endblock %}
 
 {% block contenido %}
@@ -15,79 +71,213 @@
 <div class="header-pagina">
     <div>
         <h2 class="titulo-seccion">Catálogo de Equipos</h2>
-        <p class="subtitulo-seccion">Gestiona y solicita los dispositivos disponibles en la plataforma</p>
+        <p class="subtitulo-seccion">Gestiona y consulta los dispositivos organizados por su disponibilidad</p>
     </div>
 </div>
 
-<div class="galeria-grid">
-    {% for d in dispositivo %}
-    <div class="card-pro">
-        
-        <!-- Badge de Estado FLOTANTE -->
-        {% for p in prestamos_usuario %}
-            {% if p.dispositivo.id == d.id %}
-                {% if p.estado == "pendiente" %}
-                    <span class="badge-status pendiente">
-                        <i class="fa-solid fa-clock-rotate-left"></i> Pendiente
-                    </span>
-                {% elif p.estado == "aprobado" %}
-                    <span class="badge-status aprobado">
-                        <i class="fa-solid fa-circle-check"></i> Aprobado
-                    </span>
+<!-- BARRA DE PESTAÑAS (TABS) -->
+<div class="tabs-container">
+    <button class="tab-btn active" onclick="cambiarTab(event, 'tab-disponibles')">
+        <i class="fa-solid fa-circle-check"></i> Disponibles 
+        <span class="tab-badge">{{ disponibles|length }}</span>
+    </button>
+    
+    <button class="tab-btn" onclick="cambiarTab(event, 'tab-ocupados')">
+        <i class="fa-solid fa-handshake-angle"></i> Ocupados / Prestados 
+        <span class="tab-badge">{{ ocupados|length }}</span>
+    </button>
+
+    <button class="tab-btn" onclick="cambiarTab(event, 'tab-mantenimiento')">
+        <i class="fa-solid fa-wrench"></i> En Mantenimiento 
+        <span class="tab-badge">{{ mantenimiento|length }}</span>
+    </button>
+
+    <button class="tab-btn" onclick="cambiarTab(event, 'tab-danados')">
+        <i class="fa-solid fa-triangle-exclamation"></i> Dañados 
+        <span class="tab-badge">{{ danados|length }}</span>
+    </button>
+</div>
+
+<!-- 1. PESTAÑA: DISPONIBLES -->
+<div id="tab-disponibles" class="tab-pane active">
+    <div class="galeria-grid">
+        {% for d in disponibles %}
+            <div class="card-pro">
+                <div class="card-body-click" onclick="abrirPrestamo('{{ d.id }}')">
+                    <div class="card-image-wrapper">
+                        <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}" alt="{{ d.nombre_dispositivo }}" loading="lazy">
+                        <div class="image-overlay">
+                            <span class="btn-quick-view"><i class="fa-solid fa-hand-pointer"></i> Solicitar</span>
+                        </div>
+                    </div>
+
+                    <div class="card-details">
+                        <h3 class="card-title">{{ d.nombre_dispositivo }}</h3>
+                        <div class="card-meta">
+                            <div class="meta-item">
+                                <i class="fa-solid fa-barcode"></i>
+                                <span>Código: <strong>{{ d.codigo_inventario }}</strong></span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fa-solid fa-tag"></i>
+                                <span>Marca: <strong>{{ d.marca }}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if request.user.rol == "Admin" %}
+                <div class="card-actions-admin">
+                    <button type="button" class="btn-action edit" onclick="abrirEditar('{{ d.id }}')">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </button>
+                    <form action="{% url 'eliminar_dispositivo' d.id %}" method="POST" class="form-delete" onsubmit="return confirm('¿Confirma eliminar este dispositivo?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action delete">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </form>
+                </div>
                 {% endif %}
-            {% endif %}
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
+                <h3>No hay equipos disponibles</h3>
+                <p>Actualmente no hay equipos libres para préstamo.</p>
+            </div>
         {% endfor %}
-
-        <!-- Zona Clickeable para abrir Prestamo -->
-        <div class="card-body-click" onclick="abrirPrestamo('{{ d.id }}')">
-            <div class="card-image-wrapper">
-                <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}" 
-                     alt="{{ d.nombre_dispositivo }}" 
-                     loading="lazy">
-                <div class="image-overlay">
-                    <span class="btn-quick-view"><i class="fa-solid fa-hand-pointer"></i> Solicitar</span>
-                </div>
-            </div>
-
-            <div class="card-details">
-                <h3 class="card-title">{{ d.nombre_dispositivo }}</h3>
-                <div class="card-meta">
-                    <div class="meta-item">
-                        <i class="fa-solid fa-barcode"></i>
-                        <span>Código: <strong>{{ d.codigo_inventario }}</strong></span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fa-solid fa-tag"></i>
-                        <span>Marca: <strong>{{ d.marca }}</strong></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Acciones de Administrador -->
-        {% if request.user.rol == "Admin" %}
-        <div class="card-actions-admin">
-            <button type="button" class="btn-action edit" onclick="abrirEditar('{{ d.id }}')">
-                <i class="fa-solid fa-pen-to-square"></i> Editar
-            </button>
-
-            <form action="{% url 'eliminar_dispositivo' d.id %}" method="POST" class="form-delete" onsubmit="return confirm('¿Confirma eliminar este dispositivo?');">
-                {% csrf_token %}
-                <button type="submit" class="btn-action delete">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </form>
-        </div>
-        {% endif %}
-
     </div>
-    {% empty %}
-    <div class="empty-state">
-        <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
-        <h3>No hay equipos disponibles</h3>
-        <p>Actualmente no existen registros para mostrar en esta lista.</p>
+</div>
+
+<!-- 2. PESTAÑA: OCUPADOS / PRESTADOS -->
+<div id="tab-ocupados" class="tab-pane">
+    <div class="galeria-grid">
+        {% for d in ocupados %}
+            <div class="card-pro">
+                <!-- Badge Estado -->
+                {% for p in prestamos_usuario %}
+                    {% if p.dispositivo.id == d.id %}
+                        {% if p.estado == "pendiente" %}
+                        <span class="badge-status pendiente"><i class="fa-solid fa-clock-rotate-left"></i> Tu Solicitud Pendiente</span>
+                        {% elif p.estado == "aprobado" %}
+                        <span class="badge-status aprobado"><i class="fa-solid fa-circle-check"></i> En tu poder</span>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                <div class="card-image-wrapper">
+                    <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}" alt="{{ d.nombre_dispositivo }}">
+                </div>
+
+                <div class="card-details">
+                    <h3 class="card-title">{{ d.nombre_dispositivo }}</h3>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <i class="fa-solid fa-barcode"></i>
+                            <span>Código: <strong>{{ d.codigo_inventario }}</strong></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fa-solid fa-user-clock"></i>
+                            <span>Estado: <strong>En Préstamo / Reservado</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if request.user.rol == "Admin" %}
+                <div class="card-actions-admin">
+                    <button type="button" class="btn-action edit" onclick="abrirEditar('{{ d.id }}')">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+                <h3>Sin equipos ocupados</h3>
+                <p>No hay dispositivos prestados en este momento.</p>
+            </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+</div>
+
+<!-- 3. PESTAÑA: EN MANTENIMIENTO -->
+<div id="tab-mantenimiento" class="tab-pane">
+    <div class="galeria-grid">
+        {% for d in mantenimiento %}
+            <div class="card-pro">
+                <div class="card-image-wrapper">
+                    <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}" alt="{{ d.nombre_dispositivo }}">
+                </div>
+                <div class="card-details">
+                    <h3 class="card-title">{{ d.nombre_dispositivo }}</h3>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <i class="fa-solid fa-barcode"></i>
+                            <span>Código: <strong>{{ d.codigo_inventario }}</strong></span>
+                        </div>
+                        <div class="meta-item" style="color: #d97706;">
+                            <i class="fa-solid fa-wrench"></i>
+                            <span><strong>En Mantenimiento</strong></span>
+                        </div>
+                    </div>
+                </div>
+                {% if request.user.rol == "Admin" %}
+                <div class="card-actions-admin">
+                    <button type="button" class="btn-action edit" onclick="abrirEditar('{{ d.id }}')">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                <h3>Sin mantenimientos</h3>
+                <p>No hay dispositivos actualmente en revisión o mantenimiento.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 4. PESTAÑA: DAÑADOS -->
+<div id="tab-danados" class="tab-pane">
+    <div class="galeria-grid">
+        {% for d in danados %}
+            <div class="card-pro">
+                <div class="card-image-wrapper">
+                    <img src="{% if d.imagen %}{{ d.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}" alt="{{ d.nombre_dispositivo }}">
+                </div>
+                <div class="card-details">
+                    <h3 class="card-title">{{ d.nombre_dispositivo }}</h3>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <i class="fa-solid fa-barcode"></i>
+                            <span>Código: <strong>{{ d.codigo_inventario }}</strong></span>
+                        </div>
+                        <div class="meta-item" style="color: #dc2626;">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span><strong>Dañado / Fuera de servicio</strong></span>
+                        </div>
+                    </div>
+                </div>
+                {% if request.user.rol == "Admin" %}
+                <div class="card-actions-admin">
+                    <button type="button" class="btn-action edit" onclick="abrirEditar('{{ d.id }}')">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <h3>Excelente</h3>
+                <p>No hay ningún dispositivo registrado como dañado.</p>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- Botón Flotante Agregar Dispositivo -->
@@ -99,7 +289,10 @@
 
 <!-- MODALES -->
 <div class="modal-backdrop" id="modalEditar">
-    <div class="modal-container modal-sm">
+    <div class="modal-container modal-md">
+        <button type="button" class="modal-close-btn" onclick="cerrarModalEditar()" title="Cerrar ventana">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
         <div id="contenidoEditar"></div>
     </div>
 </div>
@@ -111,41 +304,94 @@
 </div>
 
 <script>
-function abrirEditar(id) {
-    fetch(`/dispositivos/editar/${id}/`, {
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-    })
-    .then(r => r.text())
-    .then(html => {
-        document.getElementById("contenidoEditar").innerHTML = html;
-        document.getElementById("modalEditar").classList.add("active");
-    });
-}
+    // Cambio entre pestañas
+    function cambiarTab(evt, tabId) {
+        let i, tabcontent, tablinks;
+        
+        tabcontent = document.getElementsByClassName("tab-pane");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
 
-function cerrarModalEditar() {
-    document.getElementById("modalEditar").classList.remove("active");
-}
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
 
-function abrirPrestamo(id) {
-    fetch(`/prestamo/modal/${id}/`, {
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-    })
-    .then(r => r.text())
-    .then(html => {
-        document.getElementById("contenidoPrestamo").innerHTML = html;
-        document.getElementById("modalPrestamo").classList.add("active");
-    });
-}
-
-function cerrarModalPrestamo() {
-    document.getElementById("modalPrestamo").classList.remove("active");
-}
-
-window.onclick = function(e) {
-    if (e.target.classList.contains('modal-backdrop')) {
-        e.target.classList.remove("active");
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.classList.add("active");
     }
-}
+
+    function abrirEditar(id) {
+        fetch(`/dispositivos/editar/${id}/`, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById("contenidoEditar").innerHTML = html;
+            document.getElementById("modalEditar").classList.add("active");
+        });
+    }
+
+    function cerrarModalEditar() {
+        document.getElementById("modalEditar").classList.remove("active");
+    }
+
+    function abrirPrestamo(id) {
+        fetch(`/prestamo/modal/${id}/`, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(r => r.text())
+        .then(html => {
+            const contenedor = document.getElementById("contenidoPrestamo");
+            contenedor.innerHTML = html;
+            document.getElementById("modalPrestamo").classList.add("active");
+
+            Array.from(contenedor.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+
+            const form = document.getElementById("formCrearPrestamo");
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+
+                    fetch(form.action, {
+                        method: "POST",
+                        body: formData,
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
+                    })
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(data => {
+                        if (data && !data.success) {
+                            alert(data.message || "Ocurrió un error al procesar el préstamo.");
+                        }
+                    })
+                    .catch(error => console.error("Error al enviar la solicitud:", error));
+                });
+            }
+        });
+    }
+
+    function cerrarModalPrestamo() {
+        document.getElementById("modalPrestamo").classList.remove("active");
+    }
+
+    window.onclick = function (e) {
+        if (e.target.classList.contains('modal-backdrop')) {
+            e.target.classList.remove("active");
+        }
+    }
 </script>
 
 {% endblock %}
