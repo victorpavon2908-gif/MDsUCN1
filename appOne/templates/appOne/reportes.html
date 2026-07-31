@@ -1,48 +1,245 @@
 {% extends "appOne/dashboard.html" %}
 {% load static %}
 
-{% block title %}Reportes{% endblock %}
+{% block title %}Reportes y Auditoría{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/reportes.css' %}">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* Estilos del botón de impresión */
+    .btn-imprimir {
+        background-color: var(--primary, #019446);
+        color: #ffffff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-imprimir:hover {
+        background-color: #017a3a;
+        transform: translateY(-1px);
+    }
+
+    /* =========================================================
+       REGLAS DE IMPRESIÓN COMPACTA (1 SOLA HOJA LEGAL / OFICIO)
+    ========================================================= */
+    @media print {
+        /* Configuración de Hoja Legal / Oficio (8.5 x 14 pulg / 216mm x 356mm) */
+        @page {
+            size: legal portrait;
+            margin: 5mm 8mm; /* Márgenes ultrasemilimpios para ganar espacio vertical */
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden !important; /* Forzar que no haya desbordamiento */
+            background: #ffffff !important;
+        }
+
+        /* Ocultar elementos irrelevantes de la interfaz */
+        nav, sidebar, .sidebar, .navbar, .topbar, header:not(.header-reportes), 
+        footer, .btn-imprimir, .btn-ver-todo {
+            display: none !important;
+        }
+
+        .reportes-container {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+
+        /* Header ultra compacto */
+        .header-reportes {
+            margin-bottom: 10px !important;
+        }
+
+        .header-reportes h1 {
+            font-size: 18px !important;
+            margin-bottom: 2px !important;
+        }
+
+        .header-reportes p {
+            font-size: 11px !important;
+        }
+
+        /* KPIs / Cards en fila horizontal ultracorta */
+        .cards {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+            margin-bottom: 10px !important;
+        }
+
+        .card {
+            padding: 8px 12px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+
+        .card i {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 16px !important;
+            margin-bottom: 0 !important;
+            border-radius: 6px !important;
+        }
+
+        .card h3 {
+            font-size: 10px !important;
+            margin: 0 !important;
+        }
+
+        .card p {
+            font-size: 18px !important;
+        }
+
+        /* Gráficos compactos de 3 en línea */
+        .graficos {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important; /* Los 3 gráficos uno al lado del otro */
+            gap: 8px !important;
+            margin-bottom: 10px !important;
+        }
+
+        .grafico {
+            padding: 8px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+        }
+
+        .grafico.full {
+            grid-column: span 1 !important; /* Cancela el ancho completo para no gastar espacio */
+        }
+
+        .grafico h2 {
+            font-size: 11px !important;
+            margin-bottom: 6px !important;
+        }
+
+        canvas {
+            max-height: 140px !important; /* Altura controlada para los canvas */
+            height: 140px !important;
+            width: 100% !important;
+        }
+
+        /* Tabla y Auditoría Ajustadas */
+        .auditoria-section {
+            padding: 10px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+            margin-top: 0 !important;
+        }
+
+        .auditoria-header {
+            margin-bottom: 6px !important;
+        }
+
+        .auditoria-header h2 {
+            font-size: 12px !important;
+        }
+
+        .auditoria-header p {
+            font-size: 10px !important;
+        }
+
+        .table-reportes {
+            margin-top: 4px !important;
+        }
+
+        .table-reportes th {
+            padding: 4px 6px !important;
+            font-size: 9px !important;
+            background: #f1f5f9 !important;
+        }
+
+        .table-reportes td {
+            padding: 4px 6px !important;
+            font-size: 10px !important;
+            line-height: 1.1 !important;
+        }
+
+        .avatar-sm {
+            width: 20px !important;
+            height: 20px !important;
+            font-size: 9px !important;
+        }
+
+        .badge {
+            padding: 2px 6px !important;
+            font-size: 9px !important;
+        }
+
+        /* Forzar renderizado exacto de colores de fondo */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block contenido %}
 
 <div class="reportes-container">
 
-    <!-- HEADER -->
-    <div class="header-reportes">
-        <h1>Panel de Reportes</h1>
+    <!-- HEADER CON BOTÓN DE IMPRESIÓN -->
+    <div class="header-reportes" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>Panel de Reportes & Auditoría</h1>
+            <p>Métricas operativas del sistema e historial de actividades de usuarios</p>
+        </div>
+        <button onclick="window.print()" class="btn-imprimir">
+            <i class="ri-printer-line" style="font-size: 16px;"></i> Imprimir
+        </button>
     </div>
 
-    <!-- ===== CARDS ===== -->
+    <!-- ===== CARDS (KPIs) ===== -->
     <div class="cards">
-
         <div class="card">
             <i class="ri-computer-line"></i>
-            <h3>Dispositivos</h3>
-            <p>{{ total_dispositivos }}</p>
+            <div>
+                <h3>Dispositivos</h3>
+                <p>{{ total_dispositivos }}</p>
+            </div>
         </div>
 
         <div class="card">
             <i class="ri-user-3-line"></i>
-            <h3>Usuarios Activos</h3>
-            <p>{{ total_usuarios }}</p>
+            <div>
+                <h3>Usuarios Activos</h3>
+                <p>{{ total_usuarios }}</p>
+            </div>
         </div>
 
         <div class="card">
             <i class="ri-exchange-dollar-line"></i>
-            <h3>Préstamos</h3>
-            <p>{{ total_prestamos }}</p>
+            <div>
+                <h3>Préstamos</h3>
+                <p>{{ total_prestamos }}</p>
+            </div>
         </div>
-
     </div>
 
     <!-- ===== GRÁFICOS ===== -->
     <div class="graficos">
-
         <div class="grafico">
             <h2>Préstamos por Estado</h2>
             <canvas id="estadoChart"></canvas>
@@ -54,10 +251,86 @@
         </div>
 
         <div class="grafico full">
-            <h2>Dispositivos Más Solicitados</h2>
+            <h2>Dispositivos Solicitados</h2>
             <canvas id="dispositivosChart"></canvas>
         </div>
+    </div>
 
+    <!-- ===== SECCIÓN BITÁCORA DE AUDITORÍA ===== -->
+    <div class="auditoria-section">
+        <div class="auditoria-header">
+            <div>
+                <h2>Bitácora de Auditoría</h2>
+                <p>Registro en tiempo real de operaciones de usuarios</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-reportes">
+                <thead>
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Módulo / Tabla</th>
+                        <th>ID</th>
+                        <th>Detalles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="text-muted font-mono">
+                            <i class="ri-time-line"></i> {{ log.fecha_hora|date:"Y-m-d H:i:s" }}
+                        </td>
+                        <td>
+                            <div class="user-badge">
+                                <span class="avatar-sm">
+                                    {{ log.usuario.username|slice:":1"|upper|default:"S" }}
+                                </span>
+                                <span class="user-name">
+                                    {% if log.usuario %}{{ log.usuario.nombre_completo|default:log.usuario.username }}{% else %}Sistema{% endif %}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if log.accion == 'CREAR' %}
+                                <span class="badge badge-success">Creación</span>
+                            {% elif log.accion == 'EDITAR' %}
+                                <span class="badge badge-info">Edición</span>
+                            {% elif log.accion == 'ELIMINAR' %}
+                                <span class="badge badge-danger">Eliminación</span>
+                            {% elif log.accion == 'LOGIN' %}
+                                <span class="badge badge-purple">Login</span>
+                            {% else %}
+                                <span class="badge badge-warning">{{ log.accion }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="font-medium">{{ log.tabla_afectada }}</td>
+                        <td>
+                            {% if log.registro_id %}
+                                <code class="id-code">#{{ log.registro_id }}</code>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-details" title="{{ log.detalles }}">
+                            {{ log.detalles|default:"Sin detalles" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-2">
+                            <div class="empty-state">
+                                <i class="ri-history-line"></i>
+                                <p>No hay eventos registrados en la bitácora aún.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>

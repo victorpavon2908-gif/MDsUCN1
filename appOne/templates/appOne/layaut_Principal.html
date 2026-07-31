@@ -3,6 +3,8 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appOne/css/layaut_Principal.css' %}">
+<!-- CDN de FullCalendar v6 -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 {% endblock %}
 
 {% block contenido %}
@@ -99,9 +101,9 @@
             <div class="card-header">
                 <div>
                     <h3>Últimos Préstamos</h3>
-                    <p class="subtitle">Actividad reciéntemente registrada</p>
+                    <p class="subtitle">Actividad recientemente registrada</p>
                 </div>
-                <a href="#" class="btn-link">Ver todos <i class="ri-arrow-right-s-line"></i></a>
+                <a href="{% url 'solicitudes_prestamos' %}" class="btn-link">Ver todos <i class="ri-arrow-right-s-line"></i></a>
             </div>
 
             <div class="table-responsive">
@@ -124,11 +126,11 @@
                             </td>
                             <td>
                                 <span class="device-badge">
-                                    <i class="ri-macbook-line"></i> {{ p.dispositivo.nombre }}
+                                    <i class="ri-macbook-line"></i> {{ p.dispositivo.nombre_dispositivo }}
                                 </span>
                             </td>
                             <td class="text-muted">
-                                {{ p.fecha|date:"d/m/Y H:i" }}
+                                {{ p.fecha_uso|date:"d/m/Y" }}
                             </td>
                         </tr>
                         {% empty %}
@@ -148,5 +150,60 @@
 
     </section>
 
+    <!-- SECCIÓN DEL CALENDARIO DE RESERVAS -->
+    <section class="calendar-section">
+        <article class="content-card calendar-card">
+            <div class="card-header">
+                <div>
+                    <h3>Calendario de Reservas</h3>
+                    <p class="subtitle">Cronograma de préstamos y solicitudes registradas</p>
+                </div>
+            </div>
+            <div id="calendar-container">
+                <div id="calendar"></div>
+            </div>
+        </article>
+    </section>
+
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        if (calendarEl) {
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                buttonText: {
+                    today:    'Hoy',
+                    month:    'Mes',
+                    week:     'Semana',
+                    list:     'Agenda'
+                },
+                events: "{% url 'api_reservas_eventos' %}",
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: false
+                },
+                navLinks: true,
+                editable: false,
+                dayMaxEvents: true,
+                eventClick: function(info) {
+                    const props = info.event.extendedProps;
+                    let msg = `Dispositivo: ${props.dispositivo || info.event.title}\n`;
+                    if (props.usuario) msg += `Usuario: ${props.usuario}\n`;
+                    msg += `Estado: ${props.estado || 'N/A'}`;
+                    alert(msg);
+                }
+            });
+            calendar.render();
+        }
+    });
+</script>
 {% endblock %}

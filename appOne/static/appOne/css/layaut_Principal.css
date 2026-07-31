@@ -3,12 +3,25 @@
    ========================================================================== */
 
 :root {
+  /* Variables de Color por Defecto */
+ 
+  --primary-light: #e8f0fe;
+  --secondary: #10b981;
+  --secondary-light: #d1fae5;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 
   /* Sombras y Bordes */
   --radius-lg: 20px;
   --radius-md: 12px;
   --radius-sm: 8px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
   --shadow-hover: 0 20px 30px -10px rgba(21, 80, 156, 0.12);
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -25,7 +38,7 @@
   background: linear-gradient(135deg, var(--primary) 0%, #0d366b 100%);
   border-radius: var(--radius-lg);
   padding: 28px 32px;
-  color: white;
+  color: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -62,6 +75,7 @@
 .welcome-badge {
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 8px 16px;
   border-radius: 30px;
@@ -114,7 +128,7 @@
 /* Variaciones de Color en Tarjetas */
 .stat-card.primary .stat-icon { background: var(--primary-light); color: var(--primary); }
 .stat-card.success .stat-icon { background: var(--secondary-light); color: var(--secondary); }
-.stat-card.info .stat-icon { background: #e0f2fe; color: #0284c7; }
+.stat-card.info .stat-icon    { background: #e0f2fe; color: #0284c7; }
 .stat-card.warning .stat-icon { background: var(--warning-light); color: var(--warning); }
 
 .stat-info h3 {

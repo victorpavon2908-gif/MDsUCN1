@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 
 # ============================
-#           ROLES
+#         ROLES
 # ============================
 
 ROLES = (
@@ -15,7 +15,7 @@ ROLES = (
 
 
 # ============================
-#   MANAGER PERSONALIZADO
+#    MANAGER PERSONALIZADO
 # ============================
 
 class UsuarioManager(BaseUserManager):
@@ -43,7 +43,7 @@ class UsuarioManager(BaseUserManager):
 
 
 # ============================
-#       USUARIO PERSONALIZADO
+#     USUARIO PERSONALIZADO
 # ============================
 
 class Usuario(AbstractUser):
@@ -63,12 +63,9 @@ class Usuario(AbstractUser):
 
 
 # ============================
-#         DISPOSITIVOS
+#        DISPOSITIVOS
 # ============================
 
-# ============================
-#         DISPOSITIVOS
-# ============================
 class Dispositivo(models.Model):
 
     ESTADO_DISPONIBLE = 'disponible'
@@ -91,7 +88,6 @@ class Dispositivo(models.Model):
     accesorios = models.TextField(blank=True, null=True)
     observacion = models.TextField(blank=True, null=True)
     
-    # NUEVO CAMPO: Estado operativo/físico del dispositivo
     estado = models.CharField(
         max_length=20,
         choices=ESTADO_CHOICES,
@@ -101,8 +97,11 @@ class Dispositivo(models.Model):
     def __str__(self):
         return f"{self.nombre_dispositivo} ({self.codigo_inventario}) - {self.get_estado_display()}"
 
-#           PRÉSTAMOS
+
 # ============================
+#          PRÉSTAMOS
+# ============================
+
 class Prestamo(models.Model):
 
     ESTADO_PENDIENTE = 'pendiente'
@@ -142,7 +141,6 @@ class Prestamo(models.Model):
 
     fecha_solicitud = models.DateTimeField(auto_now_add=True)
 
-    # CAMPOS DE TRAZABILIDAD Y DEVOLUCIÓN REAL
     fecha_devolucion_real = models.DateTimeField(
         blank=True, 
         null=True,
@@ -178,3 +176,47 @@ class Prestamo(models.Model):
 
     def __str__(self):
         return f"{self.dispositivo.nombre_dispositivo} - {self.usuario.nombre_completo} ({self.estado})"
+
+
+# ============================
+#     BITÁCORA DE AUDITORÍA
+# ============================
+
+class BitacoraAuditoria(models.Model):
+
+    ACCION_CREAR = 'CREAR'
+    ACCION_EDITAR = 'EDITAR'
+    ACCION_ELIMINAR = 'ELIMINAR'
+    ACCION_LOGIN = 'LOGIN'
+    ACCION_LOGOUT = 'LOGOUT'
+
+    ACCION_CHOICES = [
+        (ACCION_CREAR, 'Creación'),
+        (ACCION_EDITAR, 'Modificación'),
+        (ACCION_ELIMINAR, 'Eliminación'),
+        (ACCION_LOGIN, 'Inicio de Sesión'),
+        (ACCION_LOGOUT, 'Cierre de Sesión'),
+    ]
+
+    usuario = models.ForeignKey(
+        Usuario, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name="auditorias"
+    )
+    accion = models.CharField(max_length=20, choices=ACCION_CHOICES)
+    tabla_afectada = models.CharField(max_length=100)
+    registro_id = models.IntegerField(null=True, blank=True)
+    detalles = models.TextField(blank=True, null=True)
+    ip_origen = models.GenericIPAddressField(null=True, blank=True)
+    fecha_hora = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha_hora']
+        verbose_name = 'Registro de Auditoría'
+        verbose_name_plural = 'Bitácora de Auditoría'
+
+    def __str__(self):
+        usr = self.usuario.username if self.usuario else "Sistema"
+        return f"{self.fecha_hora.strftime('%Y-%m-%d %H:%M:%S')} - {usr} - {self.accion} ({self.tabla_afectada})"

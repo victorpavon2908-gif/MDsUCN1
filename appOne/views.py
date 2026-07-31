@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
@@ -8,22 +8,47 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.contrib.auth.forms import PasswordChangeForm
+
 from .forms import RegistroForm, DispositivoForm
-from .models import Usuario, Dispositivo, Prestamo
+from .models import Usuario, Dispositivo, Prestamo, BitacoraAuditoria
 
 
 # ============================
-# ----- LOGIN ----------------
+# HELPER DE AUDITORÍA
+# ============================
+def registrar_auditoria(request, accion, tabla_afectada, registro_id=None, detalles=None):
+    """Registra una acción realizada por el usuario en la bitácora."""
+    ip = request.META.get('REMOTE_ADDR')
+    user = request.user if request.user.is_authenticated else None
+    
+    BitacoraAuditoria.objects.create(
+        usuario=user,
+        accion=accion,
+        tabla_afectada=tabla_afectada,
+        registro_id=registro_id,
+        detalles=detalles,
+        ip_origen=ip
+    )
+
+
+# ============================
+# ----- LOGIN / LOGOUT -------
 # ============================
 def login_view(request):
     if request.method == "POST":
-        correo = request.POST.get("username")  # Login usando correo institucional
+        correo = request.POST.get("username")
         password = request.POST.get("password")
 
         user = authenticate(request, correo_institucional=correo, password=password)
 
         if user is not None:
+            if not user.is_active:
+                messages.error(request, "Tu cuenta está registrada pero aún pendiente de aprobación por el administrador.")
+                return render(request, "appOne/login.html")
+
             login(request, user)
+            registrar_auditoria(request, BitacoraAuditoria.ACCION_LOGIN, "Autenticación", user.id, "Inicio de sesión exitoso")
+            messages.success(request, f"¡Bienvenido de nuevo, {user.nombre_completo}!")
             return redirect('dashboardinicio')
         else:
             messages.error(request, "Usuario o contraseña incorrectos.")
@@ -31,10 +56,9 @@ def login_view(request):
     return render(request, "appOne/login.html")
 
 
-# ============================
-# ---------- LOGOUT ----------
-# ============================
 def logout_view(request):
+    if request.user.is_authenticated:
+        registrar_auditoria(request, BitacoraAuditoria.ACCION_LOGOUT, "Autenticación", request.user.id, "Cierre de sesión")
     logout(request)
     return redirect('login')
 
@@ -50,7 +74,12 @@ def registro(request):
             usuario.is_active = False
             usuario.save()
 
-            messages.success(request, "Registro enviado. Espera la aprobación del administrador.")
+            registrar_auditoria(request, BitacoraAuditoria.ACCION_CREAR, "Usuarios", usuario.id, f"Registro de nuevo usuario pendiente de aprobación: {usuario.correo_institucional}")
+
+            messages.success(
+                request, 
+                "Solicitud de registro recibida. Se ha enviado una notificación al administrador para su aprobación."
+            )
             return redirect('login')
     else:
         form = RegistroForm()
@@ -70,23 +99,34 @@ def dashboard(request):
         logout(request)
         return redirect('login')
 
-    if usuario.rol == "Admin" or usuario.is_superuser:
-        usuarios_pendientes = Usuario.objects.filter(is_active=False)
-        pendientes_count = usuarios_pendientes.count()
-    else:
-        usuarios_pendientes = None
-        pendientes_count = 0
-
     return render(request, "appOne/dashboard.html", {
         "perfil": usuario,
-        "usuarios_pendientes": usuarios_pendientes,
-        "pendientes_count": pendientes_count
     })
 
 
 @login_required
 def layaut_Principal(request):
-    return render(request, 'appOne/layaut_Principal.html')
+    total_usuarios = Usuario.objects.filter(is_active=True).count()
+    prestamos_activos = Prestamo.objects.filter(estado=Prestamo.ESTADO_APROBADO).count()
+    dispositivos_disponibles = Dispositivo.objects.filter(estado=Dispositivo.ESTADO_DISPONIBLE).count()
+    pendientes_count = Prestamo.objects.filter(estado=Prestamo.ESTADO_PENDIENTE).count()
+
+    if request.user.rol == "Admin" or request.user.is_superuser:
+        ultimos_prestamos = Prestamo.objects.select_related('usuario', 'dispositivo').order_by('-fecha_solicitud')[:5]
+    else:
+        ultimos_prestamos = Prestamo.objects.select_related('usuario', 'dispositivo').filter(usuario=request.user).order_by('-fecha_solicitud')[:5]
+
+    context = {
+        'estadisticas': {
+            'usuarios': total_usuarios,
+            'prestamos': prestamos_activos,
+            'disponibles': dispositivos_disponibles,
+        },
+        'pendientes_count': pendientes_count,
+        'ultimos_prestamos': ultimos_prestamos,
+    }
+
+    return render(request, 'appOne/layaut_Principal.html', context)
 
 
 # ============================
@@ -122,9 +162,6 @@ def panel_usuarios(request):
     return render(request, 'appOne/panel_usuarios.html', {'usuarios': usuarios})
 
 
-# ============================
-# ---- APROBAR USUARIO -------
-# ============================
 @login_required
 def aprobar_usuario(request, id):
     if request.user.rol != "Admin" and not request.user.is_superuser:
@@ -135,13 +172,12 @@ def aprobar_usuario(request, id):
     usuario.is_active = True
     usuario.save()
 
-    messages.success(request, f"Usuario {usuario.nombre_completo} aprobado.")
+    registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Usuarios", usuario.id, f"Aprobación de usuario: {usuario.nombre_completo}")
+
+    messages.success(request, f"Usuario '{usuario.nombre_completo}' aprobado exitosamente. Ya puede iniciar sesión.")
     return redirect('panel_usuarios')
 
 
-# ============================
-# ---- RECHAZAR USUARIO ------
-# ============================
 @login_required
 def rechazar_usuario(request, id):
     if request.user.rol != "Admin" and not request.user.is_superuser:
@@ -152,13 +188,12 @@ def rechazar_usuario(request, id):
     usuario.is_active = False
     usuario.save()
 
-    messages.warning(request, f"Usuario {usuario.nombre_completo} ha sido rechazado.")
+    registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Usuarios", usuario.id, f"Rechazo de usuario: {usuario.nombre_completo}")
+
+    messages.warning(request, f"La solicitud de {usuario.nombre_completo} ha sido rechazada.")
     return redirect('panel_usuarios')
 
 
-# ============================
-# ---- ELIMINAR USUARIO ------
-# ============================
 @login_required
 def eliminar_usuario(request, id):
     if request.user.rol != "Admin" and not request.user.is_superuser:
@@ -171,7 +206,12 @@ def eliminar_usuario(request, id):
         messages.error(request, "No puedes eliminar tu propia cuenta.")
         return redirect('panel_usuarios')
 
+    detalles = f"Eliminación de usuario: {usuario.nombre_completo} ({usuario.correo_institucional})"
+    usuario_id = usuario.id
     usuario.delete()
+
+    registrar_auditoria(request, BitacoraAuditoria.ACCION_ELIMINAR, "Usuarios", usuario_id, detalles)
+
     messages.warning(request, "Usuario eliminado correctamente.")
     return redirect('panel_usuarios')
 
@@ -181,32 +221,26 @@ def eliminar_usuario(request, id):
 # ============================
 @login_required
 def listardispositivos(request):
-    # IDs de dispositivos con préstamos vigentes (Pendientes o Aprobados)
     ids_ocupados = Prestamo.objects.filter(
         estado__in=[Prestamo.ESTADO_PENDIENTE, Prestamo.ESTADO_APROBADO]
     ).values_list('dispositivo_id', flat=True)
 
-    # 1. Equipos Disponibles (Físicamente disponibles y SIN préstamos activos)
     dispositivos_disponibles = Dispositivo.objects.filter(
         estado=Dispositivo.ESTADO_DISPONIBLE
     ).exclude(id__in=ids_ocupados)
 
-    # 2. Equipos Ocupados / Prestados
     dispositivos_ocupados = Dispositivo.objects.filter(
         id__in=ids_ocupados
     )
 
-    # 3. Equipos En Mantenimiento
     dispositivos_mantenimiento = Dispositivo.objects.filter(
         estado=Dispositivo.ESTADO_MANTENIMIENTO
     )
 
-    # 4. Equipos Dañados
     dispositivos_danados = Dispositivo.objects.filter(
         estado=Dispositivo.ESTADO_DANADO
     )
 
-    # Préstamos pertenecientes al usuario actual
     prestamos_usuario = Prestamo.objects.filter(usuario=request.user)
 
     context = {
@@ -225,7 +259,8 @@ def agregar_dispositivo(request):
     if request.method == "POST":
         form = DispositivoForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            dispositivo = form.save()
+            registrar_auditoria(request, BitacoraAuditoria.ACCION_CREAR, "Dispositivos", dispositivo.id, f"Nuevo dispositivo creado: {dispositivo.nombre_dispositivo} ({dispositivo.codigo_inventario})")
             messages.success(request, "Dispositivo agregado correctamente.")
             return redirect('listardispositivos')
     else:
@@ -242,6 +277,7 @@ def editar_dispositivo(request, id):
         form = DispositivoForm(request.POST, request.FILES, instance=dispositivo)
         if form.is_valid():
             form.save()
+            registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Dispositivos", dispositivo.id, f"Edición de dispositivo: {dispositivo.nombre_dispositivo}")
             messages.success(request, "Dispositivo actualizado correctamente.")
             return redirect('listardispositivos')
     else:
@@ -260,7 +296,12 @@ def editar_dispositivo(request, id):
 @login_required
 def eliminar_dispositivo(request, id):
     dispositivo = get_object_or_404(Dispositivo, id=id)
+    detalles = f"Eliminación de dispositivo: {dispositivo.nombre_dispositivo} ({dispositivo.codigo_inventario})"
+    disp_id = dispositivo.id
     dispositivo.delete()
+
+    registrar_auditoria(request, BitacoraAuditoria.ACCION_ELIMINAR, "Dispositivos", disp_id, detalles)
+
     messages.warning(request, "Dispositivo eliminado.")
     return redirect('listardispositivos')
 
@@ -294,7 +335,6 @@ def crear_prestamo(request):
         dispositivo_id = request.POST.get("dispositivo_id")
         dispositivo = get_object_or_404(Dispositivo, id=dispositivo_id)
 
-        # 1. Validar disponibilidad física inicial
         if dispositivo.estado != Dispositivo.ESTADO_DISPONIBLE:
             msg = f"No es posible solicitar este equipo. Estado actual: {dispositivo.get_estado_display()}."
             if is_ajax:
@@ -302,7 +342,6 @@ def crear_prestamo(request):
             messages.error(request, msg)
             return redirect("listardispositivos")
 
-        # 2. Validar préstamos activos
         prestamo_activo = Prestamo.objects.filter(
             usuario=request.user,
             dispositivo=dispositivo,
@@ -319,7 +358,6 @@ def crear_prestamo(request):
             messages.warning(request, msg)
             return redirect("listardispositivos")
 
-        # 3. Extraer valores del POST
         motivo = request.POST.get("motivo", "").strip()
         fecha_uso = request.POST.get("fecha_uso")
         hora_inicio = request.POST.get("hora_inicio")
@@ -332,7 +370,6 @@ def crear_prestamo(request):
             messages.error(request, msg)
             return redirect("listardispositivos")
 
-        # 4. Crear instancia de Préstamo
         nuevo_prestamo = Prestamo(
             usuario=request.user,
             dispositivo=dispositivo,
@@ -346,7 +383,10 @@ def crear_prestamo(request):
         try:
             nuevo_prestamo.full_clean()
             nuevo_prestamo.save()
-            messages.success(request, "Solicitud enviada correctamente.")
+
+            registrar_auditoria(request, BitacoraAuditoria.ACCION_CREAR, "Préstamos", nuevo_prestamo.id, f"Solicitud de préstamo enviada para el dispositivo: {dispositivo.nombre_dispositivo}")
+
+            messages.success(request, "Solicitud enviada correctamente. Notificación generada para el administrador.")
             return redirect("listardispositivos")
 
         except ValidationError as e:
@@ -371,18 +411,21 @@ def aprobar_prestamo(request, id):
 
     prestamo = get_object_or_404(Prestamo, id=id)
 
-    # 1. Cambiar estado del préstamo y registrar timestamp de aprobación
     prestamo.estado = Prestamo.ESTADO_APROBADO
     if hasattr(prestamo, 'fecha_aprobacion'):
         prestamo.fecha_aprobacion = timezone.now()
     prestamo.save()
 
-    # 2. Marcar el dispositivo como 'prestado'
     dispositivo = prestamo.dispositivo
     dispositivo.estado = Dispositivo.ESTADO_PRESTADO
     dispositivo.save()
 
-    messages.success(request, f"Préstamo aprobado. {dispositivo.nombre_dispositivo} marcado como 'En Préstamo'.")
+    registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Préstamos", prestamo.id, f"Aprobación de préstamo de {dispositivo.nombre_dispositivo} a {prestamo.usuario.nombre_completo}")
+
+    messages.success(
+        request, 
+        f"Préstamo del equipo '{dispositivo.nombre_dispositivo}' aprobado para {prestamo.usuario.nombre_completo}."
+    )
     return redirect("solicitudes_prestamos")
 
 
@@ -395,7 +438,9 @@ def rechazar_prestamo(request, id):
     prestamo.estado = Prestamo.ESTADO_RECHAZADO
     prestamo.save()
 
-    messages.error(request, "Préstamo rechazado.")
+    registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Préstamos", prestamo.id, f"Rechazo de préstamo de {prestamo.dispositivo.nombre_dispositivo} a {prestamo.usuario.nombre_completo}")
+
+    messages.error(request, f"La solicitud del equipo '{prestamo.dispositivo.nombre_dispositivo}' ha sido rechazada.")
     return redirect('solicitudes_prestamos')
 
 
@@ -415,23 +460,23 @@ def devolver_prestamo(request, id):
         observaciones = request.POST.get("observaciones_devolucion", "").strip()
         estado_dispositivo = request.POST.get("estado_dispositivo", Dispositivo.ESTADO_DISPONIBLE)
 
-        # 1. Registrar fecha/hora de devolución real y guardar notas
         prestamo.estado = Prestamo.ESTADO_DEVUELTO
         prestamo.fecha_devolucion_real = timezone.now()
         prestamo.observaciones_devolucion = observaciones
         prestamo.save()
 
-        # 2. Actualizar estado del dispositivo según la recepción
         dispositivo = prestamo.dispositivo
         dispositivo.estado = estado_dispositivo
         dispositivo.save()
 
+        registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Préstamos", prestamo.id, f"Devolución registrada de {dispositivo.nombre_dispositivo}. Nuevo estado: {estado_dispositivo}")
+
         if estado_dispositivo == Dispositivo.ESTADO_DANADO:
-            messages.warning(request, f"Devolución registrada. {dispositivo.nombre_dispositivo} fue marcado como 'Dañado'.")
+            messages.warning(request, f"Devolución registrada. '{dispositivo.nombre_dispositivo}' marcado como 'Dañado'.")
         elif estado_dispositivo == Dispositivo.ESTADO_MANTENIMIENTO:
-            messages.warning(request, f"Devolución registrada. {dispositivo.nombre_dispositivo} pasó a 'Mantenimiento'.")
+            messages.warning(request, f"Devolución registrada. '{dispositivo.nombre_dispositivo}' pasó a 'Mantenimiento'.")
         else:
-            messages.success(request, f"Dispositivo {dispositivo.nombre_dispositivo} devuelto y marcado como 'Disponible'.")
+            messages.success(request, f"Devolución completada. '{dispositivo.nombre_dispositivo}' reincorporado como 'Disponible'.")
 
         return redirect("solicitudes_prestamos")
 
@@ -446,17 +491,14 @@ def solicitudes_prestamos(request):
     estado = request.GET.get("estado")
     estado_actual = estado if estado else "todos"
 
-    # Si se selecciona "todos" y la sesión tiene activa la bandera de limpiado:
     if estado_actual == "todos" and request.session.get("ocultar_todos", False):
         prestamos = Prestamo.objects.none()
     else:
-        # Consulta base respetando el rol del usuario optimizada con select_related
         if request.user.rol == "Admin" or request.user.is_superuser:
             prestamos = Prestamo.objects.select_related('usuario', 'dispositivo').all()
         else:
             prestamos = Prestamo.objects.select_related('usuario', 'dispositivo').filter(usuario=request.user)
 
-        # Filtrar por el estado exacto si la pestaña no es "todos"
         if estado_actual != "todos":
             prestamos = prestamos.filter(estado=estado_actual)
 
@@ -470,21 +512,33 @@ def solicitudes_prestamos(request):
 
 @login_required
 def eliminar_historial_prestamos(request):
-    """Limpia la pestaña 'Todos' sin eliminar físicamente los registros de la base de datos."""
     if request.method == "POST" and (request.user.rol == "Admin" or request.user.is_superuser):
         request.session["ocultar_todos"] = True
-        messages.success(request, "La vista 'Todos' se ha limpiado. Las solicitudes siguen accesibles en sus respectivas pestañas.")
+        messages.success(request, "Vista limpia.")
 
     return redirect(request.META.get("HTTP_REFERER", "solicitudes_prestamos"))
 
 
 @login_required
 def restaurar_historial_todos(request):
-    """Permite volver a mostrar los registros en la pestaña 'Todos'."""
     if "ocultar_todos" in request.session:
         del request.session["ocultar_todos"]
-        messages.info(request, "Se ha restaurado la vista general de la pestaña 'Todos'.")
+        messages.info(request, "Historial restaurado.")
     return redirect(request.META.get("HTTP_REFERER", "solicitudes_prestamos"))
+
+
+# ============================
+# --------- AUDITORÍA ---------
+# ============================
+@login_required
+def bitacora_auditoria(request):
+    """Muestra el historial completo de eventos y operaciones en el sistema."""
+    if request.user.rol != "Admin" and not request.user.is_superuser:
+        messages.error(request, "No tienes permisos para consultar la bitácora de auditoría.")
+        return redirect('dashboardinicio')
+
+    logs = BitacoraAuditoria.objects.all().select_related('usuario').order_by('-fecha_hora')[:200]
+    return render(request, 'appOne/bitacora_auditoria.html', {'logs': logs})
 
 
 # ============================
@@ -519,6 +573,9 @@ def reportes(request):
     dispositivos_labels = [d['dispositivo__nombre_dispositivo'] for d in dispositivos]
     dispositivos_data = [d['total'] for d in dispositivos]
 
+    # CORRECCIÓN: Obtener los últimos 10 eventos de la bitácora para el template reportes.html
+    logs = BitacoraAuditoria.objects.all().select_related('usuario').order_by('-fecha_hora')[:10]
+
     context = {
         'total_dispositivos': total_dispositivos,
         'total_usuarios': total_usuarios,
@@ -529,6 +586,7 @@ def reportes(request):
         'prestamos_por_dia': prestamos_por_dia,
         'dispositivos_labels': dispositivos_labels,
         'dispositivos_data': dispositivos_data,
+        'logs': logs,  # Pasamos los registros al contexto
     }
 
     return render(request, 'appOne/reportes.html', context)
@@ -561,13 +619,14 @@ def config_database(request):
 
 @login_required
 def config_perfil(request):
-    """Actualiza la información personal básica del usuario."""
     if request.method == "POST":
         user = request.user
         user.first_name = request.POST.get("first_name", "").strip()
         user.last_name = request.POST.get("last_name", "").strip()
         user.email = request.POST.get("email", "").strip()
         user.save()
+
+        registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Perfil", user.id, "Actualización de información de perfil")
 
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"success": True, "message": "Perfil actualizado correctamente."})
@@ -577,13 +636,13 @@ def config_perfil(request):
 
 @login_required
 def config_seguridad(request):
-    """Cambia la contraseña utilizando PasswordChangeForm nativo de Django."""
     if request.method == "POST":
         form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            # Mantiene al usuario con la sesión iniciada tras cambiar la clave
             update_session_auth_hash(request, user)
+
+            registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Seguridad", user.id, "Cambio de contraseña exitoso")
 
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"success": True, "message": "Contraseña actualizada con éxito."})
@@ -593,3 +652,69 @@ def config_seguridad(request):
                 return JsonResponse({"success": False, "message": errors}, status=400)
 
     return render(request, "appOne/configuracion/seguridad.html")
+
+
+# ============================
+# ------- CALENDARIO ---------
+# ============================
+@login_required
+def calendario_reservas(request):
+    return render(request, 'appOne/calendario.html')
+
+
+@login_required
+def api_reservas_eventos(request):
+    es_admin = getattr(request.user, 'rol', '') == 'Admin' or request.user.is_superuser
+    
+    if es_admin:
+        prestamos = Prestamo.objects.select_related('dispositivo', 'usuario').all()
+    else:
+        prestamos = Prestamo.objects.select_related('dispositivo', 'usuario').filter(usuario=request.user)
+
+    eventos = []
+    
+    color_map = {
+        'Pendiente': '#f57c00',
+        'Aprobado': '#2e7d32',
+        'Rechazado': '#d32f2f',
+        'Devuelto': '#616161',
+        'Finalizado': '#616161'
+    }
+
+    for p in prestamos:
+        nombre_usuario = getattr(p.usuario, 'nombre_completo', p.usuario.username)
+        if es_admin:
+            titulo = f"{p.dispositivo.nombre_dispositivo} - {nombre_usuario}"
+        else:
+            titulo = f"{p.dispositivo.nombre_dispositivo} ({p.get_estado_display()})"
+
+        start_iso = None
+        end_iso = None
+
+        if hasattr(p, 'fecha_uso') and p.fecha_uso:
+            if hasattr(p, 'hora_inicio') and p.hora_inicio:
+                start_iso = f"{p.fecha_uso.isoformat()}T{p.hora_inicio.isoformat()}"
+            else:
+                start_iso = p.fecha_uso.isoformat()
+
+            if hasattr(p, 'hora_entrega') and p.hora_entrega:
+                end_iso = f"{p.fecha_uso.isoformat()}T{p.hora_entrega.isoformat()}"
+        elif hasattr(p, 'fecha_solicitud') and p.fecha_solicitud:
+            start_iso = p.fecha_solicitud.isoformat()
+
+        eventos.append({
+            'id': p.id,
+            'title': titulo,
+            'start': start_iso,
+            'end': end_iso,
+            'backgroundColor': color_map.get(p.estado, '#1976d2'),
+            'borderColor': color_map.get(p.estado, '#1976d2'),
+            'extendedProps': {
+                'estado': p.get_estado_display(),
+                'dispositivo': p.dispositivo.nombre_dispositivo,
+                'usuario': nombre_usuario,
+                'motivo': getattr(p, 'motivo', '')
+            }
+        })
+
+    return JsonResponse(eventos, safe=False)

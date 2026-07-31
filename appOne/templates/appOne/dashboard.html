@@ -10,8 +10,7 @@
   <!-- Fuentes & Iconos -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
   <!-- CSS Base -->
@@ -25,12 +24,14 @@
 
   <div class="app-layout">
 
+    <!-- OVERLAY PARA MÓVIL -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="brand">
-          <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" alt="MDsUCN Logo"
-            class="brand-logo">
+          <img src="https://uploads.onecompiler.io/43nzu6ce2/43x2n985z/eslogan%20.png" alt="MDsUCN Logo" class="brand-logo">
           <span class="brand-name">MDsUCN</span>
         </div>
         <button class="toggle-sidebar-btn" id="toggleSidebar" aria-label="Toggle Sidebar">
@@ -101,7 +102,7 @@
       <!-- HEADER TOPNAV -->
       <header class="topbar">
         <div class="topbar-left">
-          <button class="mobile-toggle-btn" id="mobileToggle">
+          <button class="mobile-toggle-btn" id="mobileToggle" aria-label="Abrir menú">
             <i class="ri-menu-2-line"></i>
           </button>
           <div class="page-title">
@@ -128,36 +129,87 @@
 
             <div class="dropdown-menu notif-dropdown-menu" id="notifDropdown">
               <div class="dropdown-header">
-                <h4>Solicitudes Pendientes</h4>
+                <h4>Notificaciones del Sistema</h4>
                 {% if pendientes_count > 0 %}
                 <span class="count-pill">{{ pendientes_count }}</span>
                 {% endif %}
               </div>
 
               <div class="dropdown-body">
-                {% if usuarios_pendientes %}
-                {% for u in usuarios_pendientes %}
-                <div class="notif-card">
-                  <div class="notif-avatar">
-                    <i class="ri-user-received-line"></i>
+                <!-- VISTA PARA ADMINISTRADORES -->
+                {% if request.user.rol == "Admin" or request.user.is_superuser %}
+
+                  {% if prestamos_pendientes_admin %}
+                  <div class="notif-section-title" style="padding: 5px 10px; font-weight: bold; font-size: 0.8rem; color: #666;">
+                    SOLICITUDES DE EQUIPO
                   </div>
-                  <div class="notif-info">
-                    <strong>{{ u.nombre_completo }}</strong>
-                    <p>Solicitó rol de {{ u.rol }}</p>
+                  {% for p in prestamos_pendientes_admin %}
+                  <a href="{% url 'solicitudes_prestamos' %}" class="notif-card" style="text-decoration: none; color: inherit;">
+                    <div class="notif-avatar" style="background: #e3f2fd; color: #1976d2;">
+                      <i class="ri-computer-line"></i>
+                    </div>
+                    <div class="notif-info">
+                      <strong>{{ p.usuario.nombre_completo }}</strong>
+                      <p>Solicitó: <b>{{ p.dispositivo.nombre_dispositivo }}</b></p>
+                      <small class="text-muted" style="font-size: 0.75rem;">{{ p.fecha_solicitud|timesince }}</small>
+                    </div>
+                  </a>
+                  {% endfor %}
+                  {% endif %}
+
+                  {% if usuarios_pendientes_admin %}
+                  <div class="notif-section-title" style="padding: 5px 10px; font-weight: bold; font-size: 0.8rem; color: #666;">
+                    USUARIOS PENDIENTES
                   </div>
-                </div>
-                {% endfor %}
+                  {% for u in usuarios_pendientes_admin %}
+                  <a href="{% url 'panel_usuarios' %}" class="notif-card" style="text-decoration: none; color: inherit;">
+                    <div class="notif-avatar" style="background: #fff3e0; color: #f57c00;">
+                      <i class="ri-user-received-line"></i>
+                    </div>
+                    <div class="notif-info">
+                      <strong>{{ u.nombre_completo }}</strong>
+                      <p>Solicitó registro como: {{ u.rol }}</p>
+                    </div>
+                  </a>
+                  {% endfor %}
+                  {% endif %}
+
+                  {% if not prestamos_pendientes_admin and not usuarios_pendientes_admin %}
+                  <div class="empty-notif">
+                    <i class="ri-checkbox-circle-line"></i>
+                    <p>Todo al día. Sin actividades pendientes.</p>
+                  </div>
+                  {% endif %}
+
+                <!-- VISTA PARA USUARIOS NORMALES -->
                 {% else %}
-                <div class="empty-notif">
-                  <i class="ri-checkbox-circle-line"></i>
-                  <p>Todo al día. Sin solicitudes pendientes.</p>
-                </div>
+                  {% if prestamos_propios %}
+                  {% for p in prestamos_propios %}
+                  <a href="{% url 'solicitudes_prestamos' %}" class="notif-card" style="text-decoration: none; color: inherit;">
+                    <div class="notif-avatar">
+                      {% if p.estado == 'Pendiente' %}<i class="ri-time-line" style="color: #f57c00;"></i>
+                      {% elif p.estado == 'Aprobado' %}<i class="ri-checkbox-circle-line" style="color: #388e3c;"></i>
+                      {% else %}<i class="ri-close-circle-line" style="color: #d32f2f;"></i>{% endif %}
+                    </div>
+                    <div class="notif-info">
+                      <strong>{{ p.dispositivo.nombre_dispositivo }}</strong>
+                      <p>Estado: <b>{{ p.get_estado_display }}</b></p>
+                    </div>
+                  </a>
+                  {% endfor %}
+                  {% else %}
+                  <div class="empty-notif">
+                    <i class="ri-checkbox-circle-line"></i>
+                    <p>No has realizado solicitudes recientemente.</p>
+                  </div>
+                  {% endif %}
                 {% endif %}
+
               </div>
             </div>
           </div>
 
-          <!-- PERFIL USUARIO -->
+          <!-- PERFIL USUARIO (DENTRO DE TOPBAR-RIGHT) -->
           <div class="user-profile">
             <div class="user-avatar">
               {{ request.user.username|slice:":2"|upper }}
@@ -168,14 +220,12 @@
             </div>
           </div>
 
-        </div>
-      </header>
+        </div> <!-- CIERRA topbar-right -->
+      </header> <!-- CIERRA topbar -->
 
       <!-- CONTENIDO DINÁMICO -->
       <main class="content-body">
-        {% block contenido %}
-        <!-- Contenido fallback/ejemplo -->
-        {% endblock %}
+        {% block contenido %}{% endblock %}
       </main>
 
       <!-- FOOTER -->
@@ -183,56 +233,78 @@
         <p>© 2026 <strong>MDsUCN</strong> — Plataforma Profesional de Gestión</p>
       </footer>
 
-    </div>
+    </div> <!-- CIERRA main-wrapper -->
 
-  </div>
+  </div> <!-- CIERRA app-layout -->
 
   <!-- SCRIPT BASE -->
   <script>
-    // Reloj Nicaragua
-    function actualizarHoraNicaragua() {
-      const opciones = {
-        timeZone: 'America/Managua',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      };
-      const hora = new Intl.DateTimeFormat('es-NI', opciones).format(new Date());
-      const clockEl = document.getElementById('clock-nicaragua');
-      if (clockEl) clockEl.innerText = hora;
-    }
-    setInterval(actualizarHoraNicaragua, 1000);
-    actualizarHoraNicaragua();
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Reloj Nicaragua
+      function actualizarHoraNicaragua() {
+        const opciones = {
+          timeZone: 'America/Managua',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        };
+        const hora = new Intl.DateTimeFormat('es-NI', opciones).format(new Date());
+        const clockEl = document.getElementById('clock-nicaragua');
+        if (clockEl) clockEl.innerText = hora;
+      }
+      setInterval(actualizarHoraNicaragua, 1000);
+      actualizarHoraNicaragua();
 
-    // Toggle Dropdown Notificaciones
-    const notifBtn = document.getElementById('notifBtn');
-    const notifDropdown = document.getElementById('notifDropdown');
+      // 2. Control del Sidebar (Desktop Colapso & Móvil Toggle)
+      const sidebar = document.getElementById('sidebar');
+      const toggleSidebarBtn = document.getElementById('toggleSidebar');
+      const mobileToggleBtn = document.getElementById('mobileToggle');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    if (notifBtn && notifDropdown) {
-      notifBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notifDropdown.classList.toggle('show');
-      });
+      // Cargar estado colapsado desde localStorage
+      if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        sidebar?.classList.add('collapsed');
+      }
 
-      document.addEventListener('click', (e) => {
-        if (!notifDropdown.contains(e.target)) {
-          notifDropdown.classList.remove('show');
-        }
-      });
-    }
+      // Colapsar / Expandir Sidebar en Escritorio
+      if (toggleSidebarBtn && sidebar) {
+        toggleSidebarBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('collapsed');
+          const isCollapsed = sidebar.classList.contains('collapsed');
+          localStorage.setItem('sidebar-collapsed', isCollapsed);
+        });
+      }
 
-    // Toggle Mobile Sidebar
-    const mobileToggle = document.getElementById('mobileToggle');
-    const sidebar = document.getElementById('sidebar');
+      // Abrir / Cerrar Sidebar en Móvil
+      function toggleMobileSidebar() {
+        sidebar?.classList.toggle('mobile-open');
+        sidebarOverlay?.classList.toggle('show');
+      }
 
-    if (mobileToggle && sidebar) {
-      mobileToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('mobile-open');
-      });
-    }
+      if (mobileToggleBtn) mobileToggleBtn.addEventListener('click', toggleMobileSidebar);
+      if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleMobileSidebar);
+
+      // 3. Toggle Dropdown Notificaciones
+      const notifBtn = document.getElementById('notifBtn');
+      const notifDropdown = document.getElementById('notifDropdown');
+
+      if (notifBtn && notifDropdown) {
+        notifBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          notifDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!notifDropdown.contains(e.target)) {
+            notifDropdown.classList.remove('show');
+          }
+        });
+      }
+    });
   </script>
 
+  {% block extra_js %}{% endblock %}
 </body>
 
 </html>
