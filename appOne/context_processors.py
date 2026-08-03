@@ -21,20 +21,22 @@ def notificaciones_globales(request):
         is_active=False
     ).order_by('-date_joined')
     
-    # 3. Historial/Notificaciones para usuarios estándar (Estudiantes/Profesores)
-    prestamos_propios = Prestamo.objects.filter(
+    # 3. Guardamos la consulta base de préstamos propios (SIN [:5])
+    query_prestamos_propios = Prestamo.objects.filter(
         usuario=user
-    ).select_related('dispositivo').order_by('-fecha_solicitud')[:5]
+    ).select_related('dispositivo').order_by('-fecha_solicitud')
 
     # Cálculo del total de pendientes según el rol
     if user.rol == "Admin" or user.is_superuser:
         pendientes_count = prestamos_pendientes_admin.count() + usuarios_pendientes_admin.count()
     else:
-        pendientes_count = prestamos_propios.filter(estado=Prestamo.ESTADO_PENDIENTE).count()
+        # Hacemos el .filter() sobre la consulta completa
+        pendientes_count = query_prestamos_propios.filter(estado=Prestamo.ESTADO_PENDIENTE).count()
 
     return {
         'prestamos_pendientes_admin': prestamos_pendientes_admin,
         'usuarios_pendientes_admin': usuarios_pendientes_admin,
-        'prestamos_propios': prestamos_propios,
+        # Aplicamos el corte [:5] únicamente al enviar la variable a la plantilla
+        'prestamos_propios': query_prestamos_propios[:5],
         'pendientes_count': pendientes_count,
     }

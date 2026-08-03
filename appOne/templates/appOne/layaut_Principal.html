@@ -13,7 +13,7 @@
     <!-- WELCOME BANNER -->
     <header class="welcome-banner">
         <div class="welcome-text">
-            <h2>¡Hola de nuevo, {{ user.get_short_name|default:user.username }}! 👋</h2>
+            <h2>¡Hola de nuevo, {{ user.get_short_name|default:user.nombre_completo }}! 👋</h2>
             <p>Aquí tienes un resumen en tiempo real de la gestión de equipos y préstamos.</p>
         </div>
         <div class="welcome-badge">
