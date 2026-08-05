@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.contrib.auth.forms import PasswordChangeForm
-
 from .forms import RegistroForm, DispositivoForm
 from .models import Usuario, Dispositivo, Prestamo, BitacoraAuditoria
 
@@ -221,16 +220,14 @@ def eliminar_usuario(request, id):
 # ============================
 @login_required
 def listardispositivos(request):
-    ids_ocupados = Prestamo.objects.filter(
-        estado__in=[Prestamo.ESTADO_PENDIENTE, Prestamo.ESTADO_APROBADO]
-    ).values_list('dispositivo_id', flat=True)
-
+    # Los equipos siempre están disponibles para reserva por horas a menos que estén dañados o en mantenimiento
     dispositivos_disponibles = Dispositivo.objects.filter(
         estado=Dispositivo.ESTADO_DISPONIBLE
-    ).exclude(id__in=ids_ocupados)
+    )
 
+    # Solo dispositivos catalogados directamente en estado Ocupado/Prestado si se requiere manualmente
     dispositivos_ocupados = Dispositivo.objects.filter(
-        id__in=ids_ocupados
+        estado=Dispositivo.ESTADO_PRESTADO
     )
 
     dispositivos_mantenimiento = Dispositivo.objects.filter(
@@ -324,7 +321,44 @@ def panel_config(request):
 @login_required
 def modal_prestamo(request, id):
     dispositivo = get_object_or_404(Dispositivo, id=id)
-    return render(request, "appOne/modal_prestamo.html", {"dispositivo": dispositivo})
+    fecha_str = request.GET.get('fecha_uso', timezone.now().date().strftime('%Y-%m-%d'))
+    fecha_dt = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+
+    # Obtener préstamos activos del día para este equipo
+    reservas = Prestamo.objects.filter(
+        dispositivo=dispositivo,
+        fecha_uso=fecha_dt,
+        estado__in=[Prestamo.ESTADO_PENDIENTE, Prestamo.ESTADO_APROBADO]
+    ).select_related('usuario').order_by('hora_inicio')
+
+    # Calcular bloques de horas de 08:00 a 17:00
+    horarios_tabla = []
+    
+    for h in range(8, 17):
+        h_inicio = time(h, 0)
+        h_fin = time(h + 1, 0)
+        
+        # Buscar si este slot choca con alguna reserva
+        reserva_coincidente = None
+        for r in reservas:
+            if r.hora_inicio < h_fin and r.hora_entrega > h_inicio:
+                reserva_coincidente = r
+                break
+        
+        horarios_tabla.append({
+            'rango': f"{h:02d}:00 - {h+1:02d}:00",
+            'hora_inicio': h_inicio,
+            'hora_fin': h_fin,
+            'ocupado': reserva_coincidente is not None,
+            'reserva': reserva_coincidente
+        })
+
+    return render(request, "appOne/modal_prestamo.html", {
+        "dispositivo": dispositivo,
+        "reservas": reservas,
+        "horarios_tabla": horarios_tabla,
+        "fecha_seleccionada": fecha_str
+    })
 
 
 @login_required
@@ -335,27 +369,11 @@ def crear_prestamo(request):
         dispositivo_id = request.POST.get("dispositivo_id")
         dispositivo = get_object_or_404(Dispositivo, id=dispositivo_id)
 
-        if dispositivo.estado != Dispositivo.ESTADO_DISPONIBLE:
+        if dispositivo.estado not in [Dispositivo.ESTADO_DISPONIBLE]:
             msg = f"No es posible solicitar este equipo. Estado actual: {dispositivo.get_estado_display()}."
             if is_ajax:
                 return JsonResponse({"success": False, "message": msg}, status=400)
             messages.error(request, msg)
-            return redirect("listardispositivos")
-
-        prestamo_activo = Prestamo.objects.filter(
-            usuario=request.user,
-            dispositivo=dispositivo,
-            estado__in=[
-                Prestamo.ESTADO_PENDIENTE,
-                Prestamo.ESTADO_APROBADO
-            ]
-        ).exists()
-
-        if prestamo_activo:
-            msg = "Ya tienes una solicitud activa para este dispositivo."
-            if is_ajax:
-                return JsonResponse({"success": False, "message": msg}, status=400)
-            messages.warning(request, msg)
             return redirect("listardispositivos")
 
         motivo = request.POST.get("motivo", "").strip()
@@ -390,13 +408,17 @@ def crear_prestamo(request):
             return redirect("listardispositivos")
 
         except ValidationError as e:
+            # Limpiar mensajes de error eliminando claves internas como '__all__'
             if hasattr(e, 'message_dict'):
-                error_msg = "; ".join([f"{k}: {', '.join(v)}" for k, v in e.message_dict.items()])
+                mensajes_limpios = []
+                for field, msgs in e.message_dict.items():
+                    mensajes_limpios.extend(msgs)
+                error_msg = " ".join(mensajes_limpios)
             else:
                 error_msg = ", ".join(e.messages)
 
             if is_ajax:
-                return JsonResponse({"success": False, "message": f"Error de validación: {error_msg}"}, status=400)
+                return JsonResponse({"success": False, "message": error_msg}, status=400)
 
             messages.error(request, f"Error al procesar la solicitud: {error_msg}")
             return redirect("listardispositivos")
@@ -410,22 +432,15 @@ def aprobar_prestamo(request, id):
         return redirect("dashboard")
 
     prestamo = get_object_or_404(Prestamo, id=id)
-
     prestamo.estado = Prestamo.ESTADO_APROBADO
     if hasattr(prestamo, 'fecha_aprobacion'):
         prestamo.fecha_aprobacion = timezone.now()
     prestamo.save()
 
-    dispositivo = prestamo.dispositivo
-    dispositivo.estado = Dispositivo.ESTADO_PRESTADO
-    dispositivo.save()
+    # NOTA: El equipo NUNCA cambia su estado físico a ESTADO_PRESTADO para mantenerse en la lista de Disponibles.
 
-    registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Préstamos", prestamo.id, f"Aprobación de préstamo de {dispositivo.nombre_dispositivo} a {prestamo.usuario.nombre_completo}")
-
-    messages.success(
-        request, 
-        f"Préstamo del equipo '{dispositivo.nombre_dispositivo}' aprobado para {prestamo.usuario.nombre_completo}."
-    )
+    registrar_auditoria(request, BitacoraAuditoria.ACCION_EDITAR, "Préstamos", prestamo.id, f"Aprobación de préstamo para {prestamo.usuario.nombre_completo}")
+    messages.success(request, f"Préstamo aprobado con éxito.")
     return redirect("solicitudes_prestamos")
 
 
@@ -573,7 +588,6 @@ def reportes(request):
     dispositivos_labels = [d['dispositivo__nombre_dispositivo'] for d in dispositivos]
     dispositivos_data = [d['total'] for d in dispositivos]
 
-    # CORRECCIÓN: Obtener los últimos 10 eventos de la bitácora para el template reportes.html
     logs = BitacoraAuditoria.objects.all().select_related('usuario').order_by('-fecha_hora')[:10]
 
     context = {
@@ -586,7 +600,7 @@ def reportes(request):
         'prestamos_por_dia': prestamos_por_dia,
         'dispositivos_labels': dispositivos_labels,
         'dispositivos_data': dispositivos_data,
-        'logs': logs,  # Pasamos los registros al contexto
+        'logs': logs,
     }
 
     return render(request, 'appOne/reportes.html', context)

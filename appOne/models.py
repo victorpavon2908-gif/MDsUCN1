@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.exceptions import ValidationError
+from datetime import time
+from django.core.exceptions import ValidationError
 
 
 # ============================
@@ -173,6 +175,33 @@ class Prestamo(models.Model):
             raise ValidationError(
                 "El dispositivo ya cuenta con una solicitud activa en este horario."
             )
+
+        # 1. Validar horario permitido de servicio (08:00 AM a 05:00 PM / 17:00 PM)
+        HORA_INICIO_PERMITIDA = time(8, 0)
+        HORA_FIN_PERMITIDA = time(17, 0)
+
+        if self.hora_inicio < HORA_INICIO_PERMITIDA or self.hora_entrega > HORA_FIN_PERMITIDA:
+            raise ValidationError("Los préstamos solo pueden realizarse dentro del horario laboral de 08:00 AM a 17:00 PM.")
+
+        # 2. Validar que hora fin sea posterior a inicio
+        if self.hora_entrega and self.hora_inicio and self.hora_entrega <= self.hora_inicio:
+            raise ValidationError("La hora de entrega debe ser posterior a la hora de inicio.")
+
+        # 3. Validar que el dispositivo no esté dañado o en mantenimiento
+        if self.dispositivo.estado in [Dispositivo.ESTADO_MANTENIMIENTO, Dispositivo.ESTADO_DANADO]:
+            raise ValidationError(f"El equipo no está disponible ({self.dispositivo.get_estado_display()}).")
+
+        # 4. Validar traslape/solapamiento de horario para la misma fecha
+        prestamos_conflictivos = Prestamo.objects.filter(
+            dispositivo=self.dispositivo,
+            fecha_uso=self.fecha_uso,
+            estado__in=[self.ESTADO_APROBADO, self.ESTADO_PENDIENTE],
+            hora_inicio__lt=self.hora_entrega,
+            hora_entrega__gt=self.hora_inicio
+        ).exclude(pk=self.pk)
+
+        if prestamos_conflictivos.exists():
+            raise ValidationError("El equipo ya cuenta con una solicitud o reserva en el rango de horario seleccionado.")
 
     def __str__(self):
         return f"{self.dispositivo.nombre_dispositivo} - {self.usuario.nombre_completo} ({self.estado})"
