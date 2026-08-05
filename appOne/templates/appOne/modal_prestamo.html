@@ -20,7 +20,7 @@
         <aside class="equipo-panel" style="flex: 1;">
             <div class="imagen-equipo">
                 <img src="{% if dispositivo.imagen %}{{ dispositivo.imagen.url }}{% else %}{% static 'appOne/img/default.png' %}{% endif %}"
-                     alt="{{ dispositivo.nombre_dispositivo }}">
+                    alt="{{ dispositivo.nombre_dispositivo }}">
             </div>
 
             <h3>{{ dispositivo.nombre_dispositivo }}</h3>
@@ -56,28 +56,36 @@
         <section class="form-panel" style="flex: 2;">
 
             <!-- CAJA DE ALERTA DINÁMICA DENTRO DEL MODAL -->
-            <div id="modalAlertBox" style="display: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; font-size: 0.88rem; align-items: center; justify-content: space-between; border-left: 5px solid #ef4444; background: #fef2f2; color: #991b1b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div id="modalAlertBox"
+                style="display: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; font-size: 0.88rem; align-items: center; justify-content: space-between; border-left: 5px solid #ef4444; background: #fef2f2; color: #991b1b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.1rem; color: #ef4444;"></i>
                     <span id="modalAlertMessage">Mensaje de error</span>
                 </div>
-                <button type="button" onclick="ocultarAlertaModal()" style="background: transparent; border: none; cursor: pointer; color: #991b1b; font-size: 1rem;">✕</button>
+                <button type="button" onclick="ocultarAlertaModal()"
+                    style="background: transparent; border: none; cursor: pointer; color: #991b1b; font-size: 1rem;">✕</button>
             </div>
 
             <!-- ================= TABLA DE DISPONIBILIDAD DE HORARIOS ================= -->
-            <div class="disponibilidad-block" style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+            <div class="disponibilidad-block"
+                style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h4 style="margin: 0; font-size: 1rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                    <h4
+                        style="margin: 0; font-size: 1rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-clock"></i> Horarios del Día (08:00 - 17:00)
                     </h4>
                     <div>
-                        <label for="filtro_fecha_modal" style="font-size: 0.85rem; font-weight: bold; color: #475569;">Fecha:</label>
-                        <input type="date" id="filtro_fecha_modal" value="{{ fecha_seleccionada }}" onchange="actualizarHorariosModal(this.value, '{{ dispositivo.id }}')" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+                        <label for="filtro_fecha_modal"
+                            style="font-size: 0.85rem; font-weight: bold; color: #475569;">Fecha:</label>
+                        <input type="date" id="filtro_fecha_modal" value="{{ fecha_seleccionada }}"
+                            onchange="actualizarHorariosModal(this.value, '{{ dispositivo.id }}')"
+                            style="padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
                     </div>
                 </div>
 
                 <div style="max-height: 180px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
-                    <table class="table-dashboard" style="width: 100%; font-size: 0.85rem; border-collapse: collapse; text-align: left;">
+                    <table class="table-dashboard"
+                        style="width: 100%; font-size: 0.85rem; border-collapse: collapse; text-align: left;">
                         <thead style="background: #edf2f7; position: sticky; top: 0; z-index: 1;">
                             <tr>
                                 <th style="padding: 8px 12px;">Rango</th>
@@ -91,25 +99,28 @@
                                 <td style="padding: 8px 12px;"><strong>{{ slot.rango }}</strong></td>
                                 <td style="padding: 8px 12px;">
                                     {% if slot.ocupado %}
-                                        <span class="estado {{ slot.reserva.estado|lower }}" style="padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 0.75rem;">
-                                            {{ slot.reserva.get_estado_display }}
-                                        </span>
+                                    <span class="estado {{ slot.reserva.estado|lower }}"
+                                        style="padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 0.75rem;">
+                                        {{ slot.reserva.get_estado_display }}
+                                    </span>
                                     {% else %}
-                                        <span style="color: #16a34a; font-weight: bold; font-size: 0.8rem;">🟢 Disponible</span>
+                                    <span style="color: #16a34a; font-weight: bold; font-size: 0.8rem;">🟢
+                                        Disponible</span>
                                     {% endif %}
                                 </td>
                                 <td style="padding: 8px 12px; color: #334155;">
                                     {% if slot.ocupado %}
-                                        <strong>{{ slot.reserva.usuario.nombre_completo }}</strong> 
-                                        <small style="color: #64748b;">({{ slot.reserva.hora_inicio|time:"H:i" }} - {{ slot.reserva.hora_entrega|time:"H:i" }})</small>
+                                    <strong>{{ slot.reserva.usuario.nombre_completo }}</strong>
+                                    <small style="color: #64748b;">({{ slot.reserva.hora_inicio|time:"H:i" }} - {{ slot.reserva.hora_entrega|time:"H:i" }})</small>
                                     {% else %}
-                                        <span style="color: #94a3b8; font-style: italic;">— Libre —</span>
+                                    <span style="color: #94a3b8; font-style: italic;">— Libre —</span>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3" style="text-align: center; padding: 12px; color: #64748b;">No hay datos de horarios disponibles.</td>
+                                <td colspan="3" style="text-align: center; padding: 12px; color: #64748b;">No hay datos
+                                    de horarios disponibles.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -125,12 +136,9 @@
 
                 <!-- MOTIVO -->
                 <div class="grupo" style="margin-bottom: 15px;">
-                    <label for="motivo" style="display: block; margin-bottom: 5px; font-weight: 600;">Motivo del préstamo <span style="color:red;">*</span></label>
-                    <textarea 
-                        id="motivo"
-                        name="motivo" 
-                        rows="2"
-                        placeholder="Explique el motivo del préstamo..." 
+                    <label for="motivo" style="display: block; margin-bottom: 5px; font-weight: 600;">Motivo del
+                        préstamo <span style="color:red;">*</span></label>
+                    <textarea id="motivo" name="motivo" rows="2" placeholder="Explique el motivo del préstamo..."
                         style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;"
                         required></textarea>
                 </div>
@@ -138,43 +146,30 @@
                 <!-- FECHA Y HORAS -->
                 <div class="fila" style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <div class="grupo" style="flex: 1;">
-                        <label for="fecha_uso" style="display: block; margin-bottom: 5px; font-weight: 600;">Fecha de uso <span style="color:red;">*</span></label>
-                        <input 
-                            type="date" 
-                            id="fecha_uso"
-                            name="fecha_uso" 
-                            value="{{ fecha_seleccionada }}"
-                            style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;"
-                            required>
+                        <label for="fecha_uso" style="display: block; margin-bottom: 5px; font-weight: 600;">Fecha de
+                            uso <span style="color:red;">*</span></label>
+                        <input type="date" id="fecha_uso" name="fecha_uso" value="{{ fecha_seleccionada }}"
+                            style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" required>
                     </div>
 
                     <div class="grupo" style="flex: 1;">
-                        <label for="hora_inicio" style="display: block; margin-bottom: 5px; font-weight: 600;">Hora inicio <span style="color:red;">*</span></label>
-                        <input 
-                            type="time" 
-                            id="hora_inicio"
-                            name="hora_inicio" 
-                            min="08:00"
-                            max="17:00"
-                            style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;"
-                            required>
+                        <label for="hora_inicio" style="display: block; margin-bottom: 5px; font-weight: 600;">Hora
+                            inicio <span style="color:red;">*</span></label>
+                        <input type="time" id="hora_inicio" name="hora_inicio" min="08:00" max="17:00"
+                            style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" required>
                     </div>
 
                     <div class="grupo" style="flex: 1;">
-                        <label for="hora_entrega" style="display: block; margin-bottom: 5px; font-weight: 600;">Hora entrega <span style="color:red;">*</span></label>
-                        <input 
-                            type="time" 
-                            id="hora_entrega"
-                            name="hora_entrega" 
-                            min="08:00"
-                            max="17:00"
-                            style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;"
-                            required>
+                        <label for="hora_entrega" style="display: block; margin-bottom: 5px; font-weight: 600;">Hora
+                            entrega <span style="color:red;">*</span></label>
+                        <input type="time" id="hora_entrega" name="hora_entrega" min="08:00" max="17:00"
+                            style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" required>
                     </div>
                 </div>
 
                 <small style="display: block; color: #64748b; margin-bottom: 15px; font-size: 0.8rem;">
-                    * Las solicitudes solo están permitidas dentro del horario operativo de <strong>08:00 AM a 17:00 PM</strong>.
+                    * Las solicitudes solo están permitidas dentro del horario operativo de <strong>08:00 AM a 17:00
+                        PM</strong>.
                 </small>
 
                 <!-- BOTONES -->
@@ -211,7 +206,7 @@
         }
     }
 
-    (function() {
+    (function () {
         const fechaInput = document.getElementById('fecha_uso');
         if (fechaInput && !fechaInput.value) {
             const hoy = new Date().toISOString().split('T')[0];
@@ -220,7 +215,7 @@
         }
 
         if (fechaInput) {
-            fechaInput.addEventListener('change', function() {
+            fechaInput.addEventListener('change', function () {
                 const filtroModal = document.getElementById('filtro_fecha_modal');
                 if (filtroModal) {
                     filtroModal.value = this.value;
@@ -243,20 +238,23 @@
                     body: formData,
                     headers: { "X-Requested-With": "XMLHttpRequest" }
                 })
-                .then(async response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                        return;
-                    }
-                    const data = await response.json();
-                    if (!response.ok || !data.success) {
-                        mostrarAlertaModal(data.message || "Ocurrió un conflicto con la reserva.");
-                    }
-                })
-                .catch(error => {
-                    mostrarAlertaModal("Ocurrió un error al enviar la solicitud.");
-                    console.error(error);
-                });
+                    .then(async response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                            return;
+                        }
+                        const data = await response.json();
+                        if (response.ok && data.success) {
+                            // Redirigir o recargar al tener éxito
+                            window.location.reload();
+                        } else {
+                            mostrarAlertaModal(data.message || "Ocurrió un conflicto con la reserva.");
+                        }
+                    })
+                    .catch(error => {
+                        mostrarAlertaModal("Ocurrió un error al enviar la solicitud.");
+                        console.error(error);
+                    });
             });
         }
     })();
@@ -266,13 +264,13 @@
         fetch(`/prestamo/modal/${dispId}/?fecha_uso=${fecha}`, {
             headers: { "X-Requested-With": "XMLHttpRequest" }
         })
-        .then(response => response.text())
-        .then(html => {
-            const contenedor = document.getElementById("contenidoPrestamo");
-            if (contenedor) {
-                contenedor.innerHTML = html;
-            }
-        })
-        .catch(err => console.error("Error al actualizar la tabla de horarios:", err));
+            .then(response => response.text())
+            .then(html => {
+                const contenedor = document.getElementById("contenidoPrestamo");
+                if (contenedor) {
+                    contenedor.innerHTML = html;
+                }
+            })
+            .catch(err => console.error("Error al actualizar la tabla de horarios:", err));
     }
 </script>

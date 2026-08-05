@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
     {% load static %}
     <meta charset="utf-8">
@@ -13,16 +14,15 @@
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'appOne/css/login.css' %}">
 </head>
+
 <body>
 
     <div class="login-wrapper">
-        <!-- Elementos de fondo flotantes para efecto moderno -->
         <div class="blob-bg blob-1"></div>
         <div class="blob-bg blob-2"></div>
 
         <div class="login-container">
-
-            <!-- PANEL IZQUIERDO (Branding & Experience) -->
+            <!-- PANEL IZQUIERDO -->
             <div class="login-left">
                 <div class="brand-content">
                     <div class="badge-tag">
@@ -30,23 +30,18 @@
                     </div>
                     <h1>MDsUCN</h1>
                     <p>Gestiona dispositivos, usuarios y préstamos de forma profesional, rápida y segura en un solo lugar.</p>
-                    
-                    <!-- CONTENEDOR DE IMAGEN CON BORDES DIFUMINADOS -->
                     <div class="hero-image-container">
-                        <!-- Sustituye la ruta de src por el nombre real de tu imagen -->
                         <img src="{% static 'appOne/img/pix-1.webp' %}" alt="Ilustración MDsUCN" class="faded-hero-img">
                     </div>
                 </div>
-
                 <div class="left-footer">
                     <p>&copy; 2026 UCN. Todos los derechos reservados.</p>
                 </div>
             </div>
 
-            <!-- PANEL DERECHO (Formulario de Acceso) -->
+            <!-- PANEL DERECHO -->
             <div class="login-right">
                 <div class="login-box">
-                    
                     <div class="box-header">
                         <h2>Bienvenido de nuevo</h2>
                         <p>Ingresa tus credenciales para continuar</p>
@@ -54,7 +49,6 @@
 
                     <form method="POST" action="{% url 'login' %}" class="login-form">
                         {% csrf_token %}
-
                         <div class="input-group">
                             <label for="username">Correo institucional</label>
                             <div class="input-field">
@@ -89,15 +83,58 @@
                     {% endif %}
 
                     <div class="extras">
-                        <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        <a href="#" id="openResetModal" class="forgot-link">¿Olvidaste tu contraseña?</a>
                         <a href="{% url 'registro' %}" class="create-link">Crear cuenta nueva</a>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </div>
 
+    <!-- MODAL DE RECUPERACIÓN DE CONTRASEÑA -->
+    <div id="resetModal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" id="closeResetModal">&times;</button>
+            <div class="box-header">
+                <h2>Restablecer contraseña</h2>
+                <p>Ingresa tu correo institucional registrado para enviarte las instrucciones.</p>
+            </div>
+            <form method="POST" action="{% url 'reset_password' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <label for="reset_email">Correo institucional</label>
+                    <div class="input-field">
+                        <i class="ri-mail-line"></i>
+                        <input type="email" id="reset_email" name="email" placeholder="usuario@ucn.edu" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login">
+                    <span>Enviar instrucciones</span>
+                    <i class="ri-send-plane-line"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('resetModal');
+        const openBtn = document.getElementById('openResetModal');
+        const closeBtn = document.getElementById('closeResetModal');
+
+        openBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,42 +1,50 @@
-# appOne/context_processors.py
-from .models import Usuario, Prestamo
+from .models import Usuario, Prestamo, Notificacion
+
 
 def notificaciones_globales(request):
     """
-    Inyecta las notificaciones globales en todas las plantillas HTML
-    sin importar en qué vista se encuentre el usuario.
+    Inyecta las notificaciones del sistema y los conteos de pendientes 
+    en todas las plantillas HTML de forma global.
     """
     if not request.user.is_authenticated:
         return {}
 
     user = request.user
     
-    # 1. Préstamos pendientes de aprobación (para Admins)
-    prestamos_pendientes_admin = Prestamo.objects.filter(
-        estado=Prestamo.ESTADO_PENDIENTE
-    ).select_related('usuario', 'dispositivo').order_by('-fecha_solicitud')
-    
-    # 2. Registros de nuevos usuarios pendientes (para Admins)
-    usuarios_pendientes_admin = Usuario.objects.filter(
-        is_active=False
-    ).order_by('-date_joined')
-    
-    # 3. Guardamos la consulta base de préstamos propios (SIN [:5])
+    # 1. Notificaciones directas del usuario activo
+    notificaciones_usuario = Notificacion.objects.filter(usuario=user)
+    notificaciones_no_leidas_count = notificaciones_usuario.filter(leida=False).count()
+    notificaciones_recientes = notificaciones_usuario[:5]
+
+    # 2. Préstamos propios
     query_prestamos_propios = Prestamo.objects.filter(
         usuario=user
     ).select_related('dispositivo').order_by('-fecha_solicitud')
 
-    # Cálculo del total de pendientes según el rol
+    # 3. Lógica de consultas según el rol
     if user.rol == "Admin" or user.is_superuser:
+        prestamos_pendientes_admin = Prestamo.objects.filter(
+            estado=Prestamo.ESTADO_PENDIENTE
+        ).select_related('usuario', 'dispositivo').order_by('-fecha_solicitud')
+        
+        usuarios_pendientes_admin = Usuario.objects.filter(
+            is_active=False
+        ).order_by('-date_joined')
+
         pendientes_count = prestamos_pendientes_admin.count() + usuarios_pendientes_admin.count()
     else:
-        # Hacemos el .filter() sobre la consulta completa
+        prestamos_pendientes_admin = Prestamo.objects.none()
+        usuarios_pendientes_admin = Usuario.objects.none()
         pendientes_count = query_prestamos_propios.filter(estado=Prestamo.ESTADO_PENDIENTE).count()
 
     return {
+        # Colecciones para vistas y menús contextuales
+        'notificaciones_recientes': notificaciones_recientes,
         'prestamos_pendientes_admin': prestamos_pendientes_admin,
         'usuarios_pendientes_admin': usuarios_pendientes_admin,
-        # Aplicamos el corte [:5] únicamente al enviar la variable a la plantilla
         'prestamos_propios': query_prestamos_propios[:5],
+        
+        # Contadores de alertas y badges
+        'notificaciones_no_leidas_count': notificaciones_no_leidas_count,
         'pendientes_count': pendientes_count,
     }

@@ -1,7 +1,6 @@
+from datetime import time, date
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from django.core.exceptions import ValidationError
-from datetime import time
 from django.core.exceptions import ValidationError
 
 
@@ -60,6 +59,10 @@ class Usuario(AbstractUser):
 
     objects = UsuarioManager()
 
+    class Meta:
+        verbose_name = 'Usuario'
+        verbose_name_plural = 'Usuarios'
+
     def __str__(self):
         return f"{self.nombre_completo} ({self.rol})"
 
@@ -93,8 +96,13 @@ class Dispositivo(models.Model):
     estado = models.CharField(
         max_length=20,
         choices=ESTADO_CHOICES,
-        default=ESTADO_DISPONIBLE
+        default=ESTADO_DISPONIBLE,
+        db_index=True
     )
+
+    class Meta:
+        verbose_name = 'Dispositivo'
+        verbose_name_plural = 'Dispositivos'
 
     def __str__(self):
         return f"{self.nombre_dispositivo} ({self.codigo_inventario}) - {self.get_estado_display()}"
@@ -119,29 +127,30 @@ class Prestamo(models.Model):
     ]
 
     usuario = models.ForeignKey(
-        'Usuario',
+        Usuario,
         on_delete=models.CASCADE,
         related_name="prestamos"
     )
 
     dispositivo = models.ForeignKey(
-        'Dispositivo',
+        Dispositivo,
         on_delete=models.CASCADE,
         related_name="prestamos"
     )
 
     motivo = models.TextField()
-    fecha_uso = models.DateField()
+    fecha_uso = models.DateField(db_index=True)
     hora_inicio = models.TimeField()
     hora_entrega = models.TimeField()
 
     estado = models.CharField(
         max_length=10,
         choices=ESTADO_CHOICES,
-        default=ESTADO_PENDIENTE
+        default=ESTADO_PENDIENTE,
+        db_index=True
     )
 
-    fecha_solicitud = models.DateTimeField(auto_now_add=True)
+    fecha_solicitud = models.DateTimeField(auto_now_add=True, db_index=True)
 
     fecha_devolucion_real = models.DateTimeField(
         blank=True, 
@@ -154,57 +163,86 @@ class Prestamo(models.Model):
         help_text="Estado físico en que se recibe el equipo (daños, accesorios faltantes, etc.)"
     )
 
+    class Meta:
+        verbose_name = 'Préstamo'
+        verbose_name_plural = 'Préstamos'
+
     def clean(self):
+        super().clean()
+
+        # 1. Validar que la fecha de uso no sea pasada
+        if self.fecha_uso and self.fecha_uso < date.today():
+            raise ValidationError({'fecha_uso': "No es posible programar un préstamo para una fecha pasada."})
+
+        # 2. Validar que la hora de entrega sea posterior a la de inicio
         if self.hora_entrega and self.hora_inicio and self.hora_entrega <= self.hora_inicio:
-            raise ValidationError("La hora de entrega debe ser mayor a la hora de inicio.")
+            raise ValidationError({'hora_entrega': "La hora de entrega debe ser posterior a la hora de inicio."})
 
-        if self.dispositivo.estado in [Dispositivo.ESTADO_MANTENIMIENTO, Dispositivo.ESTADO_DANADO]:
-            raise ValidationError(
-                f"El dispositivo no está disponible ({self.dispositivo.get_estado_display()})."
-            )
-
-        prestamos_conflictivos = Prestamo.objects.filter(
-            dispositivo=self.dispositivo,
-            fecha_uso=self.fecha_uso,
-            estado__in=[self.ESTADO_APROBADO, self.ESTADO_PENDIENTE],
-            hora_inicio__lt=self.hora_entrega,
-            hora_entrega__gt=self.hora_inicio
-        ).exclude(pk=self.pk)
-
-        if prestamos_conflictivos.exists():
-            raise ValidationError(
-                "El dispositivo ya cuenta con una solicitud activa en este horario."
-            )
-
-        # 1. Validar horario permitido de servicio (08:00 AM a 05:00 PM / 17:00 PM)
+        # 3. Validar horario permitido de servicio (08:00 AM a 17:00 PM)
         HORA_INICIO_PERMITIDA = time(8, 0)
         HORA_FIN_PERMITIDA = time(17, 0)
 
-        if self.hora_inicio < HORA_INICIO_PERMITIDA or self.hora_entrega > HORA_FIN_PERMITIDA:
-            raise ValidationError("Los préstamos solo pueden realizarse dentro del horario laboral de 08:00 AM a 17:00 PM.")
+        if self.hora_inicio and self.hora_inicio < HORA_INICIO_PERMITIDA:
+            raise ValidationError({'hora_inicio': "La hora de inicio debe ser a partir de las 08:00 AM."})
 
-        # 2. Validar que hora fin sea posterior a inicio
-        if self.hora_entrega and self.hora_inicio and self.hora_entrega <= self.hora_inicio:
-            raise ValidationError("La hora de entrega debe ser posterior a la hora de inicio.")
+        if self.hora_entrega and self.hora_entrega > HORA_FIN_PERMITIDA:
+            raise ValidationError({'hora_entrega': "La hora de entrega no puede superar las 05:00 PM (17:00)."})
 
-        # 3. Validar que el dispositivo no esté dañado o en mantenimiento
-        if self.dispositivo.estado in [Dispositivo.ESTADO_MANTENIMIENTO, Dispositivo.ESTADO_DANADO]:
-            raise ValidationError(f"El equipo no está disponible ({self.dispositivo.get_estado_display()}).")
+        # 4. Validar disponibilidad del estado físico del dispositivo
+        if self.dispositivo_id and self.dispositivo.estado in [Dispositivo.ESTADO_MANTENIMIENTO, Dispositivo.ESTADO_DANADO]:
+            raise ValidationError({'dispositivo': f"El equipo no está disponible ({self.dispositivo.get_estado_display()})."})
 
-        # 4. Validar traslape/solapamiento de horario para la misma fecha
-        prestamos_conflictivos = Prestamo.objects.filter(
-            dispositivo=self.dispositivo,
-            fecha_uso=self.fecha_uso,
-            estado__in=[self.ESTADO_APROBADO, self.ESTADO_PENDIENTE],
-            hora_inicio__lt=self.hora_entrega,
-            hora_entrega__gt=self.hora_inicio
-        ).exclude(pk=self.pk)
+        # 5. Validar traslape/solapamiento de horario
+        if self.dispositivo_id and self.fecha_uso and self.hora_inicio and self.hora_entrega:
+            prestamos_conflictivos = Prestamo.objects.filter(
+                dispositivo=self.dispositivo,
+                fecha_uso=self.fecha_uso,
+                estado__in=[self.ESTADO_APROBADO, self.ESTADO_PENDIENTE],
+                hora_inicio__lt=self.hora_entrega,
+                hora_entrega__gt=self.hora_inicio
+            ).exclude(pk=self.pk)
 
-        if prestamos_conflictivos.exists():
-            raise ValidationError("El equipo ya cuenta con una solicitud o reserva en el rango de horario seleccionado.")
+            if prestamos_conflictivos.exists():
+                raise ValidationError("El equipo ya cuenta con una reserva o solicitud activa en el horario seleccionado.")
 
     def __str__(self):
         return f"{self.dispositivo.nombre_dispositivo} - {self.usuario.nombre_completo} ({self.estado})"
+
+
+# ============================
+#        NOTIFICACIONES
+# ============================
+
+class Notificacion(models.Model):
+
+    TIPO_INFO = 'INFO'
+    TIPO_ALERTA = 'ALERTA'
+    TIPO_URGENTE = 'URGENTE'
+
+    TIPO_CHOICES = [
+        (TIPO_INFO, 'Información'),
+        (TIPO_ALERTA, 'Alerta'),
+        (TIPO_URGENTE, 'Urgente / Retraso'),
+    ]
+
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="notificaciones"
+    )
+    titulo = models.CharField(max_length=100, default="Notificación del sistema")
+    mensaje = models.TextField()
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default=TIPO_INFO)
+    leida = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha_creacion']
+        verbose_name = 'Notificación'
+        verbose_name_plural = 'Notificaciones'
+
+    def __str__(self):
+        return f"[{self.get_tipo_display()}] {self.usuario.nombre_completo} - {self.titulo}"
 
 
 # ============================

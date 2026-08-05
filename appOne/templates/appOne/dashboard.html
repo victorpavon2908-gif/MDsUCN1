@@ -54,7 +54,7 @@
           <span>Dispositivos</span>
         </a>
 
-        {% if request.user.rol == "Admin" %}
+        {% if request.user.rol == "Admin" or request.user.is_superuser %}
         <div class="nav-section-title">ADMINISTRACIÓN</div>
 
         <a href="{% url 'panel_usuarios' %}"
@@ -80,19 +80,17 @@
           <i class="ri-bar-chart-grouped-line"></i>
           <span>Reportes</span>
         </a>
-
-        <a href="{% url 'configuracion' %}"
-          class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">
-          <i class="ri-settings-4-line"></i>
-          <span>Configuración</span>
-        </a>
       </nav>
 
+      <!-- BOTÓN DE CERRAR SESIÓN -->
       <div class="sidebar-footer">
-        <a href="{% url 'logout' %}" class="logout-btn">
-          <i class="ri-logout-box-r-line"></i>
-          <span>Cerrar Sesión</span>
-        </a>
+        <form method="POST" action="{% url 'logout' %}" style="width: 100%;">
+          {% csrf_token %}
+          <button type="submit" class="logout-btn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Cerrar Sesión</span>
+          </button>
+        </form>
       </div>
     </aside>
 
@@ -112,7 +110,7 @@
 
         <div class="topbar-right">
 
-          <!-- RELOJ -->
+          <!-- RELOJ NICARAGUA -->
           <div class="clock-badge">
             <i class="ri-time-line"></i>
             <span id="clock-nicaragua">00:00:00</span>
@@ -136,42 +134,36 @@
               </div>
 
               <div class="dropdown-body">
-                <!-- VISTA PARA ADMINISTRADORES -->
                 {% if request.user.rol == "Admin" or request.user.is_superuser %}
-
                   {% if prestamos_pendientes_admin %}
-                  <div class="notif-section-title" style="padding: 5px 10px; font-weight: bold; font-size: 0.8rem; color: #666;">
-                    SOLICITUDES DE EQUIPO
-                  </div>
-                  {% for p in prestamos_pendientes_admin %}
-                  <a href="{% url 'solicitudes_prestamos' %}" class="notif-card" style="text-decoration: none; color: inherit;">
-                    <div class="notif-avatar" style="background: #e3f2fd; color: #1976d2;">
-                      <i class="ri-computer-line"></i>
-                    </div>
-                    <div class="notif-info">
-                      <strong>{{ p.usuario.nombre_completo }}</strong>
-                      <p>Solicitó: <b>{{ p.dispositivo.nombre_dispositivo }}</b></p>
-                      <small class="text-muted" style="font-size: 0.75rem;">{{ p.fecha_solicitud|timesince }}</small>
-                    </div>
-                  </a>
-                  {% endfor %}
+                    <div class="notif-section-title">SOLICITUDES DE EQUIPO</div>
+                    {% for p in prestamos_pendientes_admin %}
+                    <a href="{% url 'solicitudes_prestamos' %}" class="notif-card">
+                      <div class="notif-avatar notif-blue">
+                        <i class="ri-computer-line"></i>
+                      </div>
+                      <div class="notif-info">
+                        <strong>{{ p.usuario.nombre_completo }}</strong>
+                        <p>Solicitó: <b>{{ p.dispositivo.nombre_dispositivo }}</b></p>
+                        <small class="text-muted">{{ p.fecha_solicitud|timesince }}</small>
+                      </div>
+                    </a>
+                    {% endfor %}
                   {% endif %}
 
                   {% if usuarios_pendientes_admin %}
-                  <div class="notif-section-title" style="padding: 5px 10px; font-weight: bold; font-size: 0.8rem; color: #666;">
-                    USUARIOS PENDIENTES
-                  </div>
-                  {% for u in usuarios_pendientes_admin %}
-                  <a href="{% url 'panel_usuarios' %}" class="notif-card" style="text-decoration: none; color: inherit;">
-                    <div class="notif-avatar" style="background: #fff3e0; color: #f57c00;">
-                      <i class="ri-user-received-line"></i>
-                    </div>
-                    <div class="notif-info">
-                      <strong>{{ u.nombre_completo }}</strong>
-                      <p>Solicitó registro como: {{ u.rol }}</p>
-                    </div>
-                  </a>
-                  {% endfor %}
+                    <div class="notif-section-title">USUARIOS PENDIENTES</div>
+                    {% for u in usuarios_pendientes_admin %}
+                    <a href="{% url 'panel_usuarios' %}" class="notif-card">
+                      <div class="notif-avatar notif-orange">
+                        <i class="ri-user-received-line"></i>
+                      </div>
+                      <div class="notif-info">
+                        <strong>{{ u.nombre_completo }}</strong>
+                        <p>Solicitó registro como: {{ u.rol }}</p>
+                      </div>
+                    </a>
+                    {% endfor %}
                   {% endif %}
 
                   {% if not prestamos_pendientes_admin and not usuarios_pendientes_admin %}
@@ -181,22 +173,21 @@
                   </div>
                   {% endif %}
 
-                <!-- VISTA PARA USUARIOS NORMALES -->
                 {% else %}
                   {% if prestamos_propios %}
-                  {% for p in prestamos_propios %}
-                  <a href="{% url 'solicitudes_prestamos' %}" class="notif-card" style="text-decoration: none; color: inherit;">
-                    <div class="notif-avatar">
-                      {% if p.estado == 'Pendiente' %}<i class="ri-time-line" style="color: #f57c00;"></i>
-                      {% elif p.estado == 'Aprobado' %}<i class="ri-checkbox-circle-line" style="color: #388e3c;"></i>
-                      {% else %}<i class="ri-close-circle-line" style="color: #d32f2f;"></i>{% endif %}
-                    </div>
-                    <div class="notif-info">
-                      <strong>{{ p.dispositivo.nombre_dispositivo }}</strong>
-                      <p>Estado: <b>{{ p.get_estado_display }}</b></p>
-                    </div>
-                  </a>
-                  {% endfor %}
+                    {% for p in prestamos_propios %}
+                    <a href="{% url 'solicitudes_prestamos' %}" class="notif-card">
+                      <div class="notif-avatar">
+                        {% if p.estado == 'pendiente' %}<i class="ri-time-line text-orange"></i>
+                        {% elif p.estado == 'aprobado' %}<i class="ri-checkbox-circle-line text-green"></i>
+                        {% else %}<i class="ri-close-circle-line text-red"></i>{% endif %}
+                      </div>
+                      <div class="notif-info">
+                        <strong>{{ p.dispositivo.nombre_dispositivo }}</strong>
+                        <p>Estado: <b>{{ p.get_estado_display }}</b></p>
+                      </div>
+                    </a>
+                    {% endfor %}
                   {% else %}
                   <div class="empty-notif">
                     <i class="ri-checkbox-circle-line"></i>
@@ -204,24 +195,39 @@
                   </div>
                   {% endif %}
                 {% endif %}
-
               </div>
             </div>
           </div>
 
-          <!-- PERFIL USUARIO (DENTRO DE TOPBAR-RIGHT) -->
+          <!-- PERFIL USUARIO -->
           <div class="user-profile">
             <div class="user-avatar">
-              {{ request.user.username|slice:":2"|upper }}
+              {% if request.user.nombre_completo %}
+                {{ request.user.nombre_completo|slice:":2"|upper }}
+              {% else %}
+                {{ request.user.correo_institucional|slice:":2"|upper }}
+              {% endif %}
             </div>
             <div class="user-meta">
-              <span class="user-name">{{ request.user.username }}</span>
-              <span class="user-role">{{ request.user.rol|default:"Usuario" }}</span>
+              <span class="user-name">{{ request.user.nombre_completo|default:request.user.username }}</span>
+              <span class="user-role">{{ request.user.get_rol_display|default:request.user.rol }}</span>
             </div>
           </div>
 
-        </div> <!-- CIERRA topbar-right -->
-      </header> <!-- CIERRA topbar -->
+        </div>
+      </header>
+
+      <!-- MENSAJES FLASH -->
+      {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i class="{% if message.tags == 'error' %}ri-error-warning-line{% else %}ri-checkbox-circle-line{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
 
       <!-- CONTENIDO DINÁMICO -->
       <main class="content-body">
@@ -233,9 +239,9 @@
         <p>© 2026 <strong>MDsUCN</strong> — Plataforma Profesional de Gestión</p>
       </footer>
 
-    </div> <!-- CIERRA main-wrapper -->
+    </div>
 
-  </div> <!-- CIERRA app-layout -->
+  </div>
 
   <!-- SCRIPT BASE -->
   <script>
@@ -256,18 +262,16 @@
       setInterval(actualizarHoraNicaragua, 1000);
       actualizarHoraNicaragua();
 
-      // 2. Control del Sidebar (Desktop Colapso & Móvil Toggle)
+      // 2. Control del Sidebar
       const sidebar = document.getElementById('sidebar');
       const toggleSidebarBtn = document.getElementById('toggleSidebar');
       const mobileToggleBtn = document.getElementById('mobileToggle');
       const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-      // Cargar estado colapsado desde localStorage
       if (localStorage.getItem('sidebar-collapsed') === 'true') {
         sidebar?.classList.add('collapsed');
       }
 
-      // Colapsar / Expandir Sidebar en Escritorio
       if (toggleSidebarBtn && sidebar) {
         toggleSidebarBtn.addEventListener('click', () => {
           sidebar.classList.toggle('collapsed');
@@ -276,7 +280,6 @@
         });
       }
 
-      // Abrir / Cerrar Sidebar en Móvil
       function toggleMobileSidebar() {
         sidebar?.classList.toggle('mobile-open');
         sidebarOverlay?.classList.toggle('show');
@@ -285,7 +288,7 @@
       if (mobileToggleBtn) mobileToggleBtn.addEventListener('click', toggleMobileSidebar);
       if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleMobileSidebar);
 
-      // 3. Toggle Dropdown Notificaciones
+      // 3. Dropdown Notificaciones
       const notifBtn = document.getElementById('notifBtn');
       const notifDropdown = document.getElementById('notifDropdown');
 

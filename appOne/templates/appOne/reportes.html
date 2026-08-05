@@ -9,47 +9,74 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-    /* Estilos del botón de impresión */
-    .btn-imprimir {
+    /* Estilos de Botones de Acción y Filtros */
+    .actions-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
         background-color: var(--primary, #019446);
         color: #ffffff;
         border: none;
-        padding: 8px 16px;
+        padding: 8px 14px;
         border-radius: 8px;
         font-weight: 600;
         font-size: 13px;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         cursor: pointer;
-        transition: background-color 0.2s ease, transform 0.1s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        text-decoration: none;
     }
 
-    .btn-imprimir:hover {
+    .btn-action:hover {
         background-color: #017a3a;
         transform: translateY(-1px);
+        color: #ffffff;
+    }
+
+    .btn-action.btn-secondary-action {
+        background-color: #f1f5f9;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+        box-shadow: none;
+    }
+
+    .btn-action.btn-secondary-action:hover {
+        background-color: #e2e8f0;
+        color: #0f172a;
     }
 
     /* =========================================================
        REGLAS DE IMPRESIÓN COMPACTA (1 SOLA HOJA LEGAL / OFICIO)
     ========================================================= */
     @media print {
-        /* Configuración de Hoja Legal / Oficio (8.5 x 14 pulg / 216mm x 356mm) */
         @page {
             size: legal portrait;
-            margin: 5mm 8mm; /* Márgenes ultrasemilimpios para ganar espacio vertical */
+            margin: 5mm 8mm;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
-            overflow: hidden !important; /* Forzar que no haya desbordamiento */
+            overflow: hidden !important;
             background: #ffffff !important;
         }
 
-        /* Ocultar elementos irrelevantes de la interfaz */
-        nav, sidebar, .sidebar, .navbar, .topbar, header:not(.header-reportes), 
-        footer, .btn-imprimir, .btn-ver-todo {
+        nav,
+        sidebar,
+        .sidebar,
+        .navbar,
+        .topbar,
+        header:not(.header-reportes),
+        footer,
+        .actions-bar,
+        .btn-ver-todo {
             display: none !important;
         }
 
@@ -60,7 +87,6 @@
             width: 100% !important;
         }
 
-        /* Header ultra compacto */
         .header-reportes {
             margin-bottom: 10px !important;
         }
@@ -74,7 +100,6 @@
             font-size: 11px !important;
         }
 
-        /* KPIs / Cards en fila horizontal ultracorta */
         .cards {
             display: grid !important;
             grid-template-columns: repeat(3, 1fr) !important;
@@ -109,10 +134,9 @@
             font-size: 18px !important;
         }
 
-        /* Gráficos compactos de 3 en línea */
         .graficos {
             display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important; /* Los 3 gráficos uno al lado del otro */
+            grid-template-columns: repeat(3, 1fr) !important;
             gap: 8px !important;
             margin-bottom: 10px !important;
         }
@@ -125,7 +149,7 @@
         }
 
         .grafico.full {
-            grid-column: span 1 !important; /* Cancela el ancho completo para no gastar espacio */
+            grid-column: span 1 !important;
         }
 
         .grafico h2 {
@@ -134,12 +158,11 @@
         }
 
         canvas {
-            max-height: 140px !important; /* Altura controlada para los canvas */
+            max-height: 140px !important;
             height: 140px !important;
             width: 100% !important;
         }
 
-        /* Tabla y Auditoría Ajustadas */
         .auditoria-section {
             padding: 10px !important;
             border: 1px solid #cbd5e1 !important;
@@ -187,7 +210,6 @@
             font-size: 9px !important;
         }
 
-        /* Forzar renderizado exacto de colores de fondo */
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -200,15 +222,21 @@
 
 <div class="reportes-container">
 
-    <!-- HEADER CON BOTÓN DE IMPRESIÓN -->
-    <div class="header-reportes" style="display: flex; justify-content: space-between; align-items: center;">
+    <!-- HEADER CON BARRA DE ACCIONES -->
+    <div class="header-reportes"
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div>
             <h1>Panel de Reportes & Auditoría</h1>
             <p>Métricas operativas del sistema e historial de actividades de usuarios</p>
         </div>
-        <button onclick="window.print()" class="btn-imprimir">
-            <i class="ri-printer-line" style="font-size: 16px;"></i> Imprimir
-        </button>
+        <div class="actions-bar">
+            <button onclick="exportarAuditoriaCSV()" class="btn-action btn-secondary-action" title="Exportar Bitácora">
+                <i class="ri-file-excel-2-line"></i> Exportar CSV
+            </button>
+            <button onclick="window.print()" class="btn-action">
+                <i class="ri-printer-line"></i> Imprimir Reporte
+            </button>
+        </div>
     </div>
 
     <!-- ===== CARDS (KPIs) ===== -->
@@ -216,7 +244,7 @@
         <div class="card">
             <i class="ri-computer-line"></i>
             <div>
-                <h3>Dispositivos</h3>
+                <h3>Dispositivos Registrados</h3>
                 <p>{{ total_dispositivos }}</p>
             </div>
         </div>
@@ -230,9 +258,9 @@
         </div>
 
         <div class="card">
-            <i class="ri-exchange-dollar-line"></i>
+            <i class="ri-exchange-line"></i>
             <div>
-                <h3>Préstamos</h3>
+                <h3>Total Préstamos</h3>
                 <p>{{ total_prestamos }}</p>
             </div>
         </div>
@@ -251,7 +279,7 @@
         </div>
 
         <div class="grafico full">
-            <h2>Dispositivos Solicitados</h2>
+            <h2>Dispositivos Más Solicitados</h2>
             <canvas id="dispositivosChart"></canvas>
         </div>
     </div>
@@ -261,19 +289,19 @@
         <div class="auditoria-header">
             <div>
                 <h2>Bitácora de Auditoría</h2>
-                <p>Registro en tiempo real de operaciones de usuarios</p>
+                <p>Registro en tiempo real de operaciones realizadas en el sistema</p>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table-reportes">
+            <table class="table-reportes" id="tablaAuditoria">
                 <thead>
                     <tr>
                         <th>Fecha y Hora</th>
                         <th>Usuario</th>
                         <th>Acción</th>
                         <th>Módulo / Tabla</th>
-                        <th>ID</th>
+                        <th>ID Reg.</th>
                         <th>Detalles</th>
                     </tr>
                 </thead>
@@ -289,29 +317,30 @@
                                     {{ log.usuario.username|slice:":1"|upper|default:"S" }}
                                 </span>
                                 <span class="user-name">
-                                    {% if log.usuario %}{{ log.usuario.nombre_completo|default:log.usuario.username }}{% else %}Sistema{% endif %}
+                                    {% if log.usuario %}{{ log.usuario.nombre_completo|default:log.usuario.username }}{%
+                                    else %}Sistema{% endif %}
                                 </span>
                             </div>
                         </td>
                         <td>
                             {% if log.accion == 'CREAR' %}
-                                <span class="badge badge-success">Creación</span>
+                            <span class="badge badge-success">Creación</span>
                             {% elif log.accion == 'EDITAR' %}
-                                <span class="badge badge-info">Edición</span>
+                            <span class="badge badge-info">Edición</span>
                             {% elif log.accion == 'ELIMINAR' %}
-                                <span class="badge badge-danger">Eliminación</span>
+                            <span class="badge badge-danger">Eliminación</span>
                             {% elif log.accion == 'LOGIN' %}
-                                <span class="badge badge-purple">Login</span>
+                            <span class="badge badge-purple">Login</span>
                             {% else %}
-                                <span class="badge badge-warning">{{ log.accion }}</span>
+                            <span class="badge badge-warning">{{ log.accion }}</span>
                             {% endif %}
                         </td>
                         <td class="font-medium">{{ log.tabla_afectada }}</td>
                         <td>
                             {% if log.registro_id %}
-                                <code class="id-code">#{{ log.registro_id }}</code>
+                            <code class="id-code">#{{ log.registro_id }}</code>
                             {% else %}
-                                <span class="text-muted">-</span>
+                            <span class="text-muted">-</span>
                             {% endif %}
                         </td>
                         <td class="text-details" title="{{ log.detalles }}">
@@ -335,15 +364,129 @@
 
 </div>
 
+<!-- DATA SERIALIZADA PARA CHART.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
-    const estadosLabels = {{ estados_labels|safe }};
-    const estadosData = {{ estados_data|safe }};
+    const estadosLabels = {{ estados_labels| safe }};
+    const estadosData = {{ estados_data| safe }};
 
-    const diasLabels = {{ dias|safe }};
-    const diasData = {{ prestamos_por_dia|safe }};
+    const diasLabels = {{ dias| safe }};
+    const diasData = {{ prestamos_por_dia| safe }};
 
-    const dispositivosLabels = {{ dispositivos_labels|safe }};
-    const dispositivosData = {{ dispositivos_data|safe }};
+    const dispositivosLabels = {{ dispositivos_labels| safe }};
+    const dispositivosData = {{ dispositivos_data| safe }};
+
+    // Función de exportación de tabla a CSV directo en el navegador
+    async function exportarAuditoriaCSV() {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Bitácora de Auditoría');
+
+        // 1. Título Corporativo principal
+        worksheet.mergeCells('A1:F1');
+        const titleCell = worksheet.getCell('A1');
+        titleCell.value = 'REPORTE DE BITÁCORA DE AUDITORÍA';
+        titleCell.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FFFFFF' } };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '019446' } }; // Verde primario
+        titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getRow(1).height = 35;
+
+        // Subtítulo con fecha
+        worksheet.mergeCells('A2:F2');
+        const subTitleCell = worksheet.getCell('A2');
+        subTitleCell.value = `Generado el: ${new Date().toLocaleString()}`;
+        subTitleCell.font = { name: 'Arial', size: 9, italic: true, color: { argb: '64748B' } };
+        subTitleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getRow(2).height = 20;
+
+        worksheet.addRow([]); // Fila vacía de separación
+
+        // 2. Encabezados de la Tabla
+        const headers = ['Fecha y Hora', 'Usuario', 'Acción', 'Módulo / Tabla', 'ID Reg.', 'Detalles'];
+        const headerRow = worksheet.addRow(headers);
+        headerRow.height = 25;
+
+        headerRow.eachCell((cell) => {
+            cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FFFFFF' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0F172A' } }; // Azul oscuro corporativo
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'CBD5E1' } },
+                bottom: { style: 'medium', color: { argb: '019446' } }
+            };
+        });
+
+        // 3. Extracción y formateo de datos
+        const tabla = document.getElementById('tablaAuditoria');
+        const filasHTML = tabla.querySelectorAll('tbody tr');
+
+        filasHTML.forEach((tr, index) => {
+            const celdas = tr.querySelectorAll('td');
+            if (celdas.length < 6) return;
+
+            const rowData = [
+                celdas[0].innerText.trim(),
+                celdas[1].innerText.trim(),
+                celdas[2].innerText.trim(),
+                celdas[3].innerText.trim(),
+                celdas[4].innerText.trim(),
+                celdas[5].innerText.trim()
+            ];
+
+            const row = worksheet.addRow(rowData);
+            row.height = 22;
+
+            // Estilo alternado de filas (Zebra Striping)
+            const isEven = index % 2 === 0;
+            const bgRowColor = isEven ? 'FFFFFF' : 'F8FAFC';
+
+            row.eachCell((cell, colNumber) => {
+                cell.font = { name: 'Arial', size: 10, color: { argb: '334155' } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgRowColor } };
+                cell.alignment = { vertical: 'middle', horizontal: colNumber === 1 || colNumber === 5 ? 'center' : 'left' };
+                cell.border = {
+                    bottom: { style: 'thin', color: { argb: 'E2E8F0' } },
+                    left: { style: 'thin', color: { argb: 'F1F5F9' } },
+                    right: { style: 'thin', color: { argb: 'F1F5F9' } }
+                };
+
+                // Estilos específicos para la columna de Acción (Badges)
+                if (colNumber === 3) {
+                    const accion = cell.value.toUpperCase();
+                    cell.font = { name: 'Arial', size: 10, bold: true };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+
+                    if (accion.includes('CREACI')) cell.font.color = { argb: '019446' };
+                    else if (accion.includes('EDI')) cell.font.color = { argb: '0284C7' };
+                    else if (accion.includes('ELIM')) cell.font.color = { argb: 'EF4444' };
+                    else if (accion.includes('LOGIN')) cell.font.color = { argb: '9333EA' };
+                    else cell.font.color = { argb: 'F59E0B' };
+                }
+            });
+        });
+
+        // 4. Autoajuste del ancho de las columnas
+        worksheet.columns.forEach((column, i) => {
+            let maxLength = 0;
+            column.eachCell({ includeEmpty: true }, (cell) => {
+                const columnLength = cell.value ? cell.value.toString().length : 10;
+                if (columnLength > maxLength) maxLength = columnLength;
+            });
+            column.width = Math.max(maxLength + 4, 14);
+        });
+
+        // Ancho fijo personalizado para Detalles
+        worksheet.getColumn(6).width = 45;
+
+        // 5. Descargar archivo XLSX
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `bitacora_auditoria_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

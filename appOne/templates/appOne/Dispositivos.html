@@ -338,50 +338,25 @@
     }
 
     function abrirPrestamo(id) {
-        fetch(`/prestamo/modal/${id}/`, {
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-        })
-        .then(r => r.text())
-        .then(html => {
-            const contenedor = document.getElementById("contenidoPrestamo");
-            contenedor.innerHTML = html;
-            document.getElementById("modalPrestamo").classList.add("active");
+    fetch(`/prestamo/modal/${id}/`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(r => r.text())
+    .then(html => {
+        const contenedor = document.getElementById("contenidoPrestamo");
+        contenedor.innerHTML = html;
+        document.getElementById("modalPrestamo").classList.add("active");
 
-            Array.from(contenedor.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
-
-            const form = document.getElementById("formCrearPrestamo");
-            if (form) {
-                form.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    const formData = new FormData(form);
-
-                    fetch(form.action, {
-                        method: "POST",
-                        body: formData,
-                        headers: { "X-Requested-With": "XMLHttpRequest" }
-                    })
-                    .then(response => {
-                        if (response.redirected) {
-                            window.location.href = response.url;
-                        } else {
-                            return response.json();
-                        }
-                    })
-                    .then(data => {
-                        if (data && !data.success) {
-                            alert(data.message || "Ocurrió un error al procesar el préstamo.");
-                        }
-                    })
-                    .catch(error => console.error("Error al enviar la solicitud:", error));
-                });
-            }
+        // Ejecutar únicamente los scripts internos de la plantilla devuelta
+        Array.from(contenedor.querySelectorAll("script")).forEach(oldScript => {
+            const newScript = document.createElement("script");
+            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+            oldScript.parentNode.replaceChild(newScript, oldScript);
         });
-    }
+    })
+    .catch(error => console.error("Error al abrir el modal:", error));
+}
 
     function cerrarModalPrestamo() {
         document.getElementById("modalPrestamo").classList.remove("active");

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MDsUCN DASHBOARD SYSTEM BASE - ULTRA PRO CSS (CORREGIDO)
+   MDsUCN DASHBOARD SYSTEM BASE - ULTRA PRO CSS
    ========================================================================== */
 
 :root {
@@ -78,9 +78,7 @@ body {
   background: rgba(100, 116, 139, 0.4);
 }
 
-/* ==========================================================================
-   0. OVERLAY MÓVIL
-   ========================================================================== */
+/* Overlay Móvil */
 .sidebar-overlay {
   position: fixed;
   inset: 0;
@@ -97,9 +95,7 @@ body {
   visibility: visible;
 }
 
-/* ==========================================================================
-   1. SIDEBAR BASE & DESKTOP COLLAPSE
-   ========================================================================== */
+/* Sidebar Base */
 .sidebar {
   width: var(--sidebar-width);
   background: linear-gradient(180deg, #091710 0%, #012411 100%);
@@ -248,7 +244,11 @@ body {
   gap: 10px;
   padding: 10px 14px;
   color: #fca5a5;
-  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
   font-size: 0.88rem;
   font-weight: 600;
   border-radius: var(--radius-md);
@@ -266,9 +266,7 @@ body {
   color: #ef4444;
 }
 
-/* --------------------------------------------------------------------------
-   ESTADO COLAPSADO (DESKTOP)
-   -------------------------------------------------------------------------- */
+/* Estado Colapsado */
 @media (min-width: 993px) {
   .sidebar.collapsed .toggle-sidebar-btn i {
     transform: rotate(180deg);
@@ -312,9 +310,7 @@ body {
   }
 }
 
-/* ==========================================================================
-   2. MAIN WRAPPER & TOPBAR
-   ========================================================================== */
+/* Main Wrapper & Topbar */
 .main-wrapper {
   margin-left: var(--sidebar-width);
   flex: 1;
@@ -378,7 +374,7 @@ body {
   gap: 20px;
 }
 
-/* Clock */
+/* Clock Badge */
 .clock-badge {
   display: flex;
   align-items: center;
@@ -397,7 +393,7 @@ body {
   font-size: 1rem;
 }
 
-/* Icon Buttons & Dropdown */
+/* Icon Buttons & Dropdowns */
 .dropdown-wrapper {
   position: relative;
 }
@@ -434,7 +430,6 @@ body {
   border: 2px solid white;
 }
 
-/* Notifications Dropdown */
 .dropdown-menu {
   position: absolute;
   right: 0;
@@ -487,12 +482,22 @@ body {
   overflow-y: auto;
 }
 
+.notif-section-title {
+  padding: 8px 18px 4px 18px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
 .notif-card {
   display: flex;
   gap: 12px;
   padding: 12px 18px;
   border-bottom: 1px solid var(--border-color);
   align-items: center;
+  text-decoration: none;
+  color: inherit;
   transition: var(--transition);
 }
 
@@ -512,6 +517,16 @@ body {
   flex-shrink: 0;
 }
 
+.notif-avatar.notif-blue {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.notif-avatar.notif-orange {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
 .notif-info strong {
   display: block;
   font-size: 0.85rem;
@@ -521,6 +536,10 @@ body {
 .notif-info p {
   font-size: 0.78rem;
   color: var(--text-muted);
+}
+
+.notif-info small {
+  font-size: 0.75rem;
 }
 
 .empty-notif {
@@ -576,9 +595,34 @@ body {
   color: var(--text-muted);
 }
 
-/* ==========================================================================
-   3. CONTENT BODY & FOOTER
-   ========================================================================== */
+/* Utility Colors */
+.text-orange { color: #f57c00; }
+.text-green { color: #388e3c; }
+.text-red { color: #d32f2f; }
+
+/* Messages / Alerts */
+.messages-container {
+  padding: 15px 25px 0 25px;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.alert-error {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* Content & Footer */
 .content-body {
   padding: 28px;
   flex: 1;
@@ -593,9 +637,7 @@ body {
   background: var(--surface-card);
 }
 
-/* ==========================================================================
-   4. RESPONSIVE BREAKPOINTS
-   ========================================================================== */
+/* Responsive Breakpoints */
 @media (max-width: 992px) {
   .sidebar {
     transform: translateX(-100%);

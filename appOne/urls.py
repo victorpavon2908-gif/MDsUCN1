@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views  # Importa las vistas del paquete views/
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -50,7 +50,7 @@ urlpatterns = [
     path('devolver_prestamo/<int:id>/', views.devolver_prestamo, name='devolver_prestamo'),
     path('prestamos/rechazar/<int:id>/', views.rechazar_prestamo, name='rechazar_prestamo'),
     path('eliminar-historial/', views.eliminar_historial_prestamos, name='eliminar_historial_prestamos'),
-    path('restaurar-historial/', views.restaurar_historial_todos, name='restaurar_historial_todos'), # <-- ¡Agregada aquí!
+    path('restaurar-historial/', views.restaurar_historial_todos, name='restaurar_historial_todos'),
     path('reportes/', views.reportes, name='reportes'),
 
     # =========================
@@ -62,21 +62,37 @@ urlpatterns = [
     path("configuracion/database/", views.config_database, name="config_database"),
 
     # =========================
-    # PASSWORD RESET
+    # PASSWORD RESET (MODAL INTEGRADO)
     # =========================
-    path('reset_password/', 
-         auth_views.PasswordResetView.as_view(template_name="appOne/registration/password_reset.html"), 
-         name="reset_password"),
-         
-    path('reset_password_sent/', 
-         auth_views.PasswordResetDoneView.as_view(template_name="appOne/registration/password_reset_sent.html"), 
-         name="password_reset_done"),
-         
-    path('reset/<uidb64>/<token>/', 
-         auth_views.PasswordResetConfirmView.as_view(template_name="appOne/registration/password_reset_form.html"), 
-         name="password_reset_confirm"),
-         
-    path('reset_password_complete/', 
-         auth_views.PasswordResetCompleteView.as_view(template_name="appOne/registration/password_reset_done.html"), 
-         name="password_reset_complete"),
+    path(
+        'reset_password/',
+        auth_views.PasswordResetView.as_view(
+            template_name='appOne/login.html',
+            email_template_name='appOne/password_reset_email.html',
+            subject_template_name='appOne/password_reset_subject.txt',
+            success_url='/reset_password_sent/'
+        ),
+        name='reset_password'
+    ),
+    path(
+        'reset_password_sent/',
+        auth_views.PasswordResetDoneView.as_view(
+            template_name='appOne/password_reset_done.html'
+        ),
+        name='password_reset_done'
+    ),
+    path(
+        'reset/<uidb64>/<token>/',
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name='appOne/password_reset_confirm.html'
+        ),
+        name='password_reset_confirm'
+    ),
+    path(
+        'reset_password_complete/',
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name='appOne/password_reset_complete.html'
+        ),
+        name='password_reset_complete'
+    ),
 ]
